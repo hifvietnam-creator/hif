@@ -2,7 +2,11 @@
   "crons": [
     {
       "path": "/api/cron/restream",
-      "schedule": "* * * * *"
+      "schedule": "0 3 * * 0"
+    },
+    {
+      "path": "/api/cron/restream",
+      "schedule": "0 6 * * 0"
     },
     {
       "path": "/api/cron/sync-sermons",
