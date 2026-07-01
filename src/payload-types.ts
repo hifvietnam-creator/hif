@@ -72,6 +72,14 @@ export interface Config {
     media: Media;
     categories: Category;
     users: User;
+    sermons: Sermon;
+    series: Series;
+    team: Team;
+    locations: Location;
+    testimonies: Testimony;
+    fellowships: Fellowship;
+    groups: Group;
+    'city-partners': CityPartner;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -94,6 +102,14 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     categories: CategoriesSelect<false> | CategoriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    sermons: SermonsSelect<false> | SermonsSelect<true>;
+    series: SeriesSelect<false> | SeriesSelect<true>;
+    team: TeamSelect<false> | TeamSelect<true>;
+    locations: LocationsSelect<false> | LocationsSelect<true>;
+    testimonies: TestimoniesSelect<false> | TestimoniesSelect<true>;
+    fellowships: FellowshipsSelect<false> | FellowshipsSelect<true>;
+    groups: GroupsSelect<false> | GroupsSelect<true>;
+    'city-partners': CityPartnersSelect<false> | CityPartnersSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -106,16 +122,22 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: string;
+    defaultIDType: number;
   };
   fallbackLocale: null;
   globals: {
     header: Header;
     footer: Footer;
+    'live-stream': LiveStream;
+    'media-highlights': MediaHighlight;
+    'site-settings': SiteSetting;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    'live-stream': LiveStreamSelect<false> | LiveStreamSelect<true>;
+    'media-highlights': MediaHighlightsSelect<false> | MediaHighlightsSelect<true>;
+    'site-settings': SiteSettingsSelect<false> | SiteSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -124,6 +146,10 @@ export interface Config {
   user: User;
   jobs: {
     tasks: {
+      'sync-pco-groups': TaskSyncPcoGroups;
+      'sync-sermons': TaskSyncSermons;
+      'sync-testimonies': TaskSyncTestimonies;
+      'sync-restream-status': TaskSyncRestreamStatus;
       schedulePublish: TaskSchedulePublish;
       inline: {
         input: unknown;
@@ -156,7 +182,7 @@ export interface UserAuthOperations {
  * via the `definition` "pages".
  */
 export interface Page {
-  id: string;
+  id: number;
   title: string;
   hero: {
     type: 'none' | 'highImpact' | 'mediumImpact' | 'lowImpact';
@@ -183,11 +209,11 @@ export interface Page {
             reference?:
               | ({
                   relationTo: 'pages';
-                  value: string | Page;
+                  value: number | Page;
                 } | null)
               | ({
                   relationTo: 'posts';
-                  value: string | Post;
+                  value: number | Post;
                 } | null);
             url?: string | null;
             label: string;
@@ -199,7 +225,7 @@ export interface Page {
           id?: string | null;
         }[]
       | null;
-    media?: (string | null) | Media;
+    media?: (number | null) | Media;
   };
   layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
   meta?: {
@@ -207,7 +233,7 @@ export interface Page {
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
@@ -225,9 +251,9 @@ export interface Page {
  * via the `definition` "posts".
  */
 export interface Post {
-  id: string;
+  id: number;
   title: string;
-  heroImage?: (string | null) | Media;
+  heroImage?: (number | null) | Media;
   content: {
     root: {
       type: string;
@@ -243,18 +269,18 @@ export interface Post {
     };
     [k: string]: unknown;
   };
-  relatedPosts?: (string | Post)[] | null;
-  categories?: (string | Category)[] | null;
+  relatedPosts?: (number | Post)[] | null;
+  categories?: (number | Category)[] | null;
   meta?: {
     title?: string | null;
     /**
      * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
      */
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
     description?: string | null;
   };
   publishedAt?: string | null;
-  authors?: (string | User)[] | null;
+  authors?: (number | User)[] | null;
   populatedAuthors?:
     | {
         id?: string | null;
@@ -275,7 +301,7 @@ export interface Post {
  * via the `definition` "media".
  */
 export interface Media {
-  id: string;
+  id: number;
   alt?: string | null;
   caption?: {
     root: {
@@ -292,7 +318,7 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
-  folder?: (string | null) | FolderInterface;
+  folder?: (number | null) | FolderInterface;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -368,18 +394,18 @@ export interface Media {
  * via the `definition` "payload-folders".
  */
 export interface FolderInterface {
-  id: string;
+  id: number;
   name: string;
-  folder?: (string | null) | FolderInterface;
+  folder?: (number | null) | FolderInterface;
   documentsAndFolders?: {
     docs?: (
       | {
           relationTo?: 'payload-folders';
-          value: string | FolderInterface;
+          value: number | FolderInterface;
         }
       | {
           relationTo?: 'media';
-          value: string | Media;
+          value: number | Media;
         }
     )[];
     hasNextPage?: boolean;
@@ -394,17 +420,17 @@ export interface FolderInterface {
  * via the `definition` "categories".
  */
 export interface Category {
-  id: string;
+  id: number;
   title: string;
   /**
    * When enabled, the slug will auto-generate from the title field on save and autosave.
    */
   generateSlug?: boolean | null;
   slug: string;
-  parent?: (string | null) | Category;
+  parent?: (number | null) | Category;
   breadcrumbs?:
     | {
-        doc?: (string | null) | Category;
+        doc?: (number | null) | Category;
         url?: string | null;
         label?: string | null;
         id?: string | null;
@@ -418,7 +444,7 @@ export interface Category {
  * via the `definition` "users".
  */
 export interface User {
-  id: string;
+  id: number;
   name?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -467,11 +493,11 @@ export interface CallToActionBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -517,11 +543,11 @@ export interface ContentBlock {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -542,7 +568,7 @@ export interface ContentBlock {
  * via the `definition` "MediaBlock".
  */
 export interface MediaBlock {
-  media: string | Media;
+  media: number | Media;
   id?: string | null;
   blockName?: string | null;
   blockType: 'mediaBlock';
@@ -569,12 +595,12 @@ export interface ArchiveBlock {
   } | null;
   populateBy?: ('collection' | 'selection') | null;
   relationTo?: 'posts' | null;
-  categories?: (string | Category)[] | null;
+  categories?: (number | Category)[] | null;
   limit?: number | null;
   selectedDocs?:
     | {
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       }[]
     | null;
   id?: string | null;
@@ -586,7 +612,7 @@ export interface ArchiveBlock {
  * via the `definition` "FormBlock".
  */
 export interface FormBlock {
-  form: string | Form;
+  form: number | Form;
   enableIntro?: boolean | null;
   introContent?: {
     root: {
@@ -612,7 +638,7 @@ export interface FormBlock {
  * via the `definition` "forms".
  */
 export interface Form {
-  id: string;
+  id: number;
   title: string;
   fields?:
     | (
@@ -783,10 +809,382 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sermons".
+ */
+export interface Sermon {
+  id: number;
+  title: string;
+  /**
+   * 2–3 sentence summary shown on the sermon listing page.
+   */
+  description?: string | null;
+  /**
+   * Full YouTube watch URL, e.g. https://www.youtube.com/watch?v=...
+   */
+  youtubeURL?: string | null;
+  /**
+   * Sermon card image for the listing page.
+   */
+  thumbnail?: (number | null) | Media;
+  /**
+   * Shown above the video on the sermon page. Use a link (OneDrive, Google Docs…), upload a PDF, or type the questions directly to display them as an accordion.
+   */
+  discussionQuestions?: {
+    type?: ('none' | 'url' | 'upload' | 'inline') | null;
+    /**
+     * Paste the share link — OneDrive, Google Docs, Dropbox, etc.
+     */
+    url?: string | null;
+    file?: (number | null) | Media;
+    /**
+     * Type your discussion questions. Displayed as a collapsible accordion on the sermon page.
+     */
+    questionsText?: string | null;
+  };
+  /**
+   * Upload a PDF directly to Payload. Use the URL field below for OneDrive / cloud links.
+   */
+  sermonPDF?: (number | null) | Media;
+  /**
+   * Paste an OneDrive, Google Drive, or Dropbox share link to the PDF. Used instead of uploading.
+   */
+  sermonPdfUrl?: string | null;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * Sermon date — used for year filter and sorting.
+   */
+  date: string;
+  /**
+   * Drives the speaker filter on /sermons.
+   */
+  speaker?: (number | null) | Team;
+  series?: (number | null) | Series;
+  /**
+   * e.g. John 3:16–21
+   */
+  scripture?: string | null;
+  /**
+   * e.g. 44 min
+   */
+  duration?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team".
+ */
+export interface Team {
+  id: number;
+  name: string;
+  /**
+   * e.g. Senior Pastor, Worship Director, Kids Ministry Lead
+   */
+  role: string;
+  photo?: (number | null) | Media;
+  /**
+   * Short bio shown on the About / Team page.
+   */
+  bio?: string | null;
+  /**
+   * Optional — only shown if you choose to display it.
+   */
+  email?: string | null;
+  campus?: ('tay-ho' | 'nam-tu-liem' | 'online' | 'all') | null;
+  /**
+   * e.g. Worship, Children, Connect Groups
+   */
+  ministryArea?: string | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Check for actual HIF staff. Uncheck for guest speakers imported from YouTube — they can still be credited on sermons but won't appear on the About page.
+   */
+  staffMember?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series".
+ */
+export interface Series {
+  id: number;
+  title: string;
+  description?: string | null;
+  artwork?: (number | null) | Media;
+  meta?: {
+    title?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+    description?: string | null;
+  };
+  /**
+   * e.g. 2025
+   */
+  year?: number | null;
+  /**
+   * Mark this as the current series. Only one should be active at a time.
+   */
+  isActive?: boolean | null;
+  /**
+   * The playlist ID from YouTube — used by yt-fetch-sermons.mjs to sync sermons.
+   */
+  youtubePlaylistId?: string | null;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations".
+ */
+export interface Location {
+  id: number;
+  /**
+   * e.g. Tay Ho Campus, Nam Tu Liem Campus
+   */
+  name: string;
+  address: string;
+  /**
+   * Use format: https://maps.google.com/maps?q=...&output=embed
+   */
+  mapURL?: string | null;
+  photo?: (number | null) | Media;
+  serviceTimes?:
+    | {
+        /**
+         * e.g. Sunday
+         */
+        day: string;
+        /**
+         * e.g. 9:00 AM
+         */
+        time: string;
+        /**
+         * e.g. English, Vietnamese, Bilingual
+         */
+        language?: string | null;
+        /**
+         * Optional — e.g. "KidzQuest available", "Simultaneous translation"
+         */
+        notes?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Uncheck to hide this campus from the Locations page.
+   */
+  isActive?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonies".
+ */
+export interface Testimony {
+  id: number;
+  /**
+   * Person's name (or video title if YouTube-sourced).
+   */
+  name: string;
+  /**
+   * The testimony in their own words. Required for written testimonies; leave blank for YouTube videos.
+   */
+  quote?: string | null;
+  /**
+   * e.g. "Vietnamese returnee", "Expat from Germany", "International student"
+   */
+  background?: string | null;
+  /**
+   * Used for written testimonies on the homepage stories section.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * The YouTube video ID (e.g. "jtWD5zO7k2Q"). Auto-filled by sync script.
+   */
+  youtubeId?: string | null;
+  /**
+   * Date the video was published on YouTube. Auto-filled by sync script.
+   */
+  publishedAt?: string | null;
+  /**
+   * Manual = written quote. YouTube = video from a playlist sync.
+   */
+  source?: ('manual' | 'youtube') | null;
+  /**
+   * Used to group videos on the Stories page.
+   */
+  category?: ('baptism' | 'advent-candle' | 'other') | null;
+  /**
+   * Which stage of the HIF Journey does this story best represent?
+   */
+  journeyStage?: ('try' | 'join' | 'grow' | 'serve' | 'go') | null;
+  /**
+   * Featured written testimonies appear in the homepage stories section.
+   */
+  featured?: boolean | null;
+  /**
+   * Video testimonies shown in the Watch section of the Stories page. Uncheck to hide.
+   */
+  videoFeatured?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fellowships".
+ */
+export interface Fellowship {
+  id: number;
+  /**
+   * e.g. Korean Fellowship, Vietnamese Fellowship
+   */
+  name: string;
+  /**
+   * The image shown in the fellowship tile grid.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Short description shown on hover or below the tile.
+   */
+  description?: string | null;
+  /**
+   * Link to the fellowship signup page on Church Center.
+   */
+  churchCenterURL?: string | null;
+  /**
+   * e.g. Korean, Vietnamese, English
+   */
+  language?: string | null;
+  /**
+   * Uncheck to hide from the Fellowships page.
+   */
+  isActive?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Connect Groups and Fellowships synced from Planning Center Online (PCO). Run scripts/pco-sync-groups.ts to refresh.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "groups".
+ */
+export interface Group {
+  id: number;
+  name: string;
+  /**
+   * Auto-filled from PCO. You can override this text.
+   */
+  description?: string | null;
+  /**
+   * e.g. "Mondays at 7pm" or "Every other Saturday"
+   */
+  schedule?: string | null;
+  /**
+   * S3 URL from Church Center. Auto-filled by sync script.
+   */
+  imageUrl?: string | null;
+  /**
+   * Public URL on hifvn.churchcenter.com. Used for "Learn more" and "Join" links.
+   */
+  churchCenterUrl?: string | null;
+  contactEmail?: string | null;
+  /**
+   * Planning Center Online group ID — used for upserts. Do not edit.
+   */
+  pcoId?: string | null;
+  /**
+   * Determines which page this group appears on.
+   */
+  groupType: 'connect-group' | 'fellowship';
+  /**
+   * Synced from PCO. Controls whether a "Join" button is shown.
+   */
+  enrollmentOpen?: boolean | null;
+  /**
+   * Only listed groups appear on the website.
+   */
+  listed?: boolean | null;
+  /**
+   * Auto-synced from PCO.
+   */
+  membershipsCount?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "city-partners".
+ */
+export interface CityPartner {
+  id: number;
+  name: string;
+  logo?: (number | null) | Media;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  website?: string | null;
+  /**
+   * e.g. Education, Healthcare, Community Development
+   */
+  focusArea?: string | null;
+  /**
+   * Uncheck to hide from the CityPartners page.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
-  id: string;
+  id: number;
   /**
    * You will need to rebuild the website when changing this field.
    */
@@ -796,11 +1194,11 @@ export interface Redirect {
     reference?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     url?: string | null;
   };
@@ -812,8 +1210,8 @@ export interface Redirect {
  * via the `definition` "form-submissions".
  */
 export interface FormSubmission {
-  id: string;
-  form: string | Form;
+  id: number;
+  form: number | Form;
   submissionData?:
     | {
         field: string;
@@ -831,18 +1229,23 @@ export interface FormSubmission {
  * via the `definition` "search".
  */
 export interface Search {
-  id: string;
+  id: number;
   title?: string | null;
   priority?: number | null;
-  doc: {
-    relationTo: 'posts';
-    value: string | Post;
-  };
+  doc:
+    | {
+        relationTo: 'posts';
+        value: number | Post;
+      }
+    | {
+        relationTo: 'sermons';
+        value: number | Sermon;
+      };
   slug?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
-    image?: (string | null) | Media;
+    image?: (number | null) | Media;
   };
   categories?:
     | {
@@ -860,7 +1263,7 @@ export interface Search {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: string;
+  id: number;
   key: string;
   data:
     | {
@@ -877,7 +1280,7 @@ export interface PayloadKv {
  * via the `definition` "payload-jobs".
  */
 export interface PayloadJob {
-  id: string;
+  id: number;
   /**
    * Input data provided to the job
    */
@@ -924,7 +1327,13 @@ export interface PayloadJob {
     | {
         executedAt: string;
         completedAt: string;
-        taskSlug: 'inline' | 'schedulePublish';
+        taskSlug:
+          | 'inline'
+          | 'sync-pco-groups'
+          | 'sync-sermons'
+          | 'sync-testimonies'
+          | 'sync-restream-status'
+          | 'schedulePublish';
         taskID: string;
         input?:
           | {
@@ -957,7 +1366,9 @@ export interface PayloadJob {
         id?: string | null;
       }[]
     | null;
-  taskSlug?: ('inline' | 'schedulePublish') | null;
+  taskSlug?:
+    | ('inline' | 'sync-pco-groups' | 'sync-sermons' | 'sync-testimonies' | 'sync-restream-status' | 'schedulePublish')
+    | null;
   queue?: string | null;
   waitUntil?: string | null;
   processing?: boolean | null;
@@ -969,52 +1380,84 @@ export interface PayloadJob {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: string;
+  id: number;
   document?:
     | ({
         relationTo: 'pages';
-        value: string | Page;
+        value: number | Page;
       } | null)
     | ({
         relationTo: 'posts';
-        value: string | Post;
+        value: number | Post;
       } | null)
     | ({
         relationTo: 'media';
-        value: string | Media;
+        value: number | Media;
       } | null)
     | ({
         relationTo: 'categories';
-        value: string | Category;
+        value: number | Category;
       } | null)
     | ({
         relationTo: 'users';
-        value: string | User;
+        value: number | User;
+      } | null)
+    | ({
+        relationTo: 'sermons';
+        value: number | Sermon;
+      } | null)
+    | ({
+        relationTo: 'series';
+        value: number | Series;
+      } | null)
+    | ({
+        relationTo: 'team';
+        value: number | Team;
+      } | null)
+    | ({
+        relationTo: 'locations';
+        value: number | Location;
+      } | null)
+    | ({
+        relationTo: 'testimonies';
+        value: number | Testimony;
+      } | null)
+    | ({
+        relationTo: 'fellowships';
+        value: number | Fellowship;
+      } | null)
+    | ({
+        relationTo: 'groups';
+        value: number | Group;
+      } | null)
+    | ({
+        relationTo: 'city-partners';
+        value: number | CityPartner;
       } | null)
     | ({
         relationTo: 'redirects';
-        value: string | Redirect;
+        value: number | Redirect;
       } | null)
     | ({
         relationTo: 'forms';
-        value: string | Form;
+        value: number | Form;
       } | null)
     | ({
         relationTo: 'form-submissions';
-        value: string | FormSubmission;
+        value: number | FormSubmission;
       } | null)
     | ({
         relationTo: 'search';
-        value: string | Search;
+        value: number | Search;
       } | null)
     | ({
         relationTo: 'payload-folders';
-        value: string | FolderInterface;
+        value: number | FolderInterface;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -1024,10 +1467,10 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: string;
+  id: number;
   user: {
     relationTo: 'users';
-    value: string | User;
+    value: number | User;
   };
   key?: string | null;
   value?:
@@ -1047,7 +1490,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: string;
+  id: number;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -1358,6 +1801,174 @@ export interface UsersSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sermons_select".
+ */
+export interface SermonsSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  youtubeURL?: T;
+  thumbnail?: T;
+  discussionQuestions?:
+    | T
+    | {
+        type?: T;
+        url?: T;
+        file?: T;
+        questionsText?: T;
+      };
+  sermonPDF?: T;
+  sermonPdfUrl?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  date?: T;
+  speaker?: T;
+  series?: T;
+  scripture?: T;
+  duration?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series_select".
+ */
+export interface SeriesSelect<T extends boolean = true> {
+  title?: T;
+  description?: T;
+  artwork?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        description?: T;
+      };
+  year?: T;
+  isActive?: T;
+  youtubePlaylistId?: T;
+  generateSlug?: T;
+  slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team_select".
+ */
+export interface TeamSelect<T extends boolean = true> {
+  name?: T;
+  role?: T;
+  photo?: T;
+  bio?: T;
+  email?: T;
+  campus?: T;
+  ministryArea?: T;
+  order?: T;
+  staffMember?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations_select".
+ */
+export interface LocationsSelect<T extends boolean = true> {
+  name?: T;
+  address?: T;
+  mapURL?: T;
+  photo?: T;
+  serviceTimes?:
+    | T
+    | {
+        day?: T;
+        time?: T;
+        language?: T;
+        notes?: T;
+        id?: T;
+      };
+  isActive?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "testimonies_select".
+ */
+export interface TestimoniesSelect<T extends boolean = true> {
+  name?: T;
+  quote?: T;
+  background?: T;
+  photo?: T;
+  youtubeId?: T;
+  publishedAt?: T;
+  source?: T;
+  category?: T;
+  journeyStage?: T;
+  featured?: T;
+  videoFeatured?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "fellowships_select".
+ */
+export interface FellowshipsSelect<T extends boolean = true> {
+  name?: T;
+  photo?: T;
+  description?: T;
+  churchCenterURL?: T;
+  language?: T;
+  isActive?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "groups_select".
+ */
+export interface GroupsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  schedule?: T;
+  imageUrl?: T;
+  churchCenterUrl?: T;
+  contactEmail?: T;
+  pcoId?: T;
+  groupType?: T;
+  enrollmentOpen?: T;
+  listed?: T;
+  membershipsCount?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "city-partners_select".
+ */
+export interface CityPartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  description?: T;
+  website?: T;
+  focusArea?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects_select".
  */
 export interface RedirectsSelect<T extends boolean = true> {
@@ -1636,7 +2247,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  * via the `definition` "header".
  */
 export interface Header {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1645,11 +2256,11 @@ export interface Header {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -1665,7 +2276,7 @@ export interface Header {
  * via the `definition` "footer".
  */
 export interface Footer {
-  id: string;
+  id: number;
   navItems?:
     | {
         link: {
@@ -1674,11 +2285,11 @@ export interface Footer {
           reference?:
             | ({
                 relationTo: 'pages';
-                value: string | Page;
+                value: number | Page;
               } | null)
             | ({
                 relationTo: 'posts';
-                value: string | Post;
+                value: number | Post;
               } | null);
           url?: string | null;
           label: string;
@@ -1686,6 +2297,136 @@ export interface Footer {
         id?: string | null;
       }[]
     | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "live-stream".
+ */
+export interface LiveStream {
+  id: number;
+  /**
+   * Auto-managed by the Restream polling job. You can also toggle manually. To connect Restream for the first time, visit /api/restream/authorize.
+   */
+  isLive?: boolean | null;
+  /**
+   * Auto-populated by the Restream polling job. You can also enter it manually — e.g. for https://youtube.com/watch?v=dQw4w9WgXcQ the ID is dQw4w9WgXcQ.
+   */
+  youtubeVideoId?: string | null;
+  /**
+   * Shown above the video player when live, e.g. "Sunday Worship — 9 AM".
+   */
+  streamTitle?: string | null;
+  /**
+   * Shown on the /online page when not live. Used for a countdown.
+   */
+  nextServiceDate?: string | null;
+  /**
+   * e.g. "Sunday Worship", "Easter Service"
+   */
+  nextServiceTitle?: string | null;
+  /**
+   * Shown on the /online page when not live — welcome message, what to expect, etc.
+   */
+  preServiceMessage?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Latest featured videos shown on the Watch & Listen page. Run scripts/yt-sync-media.mjs to auto-populate from YouTube.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-highlights".
+ */
+export interface MediaHighlight {
+  id: number;
+  announcement?: {
+    /**
+     * e.g. dQw4w9WgXcQ — auto-set by yt-sync-media.mjs
+     */
+    videoId?: string | null;
+    title?: string | null;
+    publishedAt?: string | null;
+  };
+  testimony?: {
+    /**
+     * Auto-set by yt-sync-media.mjs
+     */
+    videoId?: string | null;
+    title?: string | null;
+    publishedAt?: string | null;
+  };
+  /**
+   * Add a worship playlist ID to yt-sync-media.mjs to auto-populate this.
+   */
+  worship?: {
+    videoId?: string | null;
+    title?: string | null;
+    publishedAt?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings".
+ */
+export interface SiteSetting {
+  id: number;
+  contact?: {
+    /**
+     * e.g. info@hif.vn
+     */
+    email?: string | null;
+    /**
+     * e.g. +84 24 1234 5678
+     */
+    phone?: string | null;
+    address?: string | null;
+  };
+  social?: {
+    facebookURL?: string | null;
+    youtubeURL?: string | null;
+    instagramURL?: string | null;
+  };
+  /**
+   * The primary giving URL used in header/footer Give button.
+   */
+  givingURL?: string | null;
+  /**
+   * Short service info shown in the footer, e.g. "Sundays 9 AM & 11 AM · Tay Ho & Nam Tu Liem"
+   */
+  servicesSummary?: string | null;
+  /**
+   * OAuth tokens managed automatically. Use the "Authorize Restream" link in the Live Stream global to connect.
+   */
+  restream?: {
+    /**
+     * Auto-managed. Do not edit.
+     */
+    accessToken?: string | null;
+    /**
+     * Auto-managed. Do not edit.
+     */
+    refreshToken?: string | null;
+    expiresAt?: string | null;
+    connectedAt?: string | null;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -1737,6 +2478,84 @@ export interface FooterSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "live-stream_select".
+ */
+export interface LiveStreamSelect<T extends boolean = true> {
+  isLive?: T;
+  youtubeVideoId?: T;
+  streamTitle?: T;
+  nextServiceDate?: T;
+  nextServiceTitle?: T;
+  preServiceMessage?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media-highlights_select".
+ */
+export interface MediaHighlightsSelect<T extends boolean = true> {
+  announcement?:
+    | T
+    | {
+        videoId?: T;
+        title?: T;
+        publishedAt?: T;
+      };
+  testimony?:
+    | T
+    | {
+        videoId?: T;
+        title?: T;
+        publishedAt?: T;
+      };
+  worship?:
+    | T
+    | {
+        videoId?: T;
+        title?: T;
+        publishedAt?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "site-settings_select".
+ */
+export interface SiteSettingsSelect<T extends boolean = true> {
+  contact?:
+    | T
+    | {
+        email?: T;
+        phone?: T;
+        address?: T;
+      };
+  social?:
+    | T
+    | {
+        facebookURL?: T;
+        youtubeURL?: T;
+        instagramURL?: T;
+      };
+  givingURL?: T;
+  servicesSummary?: T;
+  restream?:
+    | T
+    | {
+        accessToken?: T;
+        refreshToken?: T;
+        expiresAt?: T;
+        connectedAt?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "collections_widget".
  */
 export interface CollectionsWidget {
@@ -1744,6 +2563,48 @@ export interface CollectionsWidget {
     [k: string]: unknown;
   };
   width: 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSync-pco-groups".
+ */
+export interface TaskSyncPcoGroups {
+  input?: unknown;
+  output: {
+    upserted?: number | null;
+    skipped?: number | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSync-sermons".
+ */
+export interface TaskSyncSermons {
+  input?: unknown;
+  output: {
+    created?: number | null;
+    updated?: number | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSync-testimonies".
+ */
+export interface TaskSyncTestimonies {
+  input?: unknown;
+  output: {
+    upserted?: number | null;
+  };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TaskSync-restream-status".
+ */
+export interface TaskSyncRestreamStatus {
+  input?: unknown;
+  output: {
+    ok?: boolean | null;
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1756,14 +2617,14 @@ export interface TaskSchedulePublish {
     doc?:
       | ({
           relationTo: 'pages';
-          value: string | Page;
+          value: number | Page;
         } | null)
       | ({
           relationTo: 'posts';
-          value: string | Post;
+          value: number | Post;
         } | null);
     global?: string | null;
-    user?: (string | null) | User;
+    user?: (number | null) | User;
   };
   output?: unknown;
 }

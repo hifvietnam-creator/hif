@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
+@import './hif.css';
 
 @config '../../../tailwind.config.mjs';
 
@@ -43,8 +44,9 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
-  --font-mono: var(--font-geist-mono);
-  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-inter);
+  --font-sans: var(--font-inter);
+  --font-display: var(--font-bricolage);
 }
 
 @layer utilities {

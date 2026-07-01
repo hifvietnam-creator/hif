@@ -1,67 +1,48 @@
-import { Banner } from '@payloadcms/ui/elements/Banner'
 import React from 'react'
-
-import { SeedButton } from './SeedButton'
-import './index.scss'
-
-const baseClass = 'before-dashboard'
 
 const BeforeDashboard: React.FC = () => {
   return (
-    <div className={baseClass}>
-      <Banner className={`${baseClass}__banner`} type="success">
-        <h4>Welcome to your dashboard!</h4>
-      </Banner>
-      Here&apos;s what to do next:
-      <ul className={`${baseClass}__instructions`}>
-        <li>
-          <SeedButton />
-          {' with a few pages, posts, and projects to jump-start your new site, then '}
-          <a href="/" target="_blank">
-            visit your website
-          </a>
-          {' to see the results.'}
-        </li>
-        <li>
-          {'Modify your '}
-          <a
-            href="https://payloadcms.com/docs/configuration/collections"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            collections
-          </a>
-          {' and add more '}
-          <a
-            href="https://payloadcms.com/docs/fields/overview"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            fields
-          </a>
-          {' as needed. If you are new to Payload, we also recommend you check out the '}
-          <a
-            href="https://payloadcms.com/docs/getting-started/what-is-payload"
-            rel="noopener noreferrer"
-            target="_blank"
-          >
-            Getting Started
-          </a>
-          {' docs.'}
-        </li>
-        <li>
-          Commit and push your changes to the repository to trigger a redeployment of your project.
-        </li>
-      </ul>
-      {'Pro Tip: This block is a '}
-      <a
-        href="https://payloadcms.com/docs/custom-components/overview"
-        rel="noopener noreferrer"
-        target="_blank"
-      >
-        custom component
-      </a>
-      , you can remove it at any time by updating your <strong>payload.config</strong>.
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '10px',
+        padding: '10px 16px',
+        marginBottom: '8px',
+        borderRadius: '6px',
+        background: 'rgba(192,30,39,0.08)',
+        border: '1px solid rgba(192,30,39,0.18)',
+        flexWrap: 'wrap',
+      }}
+    >
+      <span style={{ fontSize: '0.78rem', fontWeight: 600, color: '#C01E27', marginRight: '4px' }}>
+        Quick add:
+      </span>
+      {[
+        { label: '+ Sermon', href: '/admin/collections/sermons/create' },
+        { label: '+ Series', href: '/admin/collections/series/create' },
+        { label: '+ Team member', href: '/admin/collections/team/create' },
+        { label: '🔴 Live Stream', href: '/admin/globals/live-stream' },
+        { label: '⚙ Site Settings', href: '/admin/globals/site-settings' },
+      ].map((link) => (
+        <a
+          key={link.href}
+          href={link.href}
+          style={{
+            padding: '4px 12px',
+            borderRadius: '20px',
+            background: '#fff',
+            border: '1px solid #e5e7eb',
+            fontSize: '0.8rem',
+            fontWeight: 600,
+            color: '#111',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
+          }}
+        >
+          {link.label}
+        </a>
+      ))}
     </div>
   )
 }

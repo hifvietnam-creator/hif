@@ -7,6 +7,30 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
 
   const { slug, id, categories, title, meta } = originalDoc
 
+  // ── Sermons ──────────────────────────────────────────────────────────────
+  // Sermons don't have categories; use description for meta.description
+  if (collection === 'sermons') {
+    const speakerName =
+      originalDoc.speaker && typeof originalDoc.speaker === 'object'
+        ? (originalDoc.speaker as { name?: string }).name
+        : null
+
+    return {
+      ...searchDoc,
+      slug,
+      meta: {
+        title: meta?.title || title,
+        description:
+          meta?.description ||
+          originalDoc.description ||
+          (speakerName ? `Message by ${speakerName}` : undefined),
+        image: meta?.image?.id || meta?.image || originalDoc.thumbnail?.id || originalDoc.thumbnail,
+      },
+      categories: [],
+    } as DocToSync
+  }
+
+  // ── Posts / Pages (default behaviour) ────────────────────────────────────
   const modifiedDoc: DocToSync = {
     ...searchDoc,
     slug,
@@ -22,9 +46,7 @@ export const beforeSyncWithSearch: BeforeSync = async ({ req, originalDoc, searc
   if (categories && Array.isArray(categories) && categories.length > 0) {
     const populatedCategories: { id: string | number; title: string }[] = []
     for (const category of categories) {
-      if (!category) {
-        continue
-      }
+      if (!category) continue
 
       if (typeof category === 'object') {
         populatedCategories.push(category)

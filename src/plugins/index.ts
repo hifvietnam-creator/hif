@@ -10,17 +10,24 @@ import { FixedToolbarFeature, HeadingFeature, lexicalEditor } from '@payloadcms/
 import { searchFields } from '@/search/fieldOverrides'
 import { beforeSyncWithSearch } from '@/search/beforeSync'
 
-import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
 
-const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
-  return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const generateTitle: GenerateTitle<any> = ({ doc, collectionConfig }) => {
+  const siteName = 'Hanoi International Fellowship'
+  if (!doc?.title) return siteName
+  return `${doc.title} | ${siteName}`
 }
 
-const generateURL: GenerateURL<Post | Page> = ({ doc }) => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const generateURL: GenerateURL<any> = ({ doc, collectionConfig }) => {
   const url = getServerSideURL()
+  const collection = collectionConfig?.slug
 
-  return doc?.slug ? `${url}/${doc.slug}` : url
+  if (!doc?.slug) return url
+  if (collection === 'sermons') return `${url}/sermons/${doc.slug}`
+  if (collection === 'series') return `${url}/sermons?series=${doc.slug}`
+  return `${url}/${doc.slug}`
 }
 
 export const plugins: Plugin[] = [
@@ -81,7 +88,7 @@ export const plugins: Plugin[] = [
     },
   }),
   searchPlugin({
-    collections: ['posts'],
+    collections: ['posts', 'sermons'],
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
       fields: ({ defaultFields }) => {

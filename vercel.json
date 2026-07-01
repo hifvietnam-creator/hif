@@ -1,0 +1,20 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/restream",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/cron/sync-sermons",
+      "schedule": "0 4 * * 1"
+    },
+    {
+      "path": "/api/cron/sync-testimonies",
+      "schedule": "0 5 * * 1"
+    },
+    {
+      "path": "/api/cron/sync-groups",
+      "schedule": "0 2 * * 1"
+    }
+  ]
+}

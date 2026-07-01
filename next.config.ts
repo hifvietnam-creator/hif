@@ -22,6 +22,9 @@ const nextConfig: NextConfig = {
       {
         pathname: '/api/media/file/**',
       },
+      {
+        pathname: '/assets/img/**',
+      },
     ],
     qualities: [100],
     remotePatterns: [
@@ -33,6 +36,17 @@ const nextConfig: NextConfig = {
           protocol: url.protocol.replace(':', '') as 'http' | 'https',
         }
       }),
+      // YouTube thumbnails for sermon cards
+      {
+        protocol: 'https',
+        hostname: 'img.youtube.com',
+        pathname: '/vi/**',
+      },
+      // PCO / Church Center group header images
+      {
+        protocol: 'https',
+        hostname: 'groups-production.s3.amazonaws.com',
+      },
     ],
   },
   webpack: (webpackConfig) => {
