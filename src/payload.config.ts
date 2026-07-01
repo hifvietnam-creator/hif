@@ -305,7 +305,7 @@ export default buildConfig({
               if (existing.docs.length > 0) {
                 await payload.update({
                   collection: 'sermons', id: existing.docs[0]!.id,
-                  data: { title: v.title, date, series: series.id, _status: 'published' },
+                  data: { title: v.title, date, series: series.id, _status: 'published' } as any,
                   overrideAccess: true,
                 })
                 updated++
@@ -319,7 +319,7 @@ export default buildConfig({
                 }
                 await payload.create({
                   collection: 'sermons',
-                  data: { title: v.title, youtubeURL, date, series: series.id, slug, _status: 'published' },
+                  data: { title: v.title, youtubeURL, date, series: series.id, slug, _status: 'published' } as any,
                   overrideAccess: true,
                 })
                 created++
@@ -375,7 +375,7 @@ export default buildConfig({
                 if (existing.docs.length > 0) {
                   await payload.update({ collection: 'testimonies', id: existing.docs[0]!.id, data, overrideAccess: true })
                 } else {
-                  await payload.create({ collection: 'testimonies', data: { ...data, _status: 'published' }, overrideAccess: true })
+                  await payload.create({ collection: 'testimonies', data, overrideAccess: true })
                 }
                 upserted++
               }

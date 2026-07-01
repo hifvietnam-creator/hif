@@ -82,8 +82,8 @@ export const SiteSettings: GlobalConfig = {
       type: 'group',
       label: 'Restream Integration',
       access: {
-        read: authenticated,
-        update: authenticated,
+        read: ({ req }) => Boolean(req.user),
+        update: ({ req }) => Boolean(req.user),
       },
       admin: {
         description:

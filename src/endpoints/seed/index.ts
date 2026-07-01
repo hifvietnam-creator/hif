@@ -48,10 +48,7 @@ export const seed = async ({
     globals.map((global) =>
       payload.updateGlobal({
         slug: global,
-        // @ts-ignore — seed clears nav globals; types vary by global slug
-        data: {
-          navItems: [],
-        },
+        data: { navItems: [] } as any,
         depth: 0,
         context: {
           disableRevalidate: true,
