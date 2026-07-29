@@ -8,6 +8,37 @@ import CountdownTimer from './CountdownTimer'
 // Always check live status fresh — never serve a stale "not live" page to someone tuning in
 export const dynamic = 'force-dynamic'
 
+const HIF_CHANNEL_ID = 'UCgPCJErnYUZ8GPug7u2m6vQ'
+
+/** Queries YouTube Data API for a live video on the HIF channel. */
+async function getYouTubeLiveVideo(): Promise<{ videoId: string; title: string } | null> {
+  const apiKey = process.env.YOUTUBE_API_KEY
+  if (!apiKey) return null
+  try {
+    const params = new URLSearchParams({
+      part: 'id,snippet',
+      channelId: HIF_CHANNEL_ID,
+      type: 'video',
+      eventType: 'live',
+      maxResults: '1',
+      key: apiKey,
+    })
+    const res = await fetch(`https://www.googleapis.com/youtube/v3/search?${params}`, {
+      next: { revalidate: 0 }, // always fresh
+    })
+    if (!res.ok) return null
+    const data = await res.json()
+    const item = data.items?.[0]
+    if (!item) return null
+    return {
+      videoId: item.id.videoId as string,
+      title: (item.snippet?.title as string) || 'Sunday Worship — Live Now',
+    }
+  } catch {
+    return null
+  }
+}
+
 export const metadata: Metadata = {
   title: 'Watch Online — Hanoi International Fellowship',
   description:
@@ -38,9 +69,19 @@ export default async function OnlinePage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const stream = (await payload.findGlobal({ slug: 'live-stream' }).catch(() => null)) as any
 
-  const isLive = Boolean(stream?.isLive)
-  const videoId = (stream?.youtubeVideoId as string) || null
-  const streamTitle = (stream?.streamTitle as string) || 'Sunday Worship — Live Now'
+  // 1. Check YouTube directly for a live video — most reliable source
+  const ytLive = await getYouTubeLiveVideo()
+
+  // 2. Admin manual override takes precedence for video ID if set
+  const adminVideoId = (stream?.youtubeVideoId as string) || null
+  const adminIsLive = Boolean(stream?.isLive)
+
+  // isLive = YouTube detected live OR admin toggled it on
+  const isLive = Boolean(ytLive) || adminIsLive
+  // videoId = YouTube detected ID, or admin-set ID as fallback
+  const videoId = ytLive?.videoId || adminVideoId || null
+  const streamTitle =
+    ytLive?.title || (stream?.streamTitle as string) || 'Sunday Worship — Live Now'
   const nextDate = (stream?.nextServiceDate as string) || null
   const nextTitle = (stream?.nextServiceTitle as string) || 'Sunday Worship'
   const preMessage = stream?.preServiceMessage ?? null

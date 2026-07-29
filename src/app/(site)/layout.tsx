@@ -4,6 +4,7 @@ import "./globals.css";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import RevealObserver from "@/components/RevealObserver";
+import { Analytics } from "@vercel/analytics/next";
 
 const bricolage = Bricolage_Grotesque({
   variable: "--font-bricolage",
@@ -44,6 +45,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
         <RevealObserver />
         <main id="main-content">{children}</main>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
