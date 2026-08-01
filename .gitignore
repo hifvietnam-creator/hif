@@ -14,6 +14,10 @@ public/robots.txt
 public/sitemap*.xml
 
 
+# Diagnostic output — contains congregation personal data. Never commit.
+/diagnose-out/
+/diagnose-report.txt
+
 # Playwright
 node_modules/
 /test-results/

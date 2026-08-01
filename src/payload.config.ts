@@ -5,6 +5,7 @@ import { buildConfig, PayloadRequest } from 'payload'
 import { fileURLToPath } from 'url'
 
 import { checkRestreamStatus } from './lib/restream'
+import { paginate as pcoPaginate, type PcoResource } from './lib/pco'
 
 import { Categories } from './collections/Categories'
 import { CityPartners } from './collections/CityPartners'
@@ -71,7 +72,11 @@ export default buildConfig({
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
   db: postgresAdapter({
-    push: true,
+    // Schema push is a development convenience: it alters tables automatically
+    // to match the config. Payload documents it as dev-only, and it becomes
+    // genuinely dangerous once analytics tables share this database.
+    // Production uses reviewed migrations instead.
+    push: process.env.NODE_ENV !== 'production',
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
@@ -127,60 +132,36 @@ export default buildConfig({
         handler: async ({ req }) => {
           const payload = req.payload
 
-          const PCO_APP_ID = process.env.PCO_APP_ID?.trim()
-          const PCO_SECRET = process.env.PCO_SECRET?.trim()
-          if (!PCO_APP_ID || !PCO_SECRET) {
-            throw new Error('PCO_APP_ID or PCO_SECRET not set in environment')
-          }
-
-          const credentials = Buffer.from(`${PCO_APP_ID}:${PCO_SECRET}`).toString('base64')
-          const headers = {
-            Authorization: `Basic ${credentials}`,
-            'Content-Type': 'application/json',
-          }
-
           // PCO group_type_id → our groupType
           const GROUP_TYPE_MAP: Record<string, 'connect-group' | 'fellowship'> = {
             '126940': 'connect-group',
             '183728': 'fellowship',
           }
 
+          type GroupAttrs = {
+            name: string
+            description_as_plain_text: string | null
+            schedule: string | null
+            header_image: { medium: string } | null
+            public_church_center_web_url: string | null
+            enrollment_open: boolean
+            listed: boolean
+            contact_email: string | null
+            memberships_count: number
+          }
+          type GroupRels = { group_type: { data: { id: string; type: string } | null } }
+
           let upserted = 0
           let skipped = 0
-          let offset = 0
-          const perPage = 25
 
-          while (true) {
-            const url = `https://api.planningcenteronline.com/groups/v2/groups?per_page=${perPage}&offset=${offset}&include=group_type`
-            const res = await fetch(url, { headers })
-            if (!res.ok) {
-              throw new Error(`PCO API error: ${res.status} ${res.statusText}`)
-            }
-            const json = (await res.json()) as {
-              data: Array<{
-                id: string
-                attributes: {
-                  name: string
-                  description_as_plain_text: string | null
-                  schedule: string | null
-                  header_image: { medium: string } | null
-                  public_church_center_web_url: string | null
-                  enrollment_open: boolean
-                  listed: boolean
-                  contact_email: string | null
-                  memberships_count: number
-                }
-                relationships: {
-                  group_type: { data: { id: string } }
-                }
-              }>
-              meta: { total_count: number; next?: { offset: number } }
-            }
-
-            for (const group of json.data) {
+          // pcoPaginate handles User-Agent, rate limiting, retries and paging.
+          for await (const page of pcoPaginate<PcoResource<GroupAttrs, GroupRels>>(
+            '/groups/v2/groups?include=group_type',
+          )) {
+            for (const group of page.data) {
               const attr = group.attributes
-              const typeId = group.relationships.group_type.data.id
-              const groupType = GROUP_TYPE_MAP[typeId]
+              const typeId = group.relationships?.group_type?.data?.id
+              const groupType = typeId ? GROUP_TYPE_MAP[typeId] : undefined
 
               // Skip unlisted groups or unknown types
               if (!attr.listed || !groupType) {
@@ -190,8 +171,7 @@ export default buildConfig({
 
               // Detect PCO default placeholder images
               const imageUrl =
-                attr.header_image?.medium &&
-                !attr.header_image.medium.includes('/defaults/')
+                attr.header_image?.medium && !attr.header_image.medium.includes('/defaults/')
                   ? attr.header_image.medium
                   : null
 
@@ -233,10 +213,6 @@ export default buildConfig({
               }
               upserted++
             }
-
-            // Paginate
-            if (!json.meta.next || json.data.length < perPage) break
-            offset = json.meta.next.offset
           }
 
           console.log(`[PCO Sync] Done — ${upserted} upserted, ${skipped} skipped`)

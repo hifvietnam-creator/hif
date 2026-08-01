@@ -1,0 +1,27 @@
+1. Build an OCR module for shilpa to scan easily connect card and fill in automatically planning center form and wait for her approval before inserting into planning center db
+
+so, for that we can use planning center API to fetch connect card form and deal with data insertion as well.
+
+2. Data gathering / Data dashboard : the idea is to have a central dashboard where stats are displayed to emphasized on : 
+- active congregation stats (those who subscribed to the newsletter)
+- stats about those that are coming at HIF every sunday
+- children stats with kq
+- show people stage in the moebius loop with a tag and allow easy filter through dropdown or checkbox
+- FIND METRICS FOR : 
+- - TRY ; JOIN; GROW; SERVE; GO
+
+Complete Dashboard :
+- attribute specific ID for each person	
+- export ministries data every week automatically
+
+----
+1- Train Claude on how to use PCO better
+2- Use Claude to fetch data directly from PCO's API the create a copy and insert into our online database (this is just for MVP)
+3- Define content Rules for story brand using storybrand.com framework, the idea is to use AI as a controller in a sense that anyone who wants to make a post online on the website / social has to use the AI agent or prompt put his own content then take the output from this agent and publish it (it is a kind of safe guard for all content to make it conform to storybrand.com framework that works till hopefully)
+
+---
+Move 2025-2026 sermon's pdf from C:\Users\serve\OneDrive\HIF Sermons\Sermons 2025-26 to C:\Users\serve\OneDrive\HIF Media Files\PPT Slides for Messages
+it should follow the structure :
+- 2025
+- - SERMON SERIES TAG/NAME
+- - - Sermon's pdf per week 
