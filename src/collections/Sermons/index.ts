@@ -56,6 +56,15 @@ export const Sermons: CollectionConfig = {
               },
             },
             {
+              name: 'audioURL',
+              type: 'text',
+              label: 'Audio URL (MP3)',
+              admin: {
+                description:
+                  'For archive sermons that pre-date the YouTube channel and exist only as an MP3. Leave empty when a video exists.',
+              },
+            },
+            {
               name: 'thumbnail',
               type: 'upload',
               relationTo: 'media',

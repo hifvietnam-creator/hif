@@ -1,0 +1,319 @@
+{
+  "ranAt": "2026-08-05T10:05:15.396Z",
+  "applied": true,
+  "reportPath": "F:\\github.com\\payload-test\\reports\\sermon-reconciliation-full-2026-08-05.json",
+  "actions": [
+    {
+      "sermonId": 2,
+      "payloadTitle": "Where is Safety",
+      "date": "2026-06-21",
+      "series": "Turn it to praise",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQCQEy7acgeuSYTnync4wrYhAd8XAVoTKSIKL-i8TOumzHA?e=5aLR3l",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 2,
+      "payloadTitle": "Where is Safety",
+      "date": "2026-06-21",
+      "series": "Turn it to praise",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/w/c/ee6735221c522d5e/IQDDHrL1DcTUQbzjKrV7tNzbAdVEelsomGw_QF9yimDpw8s?e=c8qah8",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 1,
+      "payloadTitle": "Psalms1",
+      "date": "2026-06-14",
+      "series": "Turn it to praise",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQCPj9JwLFsmSIH0VuzLUX12Af9njq_YSYWFDib_VB4goJw?e=w6zKvg",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 4,
+      "payloadTitle": "Make it Count",
+      "date": "2026-06-07",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQC1uH1g4etTTb5IxZIPsUmLAU1wmdCf29IiTHV9NmfOP90?e=220PE1",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 5,
+      "payloadTitle": "Extend your Horizon",
+      "date": "2026-05-31",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBexDDADGvnS4NulJD6efPzAR1Wv5cpjk6HEns6kgGRWlY?e=vR8dN9",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 5,
+      "payloadTitle": "Extend your Horizon",
+      "date": "2026-05-31",
+      "series": "Pass It On",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQA3alFT4ATbQIDUgxK9s9-IAVLnXAEFEfOYIm84plRHYqw?e=mqcQdC",
+      "note": "unwrapped OneDrive redeem redirect",
+      "decision": "skip-duplicate"
+    },
+    {
+      "sermonId": 6,
+      "payloadTitle": "The Breath of GOD",
+      "date": "2026-05-24",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBASfZ5VV5KQ7G8tffah-FSAdf9sGHKCRFn96axDg8MyIg?e=NxKQca",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 6,
+      "payloadTitle": "The Breath of GOD",
+      "date": "2026-05-24",
+      "series": "Pass It On",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQA3alFT4ATbQIDUgxK9s9-IAVLnXAEFEfOYIm84plRHYqw?e=mqcQdC",
+      "note": "unwrapped OneDrive redeem redirect",
+      "decision": "skip-duplicate"
+    },
+    {
+      "sermonId": 7,
+      "payloadTitle": "When Love Becomes Distorted",
+      "date": "2026-05-17",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQAYCRTqGvLPT5w-RXJUWpGaAQMumvKDkq1VBsvXxvO5OSs?e=g8DY8R",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 7,
+      "payloadTitle": "When Love Becomes Distorted",
+      "date": "2026-05-17",
+      "series": "Pass It On",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQC41xo3qhqYSLF5rOy2qMZSASty_UXjfVO8-aGea2iH888?e=WXA8iD",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 9,
+      "payloadTitle": "Not Grit but Grace",
+      "date": "2026-05-03",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBjeHBFD8sgRZx7tOXpb4CqAf2139j7rkCu4efpiF9ix7Y?e=LsMqoJ",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 9,
+      "payloadTitle": "Not Grit but Grace",
+      "date": "2026-05-03",
+      "series": "Pass It On",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQCtlyBGtcuiRo7eScGQROi-ATXeK2R7Iqu29w5Da90bq4Q?e=hjkKKu",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 10,
+      "payloadTitle": "Do not be ashamed",
+      "date": "2026-04-26",
+      "series": "Pass It On",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQDHn7Pj3gGfR4SXBoJ8kywSAXg9AT1c4xIxV8Oxp5uXjwQ?e=Tl4Ix8",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 10,
+      "payloadTitle": "Do not be ashamed",
+      "date": "2026-04-26",
+      "series": "Pass It On",
+      "field": "discussionQuestions.url",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQAA4YJxsgJbSoq74c4ojV6dAahzl4az9Cj0ynmou3MGym0?e=Inv3XW",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 12,
+      "payloadTitle": "THE RISEN KING",
+      "date": "2026-04-05",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQAEX964UEfFTaP6k2k8ZRlcAR8b9mnAcn7ylttS_UHjjdk?e=fCFghi",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 13,
+      "payloadTitle": "And Justice for All Sermon",
+      "date": "2026-03-29",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBqqn_qzCFwTYdrHNzOJ05_AXNFYIGZk4Q4uXOOH3Htoz8?e=spS3bd",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 14,
+      "payloadTitle": "Jesus The King of Unending Love",
+      "date": "2026-03-22",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBMAB6LJYMVTqgi_5qrYGScAVxvMfKHt0t02GuvWhv9DNM?e=uzsBOM",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 15,
+      "payloadTitle": "ON HIS KNEES  :  HOW THE BATTLE WAS WON BEFORE IT BEGUN",
+      "date": "2026-03-15",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQCNnMfjUR2eS4WtULq8o3AfAWkachnhi7pwTQ56mSSVVrw?e=8k0tf2",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 16,
+      "payloadTitle": "The KING of the NEW COVENANT : REMEMBERING & FORGETTING",
+      "date": "2026-03-08",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQDehuYy1bqvS6yJLrNNMtc5AdTXeqna7Kt7Vp3Fb5cLmhA?e=v4sBna",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 17,
+      "payloadTitle": "THE KING HAS COME : KING of PEACE",
+      "date": "2026-03-01",
+      "series": "The King has Come",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBTxlIwotKWSqX0AAKlsqvFAX670GyNfISAW4gAOgJ3aRw?e=zpNhfP",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 18,
+      "payloadTitle": "LOVING THE WORST",
+      "date": "2026-02-22",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQBIXrWpS3oTQr-VLCRJEm0kAVVeGaPpIw_P1YVgo4oChBo?e=Dccpuv",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 19,
+      "payloadTitle": "Heaven's Favor : Vertical Challenges",
+      "date": "2026-02-15",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQDbUm0AJQ7ZSbtwverylTHqAfFKdq-4ywXodNqT0nbcgeI?e=tLi2Ww",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 20,
+      "payloadTitle": "Heaven's Favour : THE GREAT COMPASSION",
+      "date": "2026-02-08",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQCxFFSmd74STpBaemowp4i8AcbC_yLfEv84UJpLjjWUOTA?e=eFCjPz",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 21,
+      "payloadTitle": "Heaven's Favour : The Rescue missioN",
+      "date": "2026-02-01",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQC6LyUUPmJcTas3Ua4TserTAbBRI8p2zRsIKzSMMfZQJtI?e=wwXKFT",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 22,
+      "payloadTitle": "Living Debt Free",
+      "date": "2026-01-25",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQDY52AinzxOQpg3LoAyGXYZAZXvncMBKgTC2JJpUdh9lxE?e=3l3Mps",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 23,
+      "payloadTitle": "See like JesusAct like Jesus",
+      "date": "2026-01-18",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQAo4jST4JO7RIf_Epp6DM4zARwpRp3UhRSFVEucuARwqPw?e=ZTvdvg",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 24,
+      "payloadTitle": "Heaven's Favor",
+      "date": "2026-01-11",
+      "series": "New Sermon Series : Heaven’s Favor",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQD_k6lyQDoNSJUGxREPEuZvAVG71PhYw8pEDgg5wldb4u4?e=FpV8M8",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 25,
+      "payloadTitle": "Purpose Broke Thru",
+      "date": "2026-01-04",
+      "series": "Christmas 2025",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQB_-39LhiojSbVf27jsMGzKAbn5P12jl_l3dh5GMUoWQ9E?e=BgFgEo",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 27,
+      "payloadTitle": "Joy Broke Thru",
+      "date": "2025-12-14",
+      "series": "Christmas 2025",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/IQAmMddV24ylRYK9Z2QMQSqrARebXzsy5g_pV8Rmr-jOnK8?e=dINUjY",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 28,
+      "payloadTitle": "Peace Broke Thru",
+      "date": "2025-12-07",
+      "series": "Christmas 2025",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/Edzl0OHxxeFMmV-1KTiPGRwBuVnt1T7klqW5Vg-VgRWllg?e=IF1ohz",
+      "decision": "apply"
+    },
+    {
+      "sermonId": 29,
+      "payloadTitle": "Hope Broke Thru",
+      "date": "2025-11-30",
+      "series": "Christmas 2025",
+      "field": "sermonPdfUrl",
+      "from": null,
+      "to": "https://1drv.ms/b/c/ee6735221c522d5e/EUBSx3koYp1GmeojtEomGoMBX8mTKL5h1FzFc794j3AsTQ?e=YY8goZ",
+      "decision": "apply"
+    }
+  ]
+}

@@ -823,6 +823,10 @@ export interface Sermon {
    */
   youtubeURL?: string | null;
   /**
+   * For archive sermons that pre-date the YouTube channel and exist only as an MP3. Leave empty when a video exists.
+   */
+  audioURL?: string | null;
+  /**
    * Sermon card image for the listing page.
    */
   thumbnail?: (number | null) | Media;
@@ -1807,6 +1811,7 @@ export interface SermonsSelect<T extends boolean = true> {
   title?: T;
   description?: T;
   youtubeURL?: T;
+  audioURL?: T;
   thumbnail?: T;
   discussionQuestions?:
     | T
