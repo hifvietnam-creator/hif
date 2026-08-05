@@ -15,11 +15,11 @@ const megaGroups: MegaGroup[] = [
     id: "mega-new",
     label: "I'm New",
     links: [
-      { href: "/jesus", label: "Who is Jesus?" },
+      // { href: "/jesus", label: "Who is Jesus?" },
       { href: "/plan-visit", label: "Plan a Visit" },
       { href: "/", label: "The Journey" },
       { href: "/next-steps", label: "Next Steps" },
-      { href: "/resources#help", label: "FAQ & Practical Help" },
+      // { href: "/resources#help", label: "FAQ & Practical Help" },
     ],
   },
   {

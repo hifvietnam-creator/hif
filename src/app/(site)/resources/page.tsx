@@ -30,7 +30,7 @@ export default function ResourcesPage() {
       </section>
 
       {/* GROW YOUR FAITH */}
-      <section className="section" id="grow">
+      {/* <section className="section" id="grow">
         <div className="container">
           <div className="section-head center">
             <p className="eyebrow">Grow your faith</p>
@@ -46,7 +46,7 @@ export default function ResourcesPage() {
             <article className="min-card"><span className="min-bar bar-green"></span><h3>Design for Discipleship</h3><p>The Navigators&apos; classic study series — ask our team how to get started with a group.</p></article>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* WIDER CHURCH FAMILY */}
       <section className="section about" id="family">

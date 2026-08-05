@@ -164,6 +164,8 @@ export const Sermons: CollectionConfig = {
       name: 'date',
       type: 'date',
       required: true,
+      // Every listing query sorts by date and the year filter ranges over it.
+      index: true,
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMM yyyy' },
@@ -174,6 +176,7 @@ export const Sermons: CollectionConfig = {
       name: 'speaker',
       type: 'relationship',
       relationTo: 'team',
+      index: true,
       admin: {
         position: 'sidebar',
         description: 'Drives the speaker filter on /sermons.',
@@ -183,6 +186,7 @@ export const Sermons: CollectionConfig = {
       name: 'series',
       type: 'relationship',
       relationTo: 'series',
+      index: true,
       admin: { position: 'sidebar' },
     },
     {
