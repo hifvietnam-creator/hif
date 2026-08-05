@@ -1,0 +1,36 @@
+/* Stylesheet for the dashboard route group.
+ *
+ * Deliberately self-contained rather than importing the public site's
+ * globals.css. That file pulls in hif.css (brand design system, global
+ * resets, header/strip layout variables) and a shadcn theme keyed to a
+ * `data-theme` attribute set by a provider the dashboard does not run.
+ * An internal reporting page has no business inheriting site chrome.
+ *
+ * The explicit @source keeps utility generation deterministic — Tailwind v4
+ * auto-detection can miss a directory created after the dev server started.
+ */
+
+@import 'tailwindcss';
+
+@source "./";
+
+/* Base styles that do not depend on any Tailwind utility being generated.
+ * If utilities ever fail to build, the page degrades to readable black-on-
+ * white rather than going invisible — which is how this file came to exist. */
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: #ffffff;
+  color: #171717;
+  font-family:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+table {
+  border-collapse: collapse;
+}

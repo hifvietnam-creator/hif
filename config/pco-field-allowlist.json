@@ -1,0 +1,225 @@
+{
+  "_comment": "Controls which PCO custom fields are mirrored into pco.field_data. Fields with \"include\": false are never written to the database. Field DEFINITIONS (names/types) are always mirrored — only VALUES are gated. Setting a field to true is a deliberate act: once values are copied they also live in every database backup.",
+  "_reviewedBy": "HIF",
+  "_reviewedAt": "2026-07-30",
+  "_decisions": {
+    "elderStaffRelation": "Fields 658689-658692 (Elder/Staff Relation Preference 01-04) are EXCLUDED. Treated as a pastoral confidence rather than analytics data. Revisit with eldership if follow-up routing ever needs it.",
+    "custom2Tab": "Fields 953705-957521 are INCLUDED by explicit decision, though several duplicate core person columns. Note that PRIMARY ADDRESS places home addresses in the analytics database and its backups — factor this into dashboard access control."
+  },
+  "fields": [
+    {
+      "id": "303552",
+      "name": "Nationality",
+      "type": "select",
+      "tab": "Custom",
+      "include": true,
+      "note": "Key segmentation axis for an international congregation."
+    },
+    {
+      "id": "303557",
+      "name": "District in Hanoi",
+      "type": "select",
+      "tab": "Custom",
+      "include": true,
+      "note": "Geographic segmentation."
+    },
+    {
+      "id": "303563",
+      "name": "Volunteer in Ministry (1st)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true,
+      "note": "Serving data."
+    },
+    {
+      "id": "303567",
+      "name": "Date Joined/started attending HIF",
+      "type": "date",
+      "tab": "Custom",
+      "include": true,
+      "note": "Journey milestone date. Highest-value field in this set."
+    },
+    {
+      "id": "314333",
+      "name": "Volunteer in Ministry (2nd)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "314334",
+      "name": "Volunteer in Ministry (3rd)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "314349",
+      "name": "Role in Ministry (1st)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "314350",
+      "name": "Role in Ministry (2nd)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "314351",
+      "name": "Role in Ministry (3rd)",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "316229",
+      "name": "Baptism Type",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "362064",
+      "name": "Denomination",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "362516",
+      "name": "Country of Residence",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "379719",
+      "name": "Baptized",
+      "type": "select",
+      "tab": "Custom",
+      "include": true,
+      "note": "Core GROW signal."
+    },
+    {
+      "id": "392155",
+      "name": "Volunteer in 4th, 5th ministries? (please enter)",
+      "type": "string",
+      "tab": "Custom",
+      "include": true,
+      "note": "Free text — expect messy values."
+    },
+    {
+      "id": "583873",
+      "name": "Domain of Work",
+      "type": "select",
+      "tab": "Custom",
+      "include": true
+    },
+    {
+      "id": "658689",
+      "name": "Elder/Staff Relation - Preference No. 01",
+      "type": "select",
+      "tab": "Custom",
+      "include": false,
+      "note": "EXCLUDED: pastoral confidence, not analytics data."
+    },
+    {
+      "id": "658690",
+      "name": "Elder/Staff Relation - Preference No. 02",
+      "type": "select",
+      "tab": "Custom",
+      "include": false,
+      "note": "EXCLUDED: pastoral confidence, not analytics data."
+    },
+    {
+      "id": "658691",
+      "name": "Elder/Staff Relation - Preference No. 03",
+      "type": "select",
+      "tab": "Custom",
+      "include": false,
+      "note": "EXCLUDED: pastoral confidence, not analytics data."
+    },
+    {
+      "id": "658692",
+      "name": "Elder/Staff Relation - Preference No. 04",
+      "type": "select",
+      "tab": "Custom",
+      "include": false,
+      "note": "EXCLUDED: pastoral confidence, not analytics data."
+    },
+    {
+      "id": "749903",
+      "name": "Groups",
+      "type": "string",
+      "tab": "Custom",
+      "include": true,
+      "note": "Free text duplicating real Groups memberships. Will go stale — prefer pco.group_memberships as source of truth."
+    },
+    {
+      "id": "909434",
+      "name": "Newcomer_Engagement_Record",
+      "type": "checkboxes",
+      "tab": "Custom",
+      "include": true,
+      "note": "Likely an existing follow-up mechanism. Inspect real values before designing around it."
+    },
+    {
+      "id": "953705",
+      "name": "Name",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "Duplicates pco.people.name."
+    },
+    {
+      "id": "953706",
+      "name": "GRADE",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "Duplicates pco.people.grade."
+    },
+    {
+      "id": "953707",
+      "name": "AGE",
+      "type": "number",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "Derivable from birthdate; a stored age goes stale every year."
+    },
+    {
+      "id": "957518",
+      "name": "GENDER",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "Duplicates pco.people.gender."
+    },
+    {
+      "id": "957519",
+      "name": "MARITAL STATUS",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true
+    },
+    {
+      "id": "957520",
+      "name": "PRIMARY PHONE",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "Duplicates pco.phone_numbers."
+    },
+    {
+      "id": "957521",
+      "name": "PRIMARY ADDRESS",
+      "type": "string",
+      "tab": "Custom 2",
+      "include": true,
+      "note": "PII. Home addresses land in the analytics database and every backup. Factor into dashboard access control."
+    }
+  ]
+}

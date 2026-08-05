@@ -1,0 +1,924 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KidzQuest — Prototype</title>
+<style>
+:root{
+  --bg:#f5f6f8; --panel:#fff; --ink:#151b26; --muted:#6b7684; --line:#e3e7ed;
+  --brand:#1f6f8b; --brand-dark:#17566c; --brand-soft:#e8f2f6;
+  --green:#1f8b5f; --green-soft:#e6f4ee;
+  --amber:#b7791f; --amber-soft:#fdf3e2;
+  --red:#c0392b; --red-soft:#fbeae8;
+  --purple:#6b4f9e; --purple-soft:#efeaf8;
+  --r:10px; --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.1);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;}
+h1,h2,h3,h4{margin:0;font-weight:650;letter-spacing:-.01em}
+a{color:inherit}
+button{font:inherit;cursor:pointer}
+
+/* ── prototype banner ─────────────────────────────────────── */
+.proto-bar{background:#2b2f38;color:#cfd6e0;font-size:12.5px;padding:7px 16px;
+  display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.proto-bar b{color:#fff}
+.proto-bar .dot{width:6px;height:6px;border-radius:50%;background:#e3b341}
+
+/* ── login ─────────────────────────────────────────────────── */
+#login{min-height:calc(100vh - 34px);display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(160deg,#1f6f8b,#123f52);padding:24px}
+.login-card{background:#fff;border-radius:14px;padding:36px 34px;width:100%;max-width:390px;
+  box-shadow:0 20px 50px rgba(0,0,0,.28)}
+.logo{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.logo-mark{width:34px;height:34px;border-radius:9px;background:var(--brand);color:#fff;
+  display:grid;place-items:center;font-weight:700;font-size:15px}
+.login-card p.sub{color:var(--muted);font-size:13.5px;margin:0 0 24px}
+label{display:block;font-size:13px;font-weight:600;margin:0 0 6px;color:#3c4654}
+input[type=text],input[type=password],input[type=search],select{
+  width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;
+  font:inherit;background:#fff;margin-bottom:15px}
+input:focus,select:focus{outline:2px solid var(--brand-soft);border-color:var(--brand)}
+.btn{background:var(--brand);color:#fff;border:0;padding:11px 16px;border-radius:8px;
+  font-weight:600;width:100%;font-size:15px}
+.btn:hover{background:var(--brand-dark)}
+.btn.sm{width:auto;padding:7px 13px;font-size:13.5px}
+.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btn.ghost:hover{background:#f2f4f7}
+.btn.green{background:var(--green)} .btn.green:hover{filter:brightness(.93)}
+.btn.red{background:var(--red)} .btn.red:hover{filter:brightness(.93)}
+.hint{font-size:12.5px;color:var(--muted);text-align:center;margin-top:16px;line-height:1.6}
+
+/* ── app shell ─────────────────────────────────────────────── */
+#app{display:none;grid-template-columns:224px 1fr;min-height:calc(100vh - 34px)}
+#app.on{display:grid}
+.side{background:#16202b;color:#aebaC6;padding:16px 12px;display:flex;flex-direction:column}
+.side .logo{margin:4px 6px 20px;color:#fff}
+.side .grp{font-size:11px;text-transform:uppercase;letter-spacing:.09em;color:#66788b;
+  margin:16px 8px 6px;font-weight:700}
+.nav{display:flex;flex-direction:column;gap:1px}
+.nav button{display:flex;align-items:center;gap:9px;background:0;border:0;color:#b6c2ce;
+  padding:9px 10px;border-radius:7px;text-align:left;font-size:14px;width:100%}
+.nav button:hover{background:#1f2b38;color:#fff}
+.nav button.on{background:var(--brand);color:#fff;font-weight:600}
+.nav .tag{margin-left:auto;font-size:10px;padding:2px 6px;border-radius:20px;
+  background:#2c3b4b;color:#8fa3b6;font-weight:700;letter-spacing:.04em}
+.nav button.on .tag{background:rgba(255,255,255,.22);color:#fff}
+.side .foot{margin-top:auto;border-top:1px solid #24313f;padding:12px 8px 4px;font-size:12.5px}
+.side .foot .who{color:#fff;font-weight:600}
+.side .foot button{background:0;border:0;color:#7d8fa2;padding:6px 0;font-size:12.5px}
+.side .foot button:hover{color:#fff;text-decoration:underline}
+
+.main{padding:26px 30px 60px;overflow:auto}
+.page{display:none} .page.on{display:block}
+.head{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+.head h1{font-size:23px}
+.head .desc{color:var(--muted);font-size:13.5px;margin-top:3px}
+
+/* ── bits ──────────────────────────────────────────────────── */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.card .ch{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;
+  align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.card .ch h3{font-size:15px}
+.card .cb{padding:16px}
+.grid{display:grid;gap:14px}
+.g4{grid-template-columns:repeat(4,1fr)}
+.g3{grid-template-columns:repeat(3,1fr)}
+.g2{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1080px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
+
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px 16px;
+  box-shadow:var(--shadow);cursor:pointer;transition:.13s}
+.stat:hover{border-color:var(--brand);transform:translateY(-1px)}
+.stat .k{font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.stat .v{font-size:29px;font-weight:700;margin:5px 0 2px;letter-spacing:-.02em}
+.stat .d{font-size:12.5px;color:var(--muted)}
+.stat .d .up{color:var(--green);font-weight:600}
+.stat .d .dn{color:var(--red);font-weight:600}
+
+table{width:100%;border-collapse:collapse;font-size:14px}
+th{text-align:left;font-size:11.5px;text-transform:uppercase;letter-spacing:.05em;
+  color:var(--muted);font-weight:700;padding:9px 16px;border-bottom:1px solid var(--line);
+  background:#fafbfc;cursor:pointer;user-select:none;white-space:nowrap}
+th:hover{color:var(--ink)}
+th .ar{opacity:.35;font-size:9px}
+td{padding:11px 16px;border-bottom:1px solid #eef1f4;vertical-align:middle}
+tbody tr{cursor:pointer}
+tbody tr:hover{background:#f8fafb}
+tbody tr:last-child td{border-bottom:0}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:650;
+  padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-voy{background:var(--brand-soft);color:var(--brand-dark)}
+.p-tra{background:var(--green-soft);color:var(--green)}
+.p-pat{background:var(--amber-soft);color:var(--amber)}
+.p-q  {background:#eceff3;color:#5b6672;border:1px dashed #b3bcc7}
+.p-aft{background:var(--purple-soft);color:var(--purple)}
+.p-in {background:var(--green-soft);color:var(--green)}
+.p-out{background:#eceff3;color:#5b6672}
+.p-wait{background:var(--amber-soft);color:var(--amber)}
+.p-flag{background:var(--red-soft);color:var(--red)}
+
+.av{width:32px;height:32px;border-radius:50%;background:var(--brand-soft);color:var(--brand-dark);
+  display:grid;place-items:center;font-weight:700;font-size:12px;flex:0 0 auto}
+.av.lg{width:56px;height:56px;font-size:19px}
+.who-cell{display:flex;align-items:center;gap:10px}
+.who-cell .nm{font-weight:600}
+.who-cell .sm{font-size:12px;color:var(--muted)}
+
+.bar{height:7px;border-radius:20px;background:#eceff3;overflow:hidden}
+.bar i{display:block;height:100%;border-radius:20px}
+
+.note{background:var(--amber-soft);border:1px solid #f0dcb4;color:#7c5510;
+  padding:11px 14px;border-radius:9px;font-size:13.5px;margin-bottom:18px}
+.note b{color:#5e3f0b}
+.note.blue{background:var(--brand-soft);border-color:#c4dde7;color:#14536b}
+.note.blue b{color:#0e3d50}
+
+.crumb{font-size:13px;color:var(--muted);margin-bottom:12px}
+.crumb button{background:0;border:0;color:var(--brand);padding:0;font-weight:600}
+.crumb button:hover{text-decoration:underline}
+
+.kv{display:grid;grid-template-columns:132px 1fr;gap:9px 14px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0}
+
+.toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:14px}
+.toolbar input,.toolbar select{margin:0;width:auto;min-width:150px}
+.seg{display:flex;background:#eceff3;border-radius:8px;padding:3px;gap:2px}
+.seg button{background:0;border:0;padding:6px 13px;border-radius:6px;font-size:13.5px;
+  font-weight:600;color:var(--muted)}
+.seg button.on{background:#fff;color:var(--ink);box-shadow:var(--shadow)}
+
+/* ── station (phone) ───────────────────────────────────────── */
+.phone-wrap{display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap}
+.phone{width:372px;border:9px solid #1b232d;border-radius:32px;overflow:hidden;
+  background:#fff;box-shadow:0 18px 44px rgba(16,24,40,.24);flex:0 0 auto}
+.ph-top{background:var(--brand);color:#fff;padding:13px 15px}
+.ph-top .r1{display:flex;justify-content:space-between;align-items:center;font-size:13px;opacity:.9}
+.ph-top h3{font-size:17px;margin-top:3px}
+.ph-counts{display:flex;gap:7px;margin-top:11px}
+.ph-counts div{flex:1;background:rgba(255,255,255,.15);border-radius:7px;padding:6px 8px;text-align:center}
+.ph-counts b{display:block;font-size:18px}
+.ph-counts span{font-size:10.5px;opacity:.85;text-transform:uppercase;letter-spacing:.04em}
+.ph-seg{display:flex;border-bottom:1px solid var(--line)}
+.ph-seg button{flex:1;background:0;border:0;padding:11px;font-weight:650;font-size:14px;
+  color:var(--muted);border-bottom:2px solid transparent}
+.ph-seg button.on{color:var(--brand);border-bottom-color:var(--brand)}
+.ph-search{padding:10px 12px;border-bottom:1px solid var(--line)}
+.ph-search input{margin:0;padding:9px 11px;font-size:14px}
+.ph-list{max-height:430px;overflow:auto}
+.kid-row{display:flex;align-items:center;gap:11px;padding:11px 13px;border-bottom:1px solid #eef1f4}
+.kid-row:active{background:#f2f4f7}
+.kid-row .nm{font-weight:650;font-size:14.5px}
+.kid-row .sm{font-size:12px;color:var(--muted)}
+.kid-row .act{margin-left:auto}
+.tap{border:0;border-radius:8px;padding:9px 14px;font-weight:650;font-size:13.5px;color:#fff}
+.tap.in{background:var(--green)} .tap.out{background:var(--brand)}
+.tap.done{background:#eceff3;color:var(--muted)}
+.ph-foot{padding:10px 13px;background:#fafbfc;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.sync{display:flex;align-items:center;gap:6px}
+.sync .d{width:7px;height:7px;border-radius:50%;background:var(--green)}
+
+.explain{flex:1;min-width:290px;max-width:460px}
+.explain h4{font-size:14px;margin-bottom:7px}
+.explain ul{margin:0 0 17px;padding-left:19px;color:#3c4654;font-size:13.5px}
+.explain li{margin-bottom:6px}
+
+/* ── modal ─────────────────────────────────────────────────── */
+.mask{display:none;position:fixed;inset:0;background:rgba(16,24,40,.55);z-index:50;
+  align-items:center;justify-content:center;padding:20px}
+.mask.on{display:flex}
+.modal{background:#fff;border-radius:13px;width:100%;max-width:420px;overflow:hidden;
+  box-shadow:0 24px 60px rgba(0,0,0,.3)}
+.modal .mh{padding:16px 18px;border-bottom:1px solid var(--line)}
+.modal .mh h3{font-size:16px}
+.modal .mh p{margin:4px 0 0;font-size:13px;color:var(--muted)}
+.modal .mb{padding:18px}
+.modal .mf{padding:13px 18px;background:#fafbfc;border-top:1px solid var(--line);
+  display:flex;gap:9px;justify-content:flex-end}
+.pick{display:flex;align-items:center;gap:11px;padding:11px;border:1px solid var(--line);
+  border-radius:9px;margin-bottom:9px;cursor:pointer}
+.pick:hover{border-color:var(--brand);background:var(--brand-soft)}
+.pick.no{border-style:dashed;color:var(--muted)}
+.grid-t th{position:sticky;top:0;z-index:1;background:#fafbfc;cursor:default}
+.grid-t td{padding:7px 10px;font-size:13px}
+.grid-t tbody tr:hover td{background:#f8fafb}
+.grid-t tbody tr:hover td[style*="sticky"]{background:#f8fafb}
+.code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;
+  letter-spacing:.13em;background:#16202b;color:#fff;padding:3px 9px;border-radius:6px;font-size:13px}
+</style>
+</head>
+<body>
+
+<div class="proto-bar">
+  <span class="dot"></span>
+  <b>PROTOTYPE</b>
+  <span>Clickable mock-up for feedback — every name and number below is invented. Nothing is saved.</span>
+</div>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<div id="login">
+  <div class="login-card">
+    <div class="logo">
+      <div class="logo-mark">KQ</div>
+      <div><h2 style="font-size:18px">KidzQuest</h2>
+      <div style="font-size:12px;color:var(--muted)">Hanoi International Fellowship</div></div>
+    </div>
+    <p class="sub">Sign in to check children in and out.</p>
+    <label>Email</label>
+    <input type="text" value="grace.tran@hif.vn">
+    <label>Password</label>
+    <input type="password" value="••••••••••">
+    <button class="btn" onclick="signIn()">Sign in</button>
+    <p class="hint">Demo — press sign in to explore.<br>
+      Switch role in the sidebar to see what a TA sees.</p>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+  <aside class="side">
+    <div class="logo">
+      <div class="logo-mark">KQ</div>
+      <div><div style="font-weight:700;font-size:15px">KidzQuest</div>
+      <div style="font-size:11px;color:#66788b">Hanoi campus</div></div>
+    </div>
+
+    <div class="grp">Sunday</div>
+    <div class="nav">
+      <button class="on" data-p="station" onclick="go('station',this)">Attendance <span class="tag">SUN</span></button>
+    </div>
+
+    <div class="grp">Admin</div>
+    <div class="nav">
+      <button data-p="dash" onclick="go('dash',this)">Dashboard <span class="tag">SUN</span></button>
+      <button data-p="grid" onclick="go('grid',this)">Register <span class="tag">SUN</span></button>
+      <button data-p="kids" onclick="go('kids',this)">Kids <span class="tag">SUN</span></button>
+      <button data-p="teachers" onclick="go('teachers',this)">Teachers</button>
+      <button data-p="tas" onclick="go('tas',this)">Assistants</button>
+    </div>
+
+    <div class="foot">
+      <div class="who" id="who">Grace Tran</div>
+      <div id="role" style="color:#7d8fa2">Administrator</div>
+      <button onclick="swapRole()">↻ View as Teaching Assistant</button><br>
+      <button onclick="signOut()">Sign out</button>
+    </div>
+  </aside>
+
+  <main class="main">
+
+    <!-- ────────── STATION ────────── -->
+    <section class="page on" id="p-station">
+      <div class="head">
+        <div>
+          <h1>Attendance — Sunday 9 August</h1>
+          <div class="desc">Explorers · Room 2 · Grace Tran &amp; Minh Pham</div>
+        </div>
+        <div class="seg">
+          <button class="on">Hanoi</button><button>Ecopark</button><button>Thai Nguyen</button>
+        </div>
+      </div>
+
+      <div class="note blue"><b>This is the only screen that has to work on Sunday.</b>
+        A TA opens it on a phone or tablet at the door. Everything else can follow later.</div>
+
+      <div class="phone-wrap">
+        <div class="phone">
+          <div class="ph-top">
+            <div class="r1"><span>Explorers · Grade 0</span><span>09:58</span></div>
+            <h3>Room 2 — Hanoi</h3>
+            <div class="ph-counts">
+              <div><b id="c-exp">24</b><span>Expected</span></div>
+              <div><b id="c-in">9</b><span>Here</span></div>
+              <div><b id="c-out">2</b><span>Collected</span></div>
+            </div>
+          </div>
+          <div class="ph-seg">
+            <button class="on" id="tab-in" onclick="stTab('in')">Check in</button>
+            <button id="tab-out" onclick="stTab('out')">Check out</button>
+          </div>
+          <div class="ph-search"><input type="search" placeholder="Search a name…" oninput="stFilter(this.value)"></div>
+          <div class="ph-list" id="st-list"></div>
+          <div class="ph-foot">
+            <div class="sync"><span class="d"></span> All saved</div>
+            <div>+ Add walk-in</div>
+          </div>
+        </div>
+
+        <div class="explain">
+          <h4>What a TA does</h4>
+          <ul>
+            <li>Tap a child → choose who dropped them off → label prints.</li>
+            <li>Switch to <b>Check out</b> to release them. Only adults marked as
+                authorised appear.</li>
+            <li>An adult who isn't on the list can still collect — but it needs a
+                teacher and a typed reason, and it is recorded.</li>
+            <li>The counter at the top never lets "who is still here?" be a guess.</li>
+          </ul>
+          <h4>What it does when the wifi drops</h4>
+          <ul>
+            <li>The roster is already on the device. Taps keep working.</li>
+            <li>The dot at the bottom turns amber and says how many are queued.</li>
+            <li>Labels still print — printing never waits on the network.</li>
+          </ul>
+          <div class="note" style="margin:0">
+            <b>Open question for Sunday.</b> If a tablet dies with children checked in,
+            the room has no record at all. One printed roster per room, as a fallback,
+            costs nothing.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ────────── DASHBOARD ────────── -->
+    <section class="page" id="p-dash">
+      <div class="head">
+        <div><h1>Dashboard</h1>
+          <div class="desc">Sunday 2 August 2026 · Hanoi campus</div></div>
+        <div class="seg"><button class="on">This term</button><button>Year</button><button>All time</button></div>
+      </div>
+
+      <div class="note blue"><b>Groups follow school grade, not age.</b>
+        Explorers = Grade 0 · Voyagers = Grades 1–2 · Trailblazers = Grades 3–4 ·
+        Pathfinders = Grades 5–7. Ages shown are typical, not the rule — so
+        children move up once a year with the school year, together, rather than
+        one at a time on their birthdays.</div>
+
+      <div class="grid g4" style="margin-bottom:16px">
+        <div class="stat" onclick="go('sunday')">
+          <div class="k">Attended 2 Aug</div><div class="v">23</div>
+          <div class="d"><span class="up">▲ 3</span> vs 26 Jul</div></div>
+        <div class="stat" onclick="go('kids')">
+          <div class="k">On the roster</div><div class="v">41</div>
+          <div class="d">56% attendance</div></div>
+        <div class="stat" onclick="go('teachers')">
+          <div class="k">Teachers</div><div class="v">6</div>
+          <div class="d">4 rostered this week</div></div>
+        <div class="stat" onclick="go('tas')">
+          <div class="k">Assistants</div><div class="v">9</div>
+          <div class="d">2 unconfirmed</div></div>
+      </div>
+
+      <div class="grid g2" style="margin-bottom:16px">
+        <div class="card">
+          <div class="ch"><h3>By age group</h3>
+            <div class="seg"><button class="on">Group</button><button onclick="go('sunday')">Sex</button></div></div>
+          <div class="cb" id="grp-box"></div>
+        </div>
+
+        <div class="card">
+          <div class="ch"><h3>Recent Sundays</h3><span style="font-size:12.5px;color:var(--muted)">Click a row</span></div>
+          <table>
+            <thead><tr><th onclick="sortT(this,0)">Date <span class="ar">▼</span></th>
+              <th onclick="sortT(this,1)">Attended <span class="ar">▲▼</span></th>
+              <th onclick="sortT(this,2)">Roster <span class="ar">▲▼</span></th>
+              <th onclick="sortT(this,3)">Rate <span class="ar">▲▼</span></th></tr></thead>
+            <tbody>
+              <tr onclick="go('sunday')"><td><b>Sun 2 Aug</b></td><td>23</td><td>41</td><td>56%</td></tr>
+              <tr onclick="go('sunday')"><td>Sun 26 Jul</td><td>20</td><td>41</td><td>49%</td></tr>
+              <tr onclick="go('sunday')"><td>Sun 19 Jul</td><td>26</td><td>40</td><td>65%</td></tr>
+              <tr onclick="go('sunday')"><td>Sun 12 Jul</td><td>24</td><td>40</td><td>60%</td></tr>
+              <tr onclick="go('sunday')"><td>Sun 5 Jul</td><td>18</td><td>39</td><td>46%</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Needs a look</h3></div>
+        <table>
+          <tbody>
+            <tr onclick="go('kid')"><td style="width:38px"><span class="pill p-flag">!</span></td>
+              <td><b>Amara Okafor</b> — not seen for 4 Sundays</td>
+              <td style="text-align:right;color:var(--muted)">last: 5 Jul</td></tr>
+            <tr><td><span class="pill p-flag">!</span></td>
+              <td><b>3 children</b> have no authorised collector recorded</td>
+              <td style="text-align:right;color:var(--muted)">blocks check-out</td></tr>
+            <tr><td><span class="pill p-wait">?</span></td>
+              <td><b>7 registrations</b> waiting to be matched to the roster</td>
+              <td style="text-align:right;color:var(--muted)">from the form</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ────────── SUNDAY DETAIL ────────── -->
+    <section class="page" id="p-sunday">
+      <div class="crumb"><button onclick="go('dash')">Dashboard</button> › Sunday 2 August</div>
+      <div class="head">
+        <div><h1>Sunday 2 August 2026</h1>
+          <div class="desc">23 of 41 children attended · 4 rooms · Hanoi</div></div>
+        <button class="btn ghost sm">Export</button>
+      </div>
+
+      <div class="grid g3" style="margin-bottom:16px">
+        <div class="stat"><div class="k">Attended</div><div class="v">23</div><div class="d">56% of roster</div></div>
+        <div class="stat"><div class="k">Girls / Boys</div><div class="v">11 / 12</div><div class="d">roughly even</div></div>
+        <div class="stat"><div class="k">First time</div><div class="v">2</div><div class="d">both Voyagers</div></div>
+      </div>
+
+      <div class="card">
+        <div class="ch"><h3>Who attended</h3>
+          <div class="toolbar" style="margin:0">
+            <select><option>All groups</option><option>Explorers</option><option>Voyagers</option>
+              <option>Trailblazers</option><option>Pathfinders</option></select>
+            <select><option>All</option><option>Girls</option><option>Boys</option></select>
+          </div></div>
+        <table id="t-sunday">
+          <thead><tr><th onclick="sortT(this,0)">Child <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,1)">Group <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,2)">In <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,3)">Out <span class="ar">▲▼</span></th>
+            <th>Collected by</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ────────── REGISTER GRID ────────── -->
+    <section class="page" id="p-grid">
+      <div class="head">
+        <div><h1>Register</h1>
+          <div class="desc">The same shape as the spreadsheet — children down, Sundays across</div></div>
+        <div style="display:flex;gap:9px">
+          <select style="margin:0;width:auto"><option>Explorers</option><option>Voyagers</option>
+            <option>Trailblazers</option><option>Pathfinders</option></select>
+          <button class="btn ghost sm">Export CSV</button>
+        </div>
+      </div>
+
+      <div class="note blue"><b>This view exists so nothing is lost in the move.</b>
+        It reads like the current sheet, so an admin can scan a term at a glance —
+        but a tick here is a real check-in with a time and a named adult behind it.
+        Click any tick to see who.</div>
+
+      <div class="card" style="overflow:hidden">
+        <div class="ch"><h3>Explorers · May – August 2026</h3>
+          <span style="font-size:12.5px;color:var(--muted)">18 Sundays · scroll sideways →</span></div>
+        <div style="overflow:auto;max-height:520px">
+          <table class="grid-t" id="t-grid"></table>
+        </div>
+      </div>
+
+      <div class="grid g3" style="margin-top:16px">
+        <div class="card"><div class="cb">
+          <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Never attended</div>
+          <div style="font-size:27px;font-weight:700;margin:4px 0">3</div>
+          <div style="font-size:12.5px;color:var(--muted)">On the roster all term, no tick. Worth a call.</div>
+        </div></div>
+        <div class="card"><div class="cb">
+          <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Name only, no contact</div>
+          <div style="font-size:27px;font-weight:700;margin:4px 0">4</div>
+          <div style="font-size:12.5px;color:var(--muted)">No surname, no guardian. Cannot be checked out safely.</div>
+        </div></div>
+        <div class="card"><div class="cb">
+          <div style="font-size:12px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.05em">Median attendance</div>
+          <div style="font-size:27px;font-weight:700;margin:4px 0">3 <span style="font-size:15px;font-weight:500;color:var(--muted)">of 14</span></div>
+          <div style="font-size:12.5px;color:var(--muted)">Sundays attended since May.</div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ────────── KIDS ────────── -->
+    <section class="page" id="p-kids">
+      <div class="head">
+        <div><h1>Kids</h1><div class="desc">41 children on the roster</div></div>
+        <button class="btn sm">+ Add child</button>
+      </div>
+      <div class="toolbar">
+        <input type="search" placeholder="Search name…" oninput="kidFilter(this.value)">
+        <select><option>All groups</option><option>Explorers</option><option>Voyagers</option>
+          <option>Trailblazers</option><option>Pathfinders</option></select>
+        <select><option>All grades</option><option>Grade 0</option><option>Grade 1</option>
+          <option>Grade 2</option><option>Grade 3</option><option>Grade 4</option>
+          <option>Grade 5</option><option>Grade 6</option><option>Grade 7</option></select>
+        <select><option>All</option><option>Girls</option><option>Boys</option></select>
+        <span style="margin-left:auto;font-size:13px;color:var(--muted)" id="kid-count"></span>
+      </div>
+      <div class="card">
+        <table id="t-kids">
+          <thead><tr><th onclick="sortT(this,0)">Child <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,1)">Grade <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,2)">Group <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,3)">Age <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,4)">Guardian <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,5)">Attendance <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,6)">Last seen <span class="ar">▲▼</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ────────── KID DETAIL ────────── -->
+    <section class="page" id="p-kid">
+      <div class="crumb"><button onclick="go('kids')">Kids</button> › Linh Nguyen</div>
+      <div class="head">
+        <div style="display:flex;gap:14px;align-items:center">
+          <div class="av lg">LN</div>
+          <div><h1>Linh Nguyen</h1>
+            <div class="desc"><span class="pill p-voy">Explorers</span> &nbsp;Grade 0 · 4 years old · on roster since Feb 2026</div></div>
+        </div>
+        <button class="btn ghost sm">Edit</button>
+      </div>
+
+      <div class="grid g3">
+        <div class="card"><div class="ch"><h3>Details</h3></div><div class="cb">
+          <dl class="kv">
+            <dt>Full name</dt><dd>Nguyễn Thùy Linh</dd>
+            <dt>Goes by</dt><dd>Linh</dd>
+            <dt>Born</dt><dd>14 Mar 2022</dd>
+            <dt>Grade</dt><dd>0 — pre-school</dd>
+            <dt>Group</dt><dd>Explorers <span style="color:var(--muted);font-size:12.5px">(from grade)</span></dd>
+            <dt>Allergies</dt><dd><span class="pill p-flag">Peanuts</span></dd>
+            <dt>Photos</dt><dd>Allowed</dd>
+            <dt>Added from</dt><dd>Registration form</dd>
+          </dl></div></div>
+
+        <div class="card"><div class="ch"><h3>Who may collect</h3>
+          <button class="btn ghost sm">+ Add</button></div><div class="cb">
+          <div class="pick"><div class="av">TN</div>
+            <div><div style="font-weight:650">Thu Nguyen</div>
+              <div style="font-size:12px;color:var(--muted)">Mother · +84 91 234 5678</div></div>
+            <span class="pill p-in" style="margin-left:auto">Authorised</span></div>
+          <div class="pick"><div class="av">DN</div>
+            <div><div style="font-weight:650">Duc Nguyen</div>
+              <div style="font-size:12px;color:var(--muted)">Father · +84 90 887 2211</div></div>
+            <span class="pill p-in" style="margin-left:auto">Authorised</span></div>
+          <div class="pick no"><div class="av" style="background:#eceff3;color:#6b7684">BN</div>
+            <div><div style="font-weight:650">Ba Ngoai (grandmother)</div>
+              <div style="font-size:12px;color:var(--muted)">Contact only</div></div>
+            <span class="pill p-out" style="margin-left:auto">Not authorised</span></div>
+          <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0">
+            Being a contact and being allowed to collect are separate on purpose.</p>
+        </div></div>
+
+        <div class="card"><div class="ch"><h3>Attendance</h3></div><div class="cb">
+          <div style="display:flex;gap:16px;margin-bottom:14px">
+            <div><div style="font-size:26px;font-weight:700">14</div>
+              <div style="font-size:12px;color:var(--muted)">Sundays this year</div></div>
+            <div><div style="font-size:26px;font-weight:700">72%</div>
+              <div style="font-size:12px;color:var(--muted)">Attendance rate</div></div>
+          </div>
+          <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:12px" id="dots"></div>
+          <table style="font-size:13px"><tbody>
+            <tr><td style="padding:7px 0">Sun 2 Aug</td><td style="text-align:right">
+              <span class="pill p-in">09:41 – 11:20</span></td></tr>
+            <tr><td style="padding:7px 0">Sun 26 Jul</td><td style="text-align:right">
+              <span class="pill p-out">Absent</span></td></tr>
+            <tr><td style="padding:7px 0">Sun 19 Jul</td><td style="text-align:right">
+              <span class="pill p-in">09:52 – 11:15</span></td></tr>
+          </tbody></table>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- ────────── TEACHERS ────────── -->
+    <section class="page" id="p-teachers">
+      <div class="head">
+        <div><h1>Teachers</h1><div class="desc">6 teachers · showing Sundays served</div></div>
+        <button class="btn sm">+ Add teacher</button>
+      </div>
+      <div class="note blue">Serving history answers two questions leaders actually ask:
+        <b>who is carrying too much</b>, and <b>who has quietly stopped coming</b>.</div>
+      <div class="card">
+        <table id="t-teach">
+          <thead><tr><th onclick="sortT(this,0)">Teacher <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,1)">Group <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,2)">Sundays <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,3)">Last served <span class="ar">▲▼</span></th>
+            <th>Last 8 Sundays</th><th onclick="sortT(this,5)">Status <span class="ar">▲▼</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ────────── TAs ────────── -->
+    <section class="page" id="p-tas">
+      <div class="head">
+        <div><h1>Teaching assistants</h1><div class="desc">9 assistants · showing Sundays served</div></div>
+        <button class="btn sm">+ Add assistant</button>
+      </div>
+      <div class="card">
+        <table id="t-ta">
+          <thead><tr><th onclick="sortT(this,0)">Assistant <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,1)">Group <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,2)">Sundays <span class="ar">▲▼</span></th>
+            <th onclick="sortT(this,3)">Last served <span class="ar">▲▼</span></th>
+            <th>Last 8 Sundays</th><th onclick="sortT(this,5)">Status <span class="ar">▲▼</span></th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+<div class="mask" id="mask">
+  <div class="modal">
+    <div class="mh"><h3 id="m-title">Check in — Linh Nguyen</h3>
+      <p id="m-sub">Who is dropping off?</p></div>
+    <div class="mb" id="m-body"></div>
+    <div class="mf">
+      <button class="btn ghost sm" onclick="closeM()">Cancel</button>
+      <button class="btn sm" style="width:auto" onclick="closeM()" id="m-ok">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────── demo data ─────────── */
+const GRP = {
+  exp:{n:'Explorers',   c:'p-voy', age:'Pre-school', gr:'Grade 0'},
+  voy:{n:'Voyagers',    c:'p-tra', age:'5–6',        gr:'Grades 1–2'},
+  tra:{n:'Trailblazers',c:'p-pat', age:'7–8',        gr:'Grades 3–4'},
+  pat:{n:'Pathfinders', c:'p-aft', age:'9–11',       gr:'Grades 5–7'}
+};
+
+/* name, group, grade, age, sex, guardian, attendance %, last seen */
+const KIDS = [
+  ['Linh Nguyen','exp',0,4,'F','Thu Nguyen',72,'2 Aug'],
+  ['Ethan Reyes','exp',0,4,'M','Maria Reyes',64,'2 Aug'],
+  ['Sophia Kim','exp',0,3,'F','Jisoo Kim',88,'2 Aug'],
+  ['Minh Anh Tran','exp',0,4,'F','Hoa Tran',56,'26 Jul'],
+  ['Caleb Adeyemi','exp',0,3,'M','Funmi Adeyemi',80,'2 Aug'],
+  ['Bao Le','exp',0,4,'M','Trang Le',44,'19 Jul'],
+  ['Grace Santos','voy',2,6,'F','Ana Santos',92,'2 Aug'],
+  ['Daniel Park','voy',1,5,'M','Sunhee Park',76,'2 Aug'],
+  ['Chi Pham','voy',2,6,'F','Lan Pham',68,'2 Aug'],
+  ['Noah Williams','voy',1,5,'M','Sarah Williams',60,'26 Jul'],
+  ['Thao Vu','voy',2,6,'F','Ngoc Vu',84,'2 Aug'],
+  ['Isabella Cruz','voy',1,5,'F','Rosa Cruz',52,'19 Jul'],
+  ['Duc Hoang','tra',4,8,'M','Mai Hoang',72,'2 Aug'],
+  ['Amara Okafor','tra',3,7,'F','Chidi Okafor',28,'5 Jul'],
+  ['Lucas Meyer','tra',4,8,'M','Anna Meyer',80,'2 Aug'],
+  ['Ha My Do','tra',3,7,'F','Yen Do',64,'2 Aug'],
+  ['Joshua Tan','tra',4,8,'M','Wei Tan',88,'2 Aug'],
+  ['Trinh Bui','tra',3,7,'F','Hanh Bui',48,'26 Jul'],
+  ['Khanh Ly','pat',6,10,'F','Tuan Ly',76,'2 Aug'],
+  ['Samuel Mensah','pat',7,11,'M','Kwame Mensah',68,'2 Aug'],
+  ['Emily Chen','pat',5,9,'F','Li Chen',84,'2 Aug'],
+  ['Nam Vo','pat',6,10,'M','Bich Vo',56,'19 Jul'],
+  ['Olivia Brooks','pat',7,11,'F','Kate Brooks',72,'2 Aug']
+];
+const K = {name:0, grp:1, grade:2, age:3, sex:4, guard:5, att:6, seen:7};
+
+const STAFF_T = [
+  ['Grace Tran','exp',18,'2 Aug','active'],
+  ['Daniel Osei','voy',22,'2 Aug','active'],
+  ['Mai Nguyen','tra',15,'2 Aug','active'],
+  ['Peter Santos','pat',19,'26 Jul','active'],
+  ['Hannah Kim','voy',11,'19 Jul','active'],
+  ['John Adeyemi','exp',4,'14 Jun','quiet']
+];
+const STAFF_A = [
+  ['Minh Pham','exp',14,'2 Aug','active'],
+  ['Sarah Lim','exp',9,'2 Aug','active'],
+  ['Tuan Do','voy',17,'2 Aug','active'],
+  ['Blessing Eze','voy',12,'2 Aug','active'],
+  ['Anh Vu','tra',20,'2 Aug','active'],
+  ['Ruth Bautista','tra',8,'26 Jul','active'],
+  ['Long Ha','pat',13,'2 Aug','active'],
+  ['Chloe Martin','pat',6,'12 Jul','quiet'],
+  ['Nghia Truong','voy',3,'7 Jun','quiet']
+];
+
+const ini = n => n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase();
+const pill = g => `<span class="pill ${GRP[g].c}">${GRP[g].n}</span>`;
+const who = (n,s) => `<div class="who-cell"><div class="av">${ini(n)}</div>
+  <div><div class="nm">${n}</div>${s?`<div class="sm">${s}</div>`:''}</div></div>`;
+
+/* ─────────── nav ─────────── */
+function signIn(){document.getElementById('login').style.display='none';
+  document.getElementById('app').classList.add('on');}
+function signOut(){document.getElementById('app').classList.remove('on');
+  document.getElementById('login').style.display='flex';}
+
+function go(p,el){
+  document.querySelectorAll('.page').forEach(s=>s.classList.remove('on'));
+  document.getElementById('p-'+p).classList.add('on');
+  document.querySelectorAll('.nav button').forEach(b=>b.classList.remove('on'));
+  const t = el || document.querySelector(`.nav button[data-p="${p}"]`);
+  if(t) t.classList.add('on');
+  document.querySelector('.main').scrollTop=0;
+}
+
+let isAdmin=true;
+function swapRole(){
+  isAdmin=!isAdmin;
+  document.getElementById('who').textContent = isAdmin?'Grace Tran':'Minh Pham';
+  document.getElementById('role').textContent = isAdmin?'Administrator':'Teaching assistant';
+  document.querySelector('.side .foot button').textContent =
+    isAdmin?'↻ View as Teaching Assistant':'↻ View as Administrator';
+  document.querySelectorAll('.nav button').forEach(b=>{
+    if(b.dataset.p!=='station') b.style.display = isAdmin?'':'none';
+  });
+  if(!isAdmin) go('station');
+}
+
+/* ─────────── sortable tables ─────────── */
+function sortT(th,i){
+  const tb=th.closest('table').querySelector('tbody');
+  const rows=[...tb.rows];
+  const asc = th.dataset.d!=='asc';
+  th.closest('tr').querySelectorAll('th').forEach(h=>h.dataset.d='');
+  th.dataset.d = asc?'asc':'desc';
+  rows.sort((a,b)=>{
+    const x=a.cells[i]?.innerText.trim()||'', y=b.cells[i]?.innerText.trim()||'';
+    const nx=parseFloat(x.replace(/[^\d.-]/g,'')), ny=parseFloat(y.replace(/[^\d.-]/g,''));
+    if(!isNaN(nx)&&!isNaN(ny)) return asc?nx-ny:ny-nx;
+    return asc?x.localeCompare(y):y.localeCompare(x);
+  });
+  rows.forEach(r=>tb.appendChild(r));
+}
+
+/* ─────────── dashboard ─────────── */
+(function(){
+  const counts={exp:6,voy:6,tra:5,pat:6}, tot={exp:11,voy:10,tra:10,pat:10};
+  document.getElementById('grp-box').innerHTML = Object.keys(GRP).map(g=>{
+    const pc=Math.round(counts[g]/tot[g]*100);
+    const col={exp:'#1f6f8b',voy:'#1f8b5f',tra:'#b7791f',pat:'#6b4f9e'}[g];
+    return `<div style="margin-bottom:14px;cursor:pointer" onclick="go('sunday')">
+      <div style="display:flex;justify-content:space-between;font-size:13.5px;margin-bottom:5px">
+        <span>${pill(g)} <span style="color:var(--muted);font-size:12px">${GRP[g].gr}</span></span>
+        <b>${counts[g]} / ${tot[g]}</b></div>
+      <div class="bar"><i style="width:${pc}%;background:${col}"></i></div></div>`;
+  }).join('') + `<p style="font-size:12.5px;color:var(--muted);margin:4px 0 0">
+    Attended on 2 August, out of those on the roster. Groups follow school grade.</p>`;
+})();
+
+/* ─────────── sunday table ─────────── */
+(function(){
+  const t=['09:41','09:47','09:52','09:38','10:02','09:55','09:44','09:50'];
+  document.querySelector('#t-sunday tbody').innerHTML = KIDS.slice(0,14).map((k,i)=>
+    `<tr onclick="go('kid')"><td>${who(k[K.name])}</td><td>${pill(k[K.grp])}</td>
+     <td>${t[i%8]}</td><td>11:${10+i%9}</td>
+     <td style="color:var(--muted)">${k[K.guard]}</td></tr>`).join('');
+})();
+
+/* ─────────── kids table ─────────── */
+function drawKids(f=''){
+  const q=f.toLowerCase();
+  const rows=KIDS.filter(k=>k[K.name].toLowerCase().includes(q));
+  document.querySelector('#t-kids tbody').innerHTML = rows.map(k=>{
+    const a=k[K.att];
+    const col = a>=70?'var(--green)':a>=45?'var(--amber)':'var(--red)';
+    return `<tr onclick="go('kid')"><td>${who(k[K.name],k[K.sex]==='F'?'Girl':'Boy')}</td>
+      <td><b>${k[K.grade]}</b></td>
+      <td>${pill(k[K.grp])}</td><td>${k[K.age]}</td>
+      <td style="color:var(--muted)">${k[K.guard]}</td>
+      <td><div style="display:flex;align-items:center;gap:8px">
+        <div class="bar" style="width:60px"><i style="width:${a}%;background:${col}"></i></div>
+        <span style="font-size:12.5px;color:var(--muted)">${a}%</span></div></td>
+      <td style="color:var(--muted)">${k[K.seen]}</td></tr>`;}).join('');
+  document.getElementById('kid-count').textContent=`${rows.length} of ${KIDS.length} shown`;
+}
+function kidFilter(v){drawKids(v)}
+drawKids();
+
+/* ─────────── register grid ─────────── */
+(function(){
+  const DATES=['3 May','10 May','17 May','24 May','31 May','7 Jun','14 Jun','21 Jun',
+               '28 Jun','5 Jul','12 Jul','19 Jul','26 Jul','2 Aug','9 Aug','16 Aug',
+               '23 Aug','30 Aug'];
+  const FUTURE=14;                         // 9 Aug onwards hasn't happened
+  const seed=(s)=>{let h=0;for(const c of s)h=(h*31+c.charCodeAt(0))|0;return Math.abs(h)};
+
+  const head = `<thead><tr>
+    <th style="position:sticky;left:0;background:#fafbfc;z-index:3;min-width:190px">Child</th>
+    <th style="min-width:150px">Primary contact</th>`
+    + DATES.map((d,i)=>`<th style="text-align:center;min-width:62px;${i>=FUTURE?'color:#b3bcc7':''}">${d}</th>`).join('')
+    + `<th style="text-align:center;min-width:60px">Total</th></tr></thead>`;
+
+  const body = KIDS.map(k=>{
+    const n=k[K.name], r=seed(n);
+    let marks=DATES.map((_,i)=> i>=FUTURE ? null : ((r>>(i%12))%100) < k[K.att]);
+    const tot=marks.filter(Boolean).length;
+    const noContact = ['Sophia Kim','Bao Le'].includes(n);   // illustrate the gap
+    return `<tr>
+      <td style="position:sticky;left:0;background:#fff;z-index:2;border-right:1px solid var(--line)">
+        <div style="display:flex;align-items:center;gap:9px">
+          <div class="av" style="width:26px;height:26px;font-size:10px">${ini(n)}</div>
+          <div><div style="font-weight:600;font-size:13.5px">${n}</div>
+          <div style="font-size:11px;color:var(--muted)">${pill(k[K.grp])}</div></div></div></td>
+      <td style="font-size:12.5px;color:${noContact?'var(--red)':'var(--muted)'}">
+        ${noContact?'⚠ none recorded':k[K.guard]}</td>`
+      + marks.map(m=> m===null
+          ? `<td style="text-align:center;background:#fbfcfd"></td>`
+          : `<td style="text-align:center">${m
+              ?'<span style="color:var(--green);font-weight:700;cursor:pointer" title="09:47 · dropped by parent">✓</span>'
+              :'<span style="color:#dde2e8">·</span>'}</td>`).join('')
+      + `<td style="text-align:center;font-weight:700">${tot}</td></tr>`;
+  }).join('');
+
+  document.getElementById('t-grid').innerHTML = head + `<tbody>${body}</tbody>`;
+})();
+
+/* ─────────── kid detail dots ─────────── */
+document.getElementById('dots').innerHTML =
+  [1,0,1,1,1,0,1,1,1,1,0,1,1,1,0,1,1,1].map(v=>
+   `<span style="width:15px;height:15px;border-radius:4px;display:inline-block;
+    background:${v?'var(--green)':'#e3e7ed'}"></span>`).join('');
+
+/* ─────────── staff tables ─────────── */
+function drawStaff(sel,data){
+  document.querySelector(sel).innerHTML = data.map(s=>{
+    const dots=[...Array(8)].map((_,i)=>{
+      const on = s[4]==='quiet' ? i<2 : (i!==3&&i!==6);
+      return `<span style="width:13px;height:13px;border-radius:3px;display:inline-block;
+        margin-right:2px;background:${on?'var(--green)':'#e3e7ed'}"></span>`}).join('');
+    const st = s[4]==='active'
+      ? '<span class="pill p-in">Serving</span>'
+      : '<span class="pill p-wait">Quiet 6+ wks</span>';
+    return `<tr><td>${who(s[0])}</td><td>${pill(s[1])}</td><td><b>${s[2]}</b></td>
+      <td style="color:var(--muted)">${s[3]}</td><td>${dots}</td><td>${st}</td></tr>`;
+  }).join('');
+}
+drawStaff('#t-teach tbody',STAFF_T);
+drawStaff('#t-ta tbody',STAFF_A);
+
+/* ─────────── station ─────────── */
+let stMode='in', stQ='';
+const ROOM = KIDS.filter(k=>k[K.grp]==='exp').concat([
+  ['Yen Nhi Dang','exp',0,3,'F','Kim Dang',70,'2 Aug'],
+  ['Micah Johnson','exp',0,4,'M','Ruth Johnson',66,'2 Aug'],
+  ['Quyen Ho','exp',0,3,'F','Nga Ho',58,'26 Jul']
+]);
+const state={}; ROOM.forEach((k,i)=>state[k[K.name]] = i<2?'out':(i<6?'in':'wait'));
+
+function drawStation(){
+  const list=ROOM.filter(k=>k[K.name].toLowerCase().includes(stQ.toLowerCase()))
+    .filter(k=> stMode==='in' ? state[k[K.name]]!=='out' : state[k[K.name]]==='in');
+  document.getElementById('st-list').innerHTML = list.map(k=>{
+    const n=k[K.name], s=state[n];
+    let act;
+    if(stMode==='in') act = s==='wait'
+      ? `<button class="tap in" onclick="openM('${n}','in')">Check in</button>`
+      : `<button class="tap done">Here ✓</button>`;
+    else act = `<button class="tap out" onclick="openM('${n}','out')">Check out</button>`;
+    const al = n==='Linh Nguyen' ? ' <span class="pill p-flag">Peanuts</span>' : '';
+    return `<div class="kid-row"><div class="av">${ini(n)}</div>
+      <div><div class="nm">${n}${al}</div>
+      <div class="sm">${k[K.age]} yrs · ${k[K.guard]}</div></div>
+      <div class="act">${act}</div></div>`;}).join('')
+    || `<div style="padding:34px;text-align:center;color:var(--muted);font-size:13.5px">
+        Nobody here yet.</div>`;
+  document.getElementById('c-in').textContent  = ROOM.filter(k=>state[k[K.name]]==='in').length;
+  document.getElementById('c-out').textContent = ROOM.filter(k=>state[k[K.name]]==='out').length;
+  document.getElementById('c-exp').textContent = ROOM.length;
+}
+function stTab(m){stMode=m;
+  document.getElementById('tab-in').classList.toggle('on',m==='in');
+  document.getElementById('tab-out').classList.toggle('on',m==='out');
+  drawStation();}
+function stFilter(v){stQ=v;drawStation()}
+drawStation();
+
+/* ─────────── modal ─────────── */
+let mKid='',mMode='';
+function openM(name,mode){
+  mKid=name;mMode=mode;
+  const k=ROOM.find(x=>x[K.name]===name);
+  document.getElementById('m-title').textContent =
+    (mode==='in'?'Check in — ':'Check out — ')+name;
+  document.getElementById('m-sub').textContent =
+    mode==='in'?'Who is dropping off?':'Who is collecting?';
+  document.getElementById('m-body').innerHTML = mode==='in'
+    ? `<div class="pick" onclick="doM()"><div class="av">${ini(k[K.guard])}</div>
+         <div><div style="font-weight:650">${k[K.guard]}</div>
+         <div style="font-size:12px;color:var(--muted)">Mother</div></div></div>
+       <div class="pick" onclick="doM()"><div class="av">DN</div>
+         <div><div style="font-weight:650">Duc Nguyen</div>
+         <div style="font-size:12px;color:var(--muted)">Father</div></div></div>
+       <div class="pick no" onclick="doM()"><div class="av" style="background:#eceff3;color:#6b7684">+</div>
+         <div><div style="font-weight:650">Someone else</div>
+         <div style="font-size:12px;color:var(--muted)">Needs a note</div></div></div>
+       <p style="font-size:12.5px;color:var(--muted);margin:12px 0 0">
+         A label prints for the child and a matching one for the adult.</p>`
+    : `<p style="font-size:13.5px;margin:0 0 13px;color:#3c4654">
+         Adult's label should read <span class="code">K7M</span></p>
+       <div class="pick" onclick="doM()"><div class="av">${ini(k[K.guard])}</div>
+         <div><div style="font-weight:650">${k[K.guard]}</div>
+         <div style="font-size:12px;color:var(--muted)">Mother · authorised</div></div>
+         <span class="pill p-in" style="margin-left:auto">✓</span></div>
+       <div class="pick no" onclick="doM()">
+         <div class="av" style="background:var(--red-soft);color:var(--red)">!</div>
+         <div><div style="font-weight:650">Not on the list</div>
+         <div style="font-size:12px;color:var(--muted)">Teacher must approve + give a reason</div></div></div>`;
+  document.getElementById('mask').classList.add('on');
+}
+function doM(){
+  state[mKid] = mMode==='in' ? 'in' : 'out';
+  closeM(); drawStation();
+}
+function closeM(){document.getElementById('mask').classList.remove('on')}
+document.getElementById('m-ok').onclick=doM;
+document.getElementById('mask').onclick=e=>{if(e.target.id==='mask')closeM()};
+</script>
+</body>
+</html>
