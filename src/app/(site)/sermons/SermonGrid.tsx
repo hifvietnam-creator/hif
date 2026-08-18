@@ -2,6 +2,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import configPromise from '@payload-config'
 import { getPayload } from 'payload'
+import type { Where } from 'payload'
 
 export const SERMONS_PER_PAGE = 24
 
@@ -49,7 +50,10 @@ export default async function SermonGrid({ filters }: { filters: SermonFilters }
 
   const payload = await getPayload({ config: configPromise })
 
-  const and: Record<string, unknown>[] = [{ _status: { equals: 'published' } }]
+  // Typed as Where[] rather than Record<string, unknown>[]. Payload's Where is
+  // recursive — a clause value may itself be a Where[] — and an `unknown` index
+  // signature is not assignable to that, so the looser type failed the build.
+  const and: Where[] = [{ _status: { equals: 'published' } }]
   if (year) {
     and.push({ date: { greater_than_equal: `${year}-01-01` } })
     and.push({ date: { less_than_equal: `${year}-12-31` } })

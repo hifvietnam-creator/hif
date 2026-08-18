@@ -14,7 +14,7 @@ import { buildHref, type SermonFilters } from './SermonGrid'
 //
 // So it is cached. Facets only change when sermons are added or edited, and a
 // stale entry costs nothing worse than a missing year in the sidebar for a few
-// minutes. Call revalidateTag('sermons') after a sync to refresh immediately.
+// minutes. Call revalidateTag('sermons', 'max') after a sync to refresh it.
 
 export const getFacets = unstable_cache(
   async () => {

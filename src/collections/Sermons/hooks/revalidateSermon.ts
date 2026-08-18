@@ -21,7 +21,17 @@ export const revalidateSermon: CollectionAfterChangeHook<Sermon> = ({
   if (context.disableRevalidate) return doc
 
   // Filter facets depend on every sermon, not just this one.
-  revalidateTag('sermons')
+  //
+  // Next 16 made the cacheLife profile required. 'max' is the documented
+  // migration and gives stale-while-revalidate: the next request serves the old
+  // facets and refreshes in the background, rather than blocking on the full
+  // collection scan this cache exists to avoid.
+  //
+  // The cost is one stale render immediately after publishing. If an editor
+  // needs the sidebar correct on their very next reload, updateTag() is the
+  // call that invalidates without serving stale — at the price of that request
+  // paying for the rescan.
+  revalidateTag('sermons', 'max')
 
   if (doc._status === 'published') {
     revalidatePath(`/sermons/${doc.slug}`)
@@ -47,7 +57,7 @@ export const revalidateSermonDelete: CollectionAfterDeleteHook<Sermon> = ({
 }) => {
   if (context.disableRevalidate) return doc
 
-  revalidateTag('sermons')
+  revalidateTag('sermons', 'max')
   revalidatePath('/sermons')
   if (doc?.slug) revalidatePath(`/sermons/${doc.slug}`)
 
