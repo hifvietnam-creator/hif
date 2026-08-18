@@ -1,0 +1,36 @@
+{
+  "_instructions": [
+    "Hand-maintained decisions that survive re-running `pnpm analyze:speakers`.",
+    "The generated map (sermon-speaker-map.json) is overwritten on every run;",
+    "this file is not, so record judgement calls here rather than there.",
+    "",
+    "merge[].canonical — the name to keep",
+    "merge[].absorb    — normalised cluster keys to fold into it (lowercase, no titles)",
+    "defaultRole       — `role` is required on the team collection; used for created speakers"
+  ],
+
+  "defaultRole": "Guest Speaker",
+
+  "merge": [
+    {
+      "canonical": "Michael Beard",
+      "absorb": ["mike beard", "mike"],
+      "reason": "Nickname. Confirmed same person — too many edits apart for the spelling check to catch."
+    },
+    {
+      "canonical": "Steve Buchele",
+      "absorb": ["steve buchele & pastor ryan robinson"],
+      "reason": "Two speakers in one string. `speaker` is a single relationship, so the first-named is used; Ryan Robinson is noted on the sermon."
+    },
+    {
+      "canonical": "John Gascon",
+      "absorb": ["john & kelli gascon"],
+      "reason": "Couple listed together. First-named used; Kelli noted on the sermon."
+    }
+  ],
+
+  "coSpeakers": {
+    "steve buchele & pastor ryan robinson": "Ryan Robinson",
+    "john & kelli gascon": "Kelli Gascon"
+  }
+}

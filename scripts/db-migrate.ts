@@ -10,6 +10,7 @@
  * Usage:
  *   npx tsx --tsconfig tsconfig.scripts.json scripts/db-migrate.ts
  *   npx tsx --tsconfig tsconfig.scripts.json scripts/db-migrate.ts --status
+ *   npx tsx --tsconfig tsconfig.scripts.json scripts/db-migrate.ts --only kidzquest
  *
  * Requires: pnpm add pg && pnpm add -D @types/pg
  */
@@ -47,6 +48,21 @@ if (!connectionString) {
 
 const statusOnly = process.argv.includes('--status')
 
+/**
+ * --only <substring>   restrict this run to migrations whose filename matches.
+ *
+ * The runner is already idempotent — applied files are skipped by filename and
+ * checksum — so this is not a safety mechanism. It is a blast-radius one: when
+ * two people are working in the same repo, being able to say "apply only the
+ * KidzQuest migration" is easier to reason about than trusting that everything
+ * else really was applied earlier.
+ */
+const onlyArg = process.argv.find((a) => a.startsWith('--only='))
+  ?? (process.argv.includes('--only')
+      ? `--only=${process.argv[process.argv.indexOf('--only') + 1] ?? ''}`
+      : undefined)
+const only = onlyArg?.slice('--only='.length).trim() || null
+
 const ok = (m: string) => console.log(`  \x1b[32m✓\x1b[0m ${m}`)
 const skip = (m: string) => console.log(`  \x1b[2m·\x1b[0m \x1b[2m${m}\x1b[0m`)
 const fail = (m: string) => console.log(`  \x1b[31m✗\x1b[0m ${m}`)
@@ -79,11 +95,24 @@ try {
   )
   for (const r of rows) applied.set(r.filename, r.checksum)
 
-  const files = readdirSync(MIGRATIONS_DIR)
+  const allFiles = readdirSync(MIGRATIONS_DIR)
     .filter((f) => f.endsWith('.sql'))
     .sort()
 
-  console.log(`\n\x1b[1mAnalytics migrations\x1b[0m  (${files.length} files)\n`)
+  const files = only
+    ? allFiles.filter((f) => f.toLowerCase().includes(only.toLowerCase()))
+    : allFiles
+
+  if (only && files.length === 0) {
+    fail(`no migration filename contains "${only}"`)
+    console.log(`      available: ${allFiles.join(', ')}\n`)
+    process.exit(1)
+  }
+
+  console.log(
+    `\n\x1b[1mAnalytics migrations\x1b[0m  (${files.length} file${files.length === 1 ? '' : 's'}` +
+    `${only ? `, filtered by "${only}" from ${allFiles.length}` : ''})\n`,
+  )
 
   let ran = 0
 
@@ -135,7 +164,7 @@ try {
     const { rows: tables } = await client.query<{ table_schema: string; table_name: string }>(`
       select table_schema, table_name
       from information_schema.tables
-      where table_schema in ('pco','ml','hif')
+      where table_schema in ('pco','ml','hif','kq')
       order by table_schema, table_name
     `)
     let currentSchema = ''

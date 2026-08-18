@@ -42,11 +42,13 @@ export const getFacets = unstable_cache(
       }),
       payload.find({
         collection: 'series',
-        sort: '-year',
+        // Sorted in JS below, not here. Postgres orders NULLs FIRST on a
+        // descending sort, so `-year` put every year-less archive series above
+        // the current one — the newest series ended up buried at the bottom.
         limit: 200,
         depth: 0,
         overrideAccess: true,
-        select: { title: true, youtubePlaylistId: true },
+        select: { title: true, year: true, youtubePlaylistId: true },
       }),
     ])
 
@@ -72,11 +74,23 @@ export const getFacets = unstable_cache(
 
     return {
       years,
-      series: seriesRes.docs.map((s) => ({
-        id: String(s.id),
-        title: s.title as string,
-        youtubePlaylistId: (s.youtubePlaylistId as string | null) ?? null,
-      })),
+      series: seriesRes.docs
+        .map((s) => ({
+          id: String(s.id),
+          title: s.title as string,
+          year: (s.year as number | null) ?? null,
+          youtubePlaylistId: (s.youtubePlaylistId as string | null) ?? null,
+        }))
+        // Newest first, with undated series last rather than first, then
+        // alphabetical within a year so the order is stable between renders.
+        .sort((a, b) => {
+          if (a.year !== b.year) {
+            if (a.year === null) return 1
+            if (b.year === null) return -1
+            return b.year - a.year
+          }
+          return a.title.localeCompare(b.title)
+        }),
       speakers: teamRes.docs
         .filter((sp) => speakerIdsWithSermons.has(String(sp.id)))
         .map((sp) => ({ id: String(sp.id), name: sp.name as string })),

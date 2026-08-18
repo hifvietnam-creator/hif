@@ -1,0 +1,30 @@
+{
+  "_instructions": [
+    "Hand-maintained. Survives re-running `pnpm analyze:series`, unlike the",
+    "generated sermon-series-map.json which is overwritten each time.",
+    "",
+    "map: postSlug -> series id, existing series title, or null to leave unset.",
+    "     A title that does not exist yet will be created under that name.",
+    "titles: postSlug -> the name a NEW series should be given, when the post",
+    "     title is not what you want the series called."
+  ],
+
+  "map": {
+    "turn-it-to-praise": "Story of The Psalms"
+  },
+
+  "titles": {
+    "heavens-favor": "Heaven's Favor",
+    "nehemiah-sermon-series": "Nehemiah",
+    "no-greater-love": "The Gospel of John",
+    "jonah-2": "Jonah's Journey",
+
+    "_comment_duplicates": "Three series names were reused years apart. Payload shows series by title alone, so identical names are unusable in the admin. Year suffixes are a suggestion — rename freely, they just have to differ.",
+    "character-counts": "Character Counts (2015)",
+    "character-counts-2": "Character Counts (2024)",
+    "god-with-us": "God With Us (2023)",
+    "god-with-us-2": "God With Us (2024)",
+    "the-blessed-life-sermon-series": "The Blessed Life (2016)",
+    "the-blessed-life": "The Blessed Life (2023)"
+  }
+}

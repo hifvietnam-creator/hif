@@ -913,6 +913,15 @@ em { font-style: italic; }
 .sermon-detail { max-width: 860px; margin-inline: auto; }
 .sermon-resources { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
 .sermon-no-video { background: #f4f4f4; border-radius: var(--radius); padding: 40px; text-align: center; color: var(--grey); margin-bottom: 24px; }
+
+/* ── Audio-only sermons (pre-2018, no video ever existed) ────────────────── */
+.sermon-audio { background: #f4f4f4; border-radius: var(--radius); padding: 28px 32px; margin-bottom: 24px; }
+.sermon-audio-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.07em; text-transform: uppercase; color: var(--red); margin-bottom: 14px; }
+.sermon-audio-player { width: 100%; display: block; }
+.sermon-audio-note { font-size: 0.82rem; color: var(--grey); margin-top: 14px; }
+.sermon-audio-note a { color: var(--red); font-weight: 600; }
+.sermon-audio-btn { font-size: 1.3rem; background: rgba(0,0,0,.55); }
+.sermon-thumb-link:hover .sermon-audio-btn { background: var(--red); }
 .sermon-body { margin-top: 28px; font-size: 1.05rem; line-height: 1.7; color: #333; }
 
 /* ── Discussion questions accordion ── */

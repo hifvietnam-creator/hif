@@ -142,9 +142,23 @@ function cleanPhone(v: unknown): Phone {
   else if (d.length > 10) issue = `${d.length} digits — too long, needs re-asking`
   else if (d.length < 9) issue = `${d.length} digits — too short`
 
-  const valid = d.length === 10 && d.startsWith('0')
+  // Length alone is not enough. Vietnamese mobiles are 10 digits beginning
+  // 03/05/07/08/09; anything beginning 02 (or the pre-2017 area codes like 04
+  // for Hanoi) is a LANDLINE, and 10 digits of it sails through a length check.
+  //
+  // Found in the data: 043 534 1916 on the Denness record — an old-format Hanoi
+  // landline that became 024 3534 1916 in 2017. It passes as "10 digits, starts
+  // with 0" and would have been stored as +84435341916, which dials nowhere.
+  const mobile = /^0[35789]/.test(d)
+  const valid = d.length === 10 && mobile
+  if (d.length === 10 && !mobile && !issue)
+    issue = 'looks like a landline, not a mobile — cannot be texted'
+
   return { raw, digits: d, e164: valid ? '+84' + d.slice(1) : null, issue }
 }
+
+/** True when a number is a usable Vietnamese mobile. */
+const isMobile = (d: string | null) => !!d && d.length === 10 && /^0[35789]/.test(d)
 
 /** Edit distance, capped — used only to spot near-duplicate child names. */
 function editDistance(a: string, b: string): number {
@@ -294,7 +308,12 @@ if (!existsSync(DATA_DIR)) {
 }
 
 const files = readdirSync(DATA_DIR).filter((f) => f.toLowerCase().endsWith('.csv'))
-const classFiles = files.filter((f) => !/parent/i.test(f))
+
+// Class rosters only. The parents mailing list is a cross-check, and the grade
+// files are our own output/input — reading either as a class sheet finds no
+// Location column, silently yields zero children, and then lists itself as an
+// input in the report as though it had contributed something.
+const classFiles = files.filter((f) => !/parent|grade/i.test(f))
 
 let raw: RawChild[] = []
 for (const f of classFiles) {
@@ -350,7 +369,12 @@ const grades = new Map<string, GradeRow>()
 const gradeKey = (first: string | null, last: string | null, group: string) =>
   `${group}|${norm(first)}|${norm(last)}`
 
-const gradeFile = files.find((f) => /grade/i.test(f))
+// grades.csv is the filled-in file. grade-worksheet.csv is the blank one this
+// script writes — reading it back would find no grades and, worse, would win
+// the lookup on some filesystems once both exist.
+const gradeFile =
+  files.find((f) => f.toLowerCase() === 'grades.csv')
+  ?? files.find((f) => /grade/i.test(f) && !/worksheet/i.test(f))
 if (gradeFile) {
   const rows = parseCsv(readFileSync(join(DATA_DIR, gradeFile), 'utf8'))
   const hIdx = rows.findIndex((r) => r.some((c) => norm(c) === 'first name'))
@@ -440,7 +464,10 @@ let gid = 0
 for (const [, members] of clusters) {
   const names = [...new Set(members.map((m) => m.contactName).filter(Boolean) as string[])]
   const emails = [...new Set(members.map((m) => m.email).filter(Boolean) as string[])]
+  // A mobile first, then anything. Where a family has both a mobile and an old
+  // landline on file, the mobile is the one that reaches a parent on a Sunday.
   const phones = [...new Set(members.map((m) => m.phone.digits).filter(Boolean) as string[])]
+    .sort((a, b) => Number(isMobile(b)) - Number(isMobile(a)))
   const e164 = members.map((m) => m.phone.e164).find(Boolean) ?? null
 
   const issues: string[] = []

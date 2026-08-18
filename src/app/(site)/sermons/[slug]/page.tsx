@@ -122,6 +122,13 @@ export default async function SermonPage({ params }: Args) {
   const sermonPDF = sermon.sermonPDF as { url?: string; filename?: string } | undefined
   const pdfUrl = sermonPDF?.url ?? (sermon.sermonPdfUrl as string | null) ?? null
 
+  // Pre-2018 sermons exist only as an MP3 — there was no YouTube channel yet.
+  // But every one of those links is dead (Dropbox retired the Public folder in
+  // 2017), so a player is only rendered for audio that has not been marked
+  // unavailable. Showing a control that silently does nothing is worse than
+  // saying plainly that there is no recording.
+  const audioUrl = sermon.audioUnavailable ? null : ((sermon.audioURL as string | null) ?? null)
+
   return (
     <>
       {/* PAGE HERO */}
@@ -205,6 +212,24 @@ export default async function SermonPage({ params }: Args) {
                 allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
                 allowFullScreen
               />
+            </div>
+          ) : audioUrl ? (
+            <div className="sermon-audio reveal">
+              <p className="sermon-audio-label">
+                <span aria-hidden="true">🎧</span> Audio recording
+              </p>
+              {/* Native controls: no JS, keyboard accessible, and these are
+                  plain MP3s on external storage with nothing to enhance. */}
+              <audio controls preload="none" src={audioUrl} className="sermon-audio-player">
+                Your browser cannot play audio inline.{' '}
+                <a href={audioUrl}>Download the MP3</a> instead.
+              </audio>
+              <p className="sermon-audio-note">
+                This sermon pre-dates our video recordings.{' '}
+                <a href={audioUrl} download>
+                  Download the MP3
+                </a>
+              </p>
             </div>
           ) : (
             <div className="sermon-no-video reveal">

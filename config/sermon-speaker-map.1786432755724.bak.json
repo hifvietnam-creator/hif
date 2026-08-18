@@ -1,0 +1,1173 @@
+{
+  "_instructions": [
+    "Edit `action` on each entry, then run the import. Nothing else reads these guesses.",
+    "  link   — use the given teamId (check teamName is the right person)",
+    "  create — make a new team member named `canonical`",
+    "  review — unresolved; the importer will REFUSE to run while any remain",
+    "Merge two entries by giving them the same teamId and action \"link\".",
+    "To leave a speaker unset on the sermon, set action to \"link\" and teamId to null."
+  ],
+  "generatedAt": "2026-08-11T07:11:32.294Z",
+  "sourceReport": ".\\reports\\sermon-reconciliation-full-2026-08-05.json",
+  "speakers": [
+    {
+      "canonical": "Jacob Bloemberg",
+      "action": "link",
+      "teamId": "3",
+      "teamName": "Jacob Bloemberg",
+      "confidence": "exact",
+      "sermonCount": 261,
+      "activeBetween": [
+        "2015-06-14",
+        "2025-10-05"
+      ],
+      "variants": [
+        "Pastor Jacob Bloemberg",
+        "Jacob Bloemberg"
+      ]
+    },
+    {
+      "canonical": "Jason Fizzard",
+      "action": "review",
+      "teamId": "5",
+      "teamName": "Jason Morris",
+      "confidence": "given-name",
+      "sermonCount": 177,
+      "activeBetween": [
+        "2019-09-08",
+        "2023-03-26"
+      ],
+      "variants": [
+        "Pastor Jason Fizzard",
+        "Jason Fizzard",
+        "Pastor Pastor Jason Fizzard"
+      ]
+    },
+    {
+      "canonical": "John Johnson",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 69,
+      "activeBetween": [
+        "2015-06-14",
+        "2016-11-20"
+      ],
+      "variants": [
+        "Pastor John Johnson"
+      ]
+    },
+    {
+      "canonical": "Jacob",
+      "action": "review",
+      "teamId": "3",
+      "teamName": "Jacob Bloemberg",
+      "confidence": "given-name",
+      "sermonCount": 41,
+      "activeBetween": [
+        "2024-09-15",
+        "2026-06-07"
+      ],
+      "variants": [
+        "Pastor Jacob"
+      ]
+    },
+    {
+      "canonical": "Ryan Robinson",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 28,
+      "activeBetween": [
+        "2019-09-08",
+        "2021-01-31"
+      ],
+      "variants": [
+        "Pastor Ryan Robinson",
+        "Ryan Robinson"
+      ]
+    },
+    {
+      "canonical": "Charlie Mackenzie",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 22,
+      "activeBetween": [
+        "2015-09-13",
+        "2016-10-30"
+      ],
+      "variants": [
+        "Pastor Charlie Mackenzie",
+        "Pastor Charlie MacKenzie",
+        "Charlie Mackenzie"
+      ]
+    },
+    {
+      "canonical": "Kester",
+      "action": "review",
+      "teamId": "2",
+      "teamName": "Kester Scandrett",
+      "confidence": "given-name",
+      "sermonCount": 15,
+      "activeBetween": [
+        "2025-06-29",
+        "2026-06-21"
+      ],
+      "variants": [
+        "Mr. Kester",
+        "Pastor Kester"
+      ]
+    },
+    {
+      "canonical": "Jason Morris",
+      "action": "link",
+      "teamId": "5",
+      "teamName": "Jason Morris",
+      "confidence": "exact",
+      "sermonCount": 14,
+      "activeBetween": [
+        "2022-01-09",
+        "2026-03-22"
+      ],
+      "variants": [
+        "Pastor Jason Morris"
+      ]
+    },
+    {
+      "canonical": "Kester Scandrett",
+      "action": "link",
+      "teamId": "2",
+      "teamName": "Kester Scandrett",
+      "confidence": "exact",
+      "sermonCount": 12,
+      "activeBetween": [
+        "2022-06-19",
+        "2026-07-26"
+      ],
+      "variants": [
+        "Kester Scandrett",
+        "Pastor Kester Scandrett"
+      ]
+    },
+    {
+      "canonical": "Nelson Annan",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 11,
+      "activeBetween": [
+        "2016-03-20",
+        "2016-10-16"
+      ],
+      "variants": [
+        "Pastor Nelson Annan"
+      ]
+    },
+    {
+      "canonical": "Michael Walls",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 8,
+      "activeBetween": [
+        "2021-06-27",
+        "2024-12-29"
+      ],
+      "variants": [
+        "Michael Walls"
+      ]
+    },
+    {
+      "canonical": "Daniel Owens",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 7,
+      "activeBetween": [
+        "2019-10-13",
+        "2023-04-23"
+      ],
+      "variants": [
+        "Pastor Daniel Owens",
+        "Daniel Owens"
+      ]
+    },
+    {
+      "canonical": "Charlie Mckenzie",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 7,
+      "activeBetween": [
+        "2015-06-21",
+        "2016-02-14"
+      ],
+      "variants": [
+        "Pastor Charlie Mckenzie",
+        "Charlie Mckenzie"
+      ]
+    },
+    {
+      "canonical": "Steve Buchele",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 6,
+      "activeBetween": [
+        "2019-10-20",
+        "2020-10-11"
+      ],
+      "variants": [
+        "Pastor Steve Buchele"
+      ]
+    },
+    {
+      "canonical": "Luan",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 6,
+      "activeBetween": [
+        "2024-07-21",
+        "2024-12-08"
+      ],
+      "variants": [
+        "Pastor Luan"
+      ]
+    },
+    {
+      "canonical": "Peter de Fretes",
+      "action": "link",
+      "teamId": "4",
+      "teamName": "Peter De Fretes",
+      "confidence": "exact",
+      "sermonCount": 5,
+      "activeBetween": [
+        "2021-07-04",
+        "2026-05-17"
+      ],
+      "variants": [
+        "Peter de Fretes",
+        "Pastor Peter DE FRETES",
+        "Peter De Fretes"
+      ]
+    },
+    {
+      "canonical": "Mike Beard",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 5,
+      "activeBetween": [
+        "2023-02-26",
+        "2024-05-12"
+      ],
+      "variants": [
+        "Pastor Mike",
+        "Mike",
+        "Mike Beard"
+      ]
+    },
+    {
+      "canonical": "Mic Ngo",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 5,
+      "activeBetween": [
+        "2022-07-31",
+        "2024-03-24"
+      ],
+      "variants": [
+        "Mic Ngo",
+        "Pastor Mic Ngo",
+        "Ngo"
+      ]
+    },
+    {
+      "canonical": "Jan Drayer",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 5,
+      "activeBetween": [
+        "2023-07-02",
+        "2023-07-30"
+      ],
+      "variants": [
+        "Pastor Jan Drayer"
+      ]
+    },
+    {
+      "canonical": "Regan Miller",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 5,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Regan Miller",
+        "Regan Miller"
+      ]
+    },
+    {
+      "canonical": "Ariel Bloomer",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 4,
+      "activeBetween": [
+        "2022-12-04",
+        "2022-12-04"
+      ],
+      "variants": [
+        "Ariel",
+        "Ariel Bloomer"
+      ]
+    },
+    {
+      "canonical": "Jason Bloemberg",
+      "action": "review",
+      "teamId": "3",
+      "teamName": "Jacob Bloemberg",
+      "confidence": "surname",
+      "sermonCount": 4,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Jason Bloemberg"
+      ]
+    },
+    {
+      "canonical": "Daniel Owen",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 3,
+      "activeBetween": [
+        "2023-01-22",
+        "2023-01-22"
+      ],
+      "variants": [
+        "Pastor Daniel Owen"
+      ]
+    },
+    {
+      "canonical": "PastorJacob Bloemberg",
+      "action": "review",
+      "teamId": "3",
+      "teamName": "Jacob Bloemberg",
+      "confidence": "surname",
+      "sermonCount": 3,
+      "activeBetween": [
+        "2022-12-18",
+        "2022-12-24"
+      ],
+      "variants": [
+        "PastorJacob Bloemberg"
+      ]
+    },
+    {
+      "canonical": "Todd Nelson",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 3,
+      "activeBetween": [
+        "2016-10-02",
+        "2016-10-02"
+      ],
+      "variants": [
+        "Pastor Todd Nelson"
+      ]
+    },
+    {
+      "canonical": "Charlie",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 3,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Charlie"
+      ]
+    },
+    {
+      "canonical": "Roslyn Jackson",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2023-10-29",
+        "2024-07-14"
+      ],
+      "variants": [
+        "Roslyn Jackson"
+      ]
+    },
+    {
+      "canonical": "Beka Riese",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2023-11-19",
+        "2024-04-14"
+      ],
+      "variants": [
+        "Beka Riese"
+      ]
+    },
+    {
+      "canonical": "Jody Goodwin",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2023-11-26",
+        "2023-11-26"
+      ],
+      "variants": [
+        "Jody Goodwin"
+      ]
+    },
+    {
+      "canonical": "Michael Beard",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2023-02-12",
+        "2023-06-18"
+      ],
+      "variants": [
+        "Michael Beard",
+        "Pastor Michael Beard"
+      ]
+    },
+    {
+      "canonical": "JV Sundersingh",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2021-07-18",
+        "2022-07-17"
+      ],
+      "variants": [
+        "JV Sundersingh"
+      ]
+    },
+    {
+      "canonical": "Hardwick Tchale",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        "2021-07-25",
+        "2021-07-25"
+      ],
+      "variants": [
+        "Hardwick Tchale"
+      ]
+    },
+    {
+      "canonical": "Reagan Miller",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Reagan Miller"
+      ]
+    },
+    {
+      "canonical": "Matthias Morzuch",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Matthias Morzuch"
+      ]
+    },
+    {
+      "canonical": "David Young",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 2,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor David Young"
+      ]
+    },
+    {
+      "canonical": "Peter DeFretes",
+      "action": "review",
+      "teamId": "4",
+      "teamName": "Peter De Fretes",
+      "confidence": "given-name",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2026-07-12",
+        "2026-07-12"
+      ],
+      "variants": [
+        "Pastor Peter DeFretes"
+      ]
+    },
+    {
+      "canonical": "Peter Lim",
+      "action": "review",
+      "teamId": "4",
+      "teamName": "Peter De Fretes",
+      "confidence": "given-name",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2025-09-28",
+        "2025-09-28"
+      ],
+      "variants": [
+        "Pastor Peter Lim"
+      ]
+    },
+    {
+      "canonical": "Jim Rion",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2025-06-15",
+        "2025-06-15"
+      ],
+      "variants": [
+        "Rev. Jim Rion"
+      ]
+    },
+    {
+      "canonical": "Tony Rucinski",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2025-04-27",
+        "2025-04-27"
+      ],
+      "variants": [
+        "Dr. Tony Rucinski"
+      ]
+    },
+    {
+      "canonical": "Jose Zayas",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-11-03",
+        "2024-11-03"
+      ],
+      "variants": [
+        "Pastor Jose Zayas"
+      ]
+    },
+    {
+      "canonical": "David Chotka",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-10-27",
+        "2024-10-27"
+      ],
+      "variants": [
+        "Dr. David Chotka"
+      ]
+    },
+    {
+      "canonical": "Brian Stiller",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-10-20",
+        "2024-10-20"
+      ],
+      "variants": [
+        "Dr. Rev. Brian Stiller"
+      ]
+    },
+    {
+      "canonical": "Troy Murphy",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-09-29",
+        "2024-09-29"
+      ],
+      "variants": [
+        "Pastor Troy Murphy"
+      ]
+    },
+    {
+      "canonical": "Tim Costello",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-05-19",
+        "2024-05-19"
+      ],
+      "variants": [
+        "Rev. Tim Costello"
+      ]
+    },
+    {
+      "canonical": "Micheal Beard",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-03-29",
+        "2024-03-29"
+      ],
+      "variants": [
+        "Micheal Beard"
+      ]
+    },
+    {
+      "canonical": "Andrew Riese",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-03-10",
+        "2024-03-10"
+      ],
+      "variants": [
+        "Andrew Riese"
+      ]
+    },
+    {
+      "canonical": "Daniel Chung",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-02-04",
+        "2024-02-04"
+      ],
+      "variants": [
+        "Pastor Daniel Chung"
+      ]
+    },
+    {
+      "canonical": "Chris Ball",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2024-01-14",
+        "2024-01-14"
+      ],
+      "variants": [
+        "Pastor Chris Ball"
+      ]
+    },
+    {
+      "canonical": "Roy Tinklenberg",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2023-12-03",
+        "2023-12-03"
+      ],
+      "variants": [
+        "Pastor Roy Tinklenberg"
+      ]
+    },
+    {
+      "canonical": "Dave Roever",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2023-08-20",
+        "2023-08-20"
+      ],
+      "variants": [
+        "Pastor Dave Roever"
+      ]
+    },
+    {
+      "canonical": "Andrew & Beka",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2023-05-21",
+        "2023-05-21"
+      ],
+      "variants": [
+        "Andrew & Beka"
+      ]
+    },
+    {
+      "canonical": "John Luong",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2022-06-26",
+        "2022-06-26"
+      ],
+      "variants": [
+        "John Luong"
+      ]
+    },
+    {
+      "canonical": "David Fresh",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor David Fresh"
+      ]
+    },
+    {
+      "canonical": "John Gascon",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2021-07-04",
+        "2021-07-04"
+      ],
+      "variants": [
+        "John Gascon"
+      ]
+    },
+    {
+      "canonical": "Kester Scandrette",
+      "action": "review",
+      "teamId": "2",
+      "teamName": "Kester Scandrett",
+      "confidence": "given-name",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2021-06-20",
+        "2021-06-20"
+      ],
+      "variants": [
+        "Kester Scandrette"
+      ]
+    },
+    {
+      "canonical": "Steve Buchele & Pastor Ryan Robinson",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2020-06-28",
+        "2020-06-28"
+      ],
+      "variants": [
+        "Pastor Steve Buchele & Pastor Ryan Robinson"
+      ]
+    },
+    {
+      "canonical": "Jhon Freeman",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Jhon Freeman"
+      ]
+    },
+    {
+      "canonical": "John & Kelli Gascon",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "John & Kelli Gascon"
+      ]
+    },
+    {
+      "canonical": "Ray Bentley",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Ray Bentley"
+      ]
+    },
+    {
+      "canonical": "Warren Reeve",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Warren Reeve"
+      ]
+    },
+    {
+      "canonical": "Jacob Bloomberg",
+      "action": "review",
+      "teamId": "3",
+      "teamName": "Jacob Bloemberg",
+      "confidence": "given-name",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Jacob Bloomberg"
+      ]
+    },
+    {
+      "canonical": "Irvin Rutherford",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Irvin Rutherford"
+      ]
+    },
+    {
+      "canonical": "Ryan Robinson@ My Dinh",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Ryan Robinson@ My Dinh"
+      ]
+    },
+    {
+      "canonical": "Phil McNeill",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Phil McNeill"
+      ]
+    },
+    {
+      "canonical": "Pat Copple",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pat Copple"
+      ]
+    },
+    {
+      "canonical": "David Durance",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2016-10-30",
+        "2016-10-30"
+      ],
+      "variants": [
+        "David Durance"
+      ]
+    },
+    {
+      "canonical": "Charlie Mcckenzie",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2015-08-09",
+        "2015-08-09"
+      ],
+      "variants": [
+        "Charlie Mcckenzie"
+      ]
+    },
+    {
+      "canonical": "Harv Matchullis at 11am Service PLAY MP3 by Pastor Harv Matchullis",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2015-07-12",
+        "2015-07-12"
+      ],
+      "variants": [
+        "Pastor Harv Matchullis at 11am Service PLAY MP3 by Pastor Harv Matchullis"
+      ]
+    },
+    {
+      "canonical": "Terry Young",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2016-03-13",
+        "2016-03-13"
+      ],
+      "variants": [
+        "Terry Young"
+      ]
+    },
+    {
+      "canonical": "Roberts",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2026-06-28",
+        "2026-06-28"
+      ],
+      "variants": [
+        "Pastor Roberts"
+      ]
+    },
+    {
+      "canonical": "Desmond",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2025-03-02",
+        "2025-03-02"
+      ],
+      "variants": [
+        "Dr. Desmond"
+      ]
+    },
+    {
+      "canonical": "Lao",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2023-05-14",
+        "2023-05-14"
+      ],
+      "variants": [
+        "Pastor Lao"
+      ]
+    },
+    {
+      "canonical": "Michael",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        "2022-07-24",
+        "2022-07-24"
+      ],
+      "variants": [
+        "Michael"
+      ]
+    },
+    {
+      "canonical": "Ben",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Ben"
+      ]
+    },
+    {
+      "canonical": "Min",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Pastor Min"
+      ]
+    },
+    {
+      "canonical": "Westlake",
+      "action": "create",
+      "teamId": null,
+      "teamName": null,
+      "confidence": "none",
+      "sermonCount": 1,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "variants": [
+        "Westlake"
+      ]
+    }
+  ]
+}

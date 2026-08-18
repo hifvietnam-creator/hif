@@ -1,0 +1,101 @@
+/* Stylesheet for the KidzQuest station route group.
+ *
+ * Same reasoning as dashboard.css: self-contained rather than importing the
+ * public site's globals.css, which pulls in hif.css (header/strip layout
+ * variables, scroll padding for a header this group does not render) and a
+ * shadcn theme keyed to a `data-theme` attribute set by a provider that does
+ * not run here.
+ *
+ * The brand colours below are COPIED from hif.css rather than imported, for
+ * that reason. If the palette changes there, change it here too — a short,
+ * honest duplication is better than dragging site chrome onto a screen a
+ * volunteer uses one-handed at a door.
+ *
+ * The explicit @source matters more here than anywhere: this directory was
+ * created after the dev server was already running, which is exactly the case
+ * Tailwind v4's auto-detection misses. Without it every utility below silently
+ * fails to generate and the page renders as unstyled HTML.
+ */
+
+@import 'tailwindcss';
+
+@source "./";
+
+@theme {
+  /* HIF brand, from the Journey graphic */
+  --color-brand: #3aa6c9;
+  --color-brand-deep: #2c8aaa;
+  /* Darkened for white text on a filled header — #2c8aaa is only ~3.3:1
+     against white, which is below the threshold for anything but large type. */
+  --color-brand-dark: #1f6b85;
+  --color-brand-soft: #e8f4f8;
+
+  /* Present / checked in. HIF green (#8FC23E) is a bright lime: fine as a fill,
+     unreadable as text on white. -ink is the darkened variant for type. */
+  --color-ok: #6fa22a;
+  --color-ok-soft: #f0f7e4;
+  --color-ok-ink: #47690f;
+
+  /* Allergies, overrides, missing guardians. */
+  --color-alert: #c01e27;
+  --color-alert-deep: #9c171e;
+  --color-alert-soft: #fbecec;
+
+  --color-flag: #b7791f;
+  --color-flag-soft: #fdf3e2;
+
+  /* Neutrals */
+  --color-ink: #1a1b1e;
+  --color-ink-2: #3d3f44;
+  --color-hifmuted: #6b6e74;
+  --color-line: #e7e4df;
+  --color-paper: #ffffff;
+  --color-mist: #f6f4f1;
+
+  --radius-card: 14px;
+}
+
+/* Base styles that do not depend on any Tailwind utility being generated.
+ * If utilities fail to build, this degrades to readable black-on-white rather
+ * than the browser's dark-mode default — which is how the first version of
+ * this screen came out looking. */
+html {
+  -webkit-text-size-adjust: 100%;
+  /* Chrome's "auto dark mode for web contents" will otherwise invert this
+     screen, which is why the first build came out dark despite an explicit
+     light background. A station has one job in one lighting condition; it
+     should not follow the operator's OS theme. */
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  background: #f6f4f1;
+  color: #1a1b1e;
+  font-family: var(--font-inter), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+/* Tap targets on a phone held in one hand. Prevents iOS zooming a form field
+   into focus mid-queue and leaving the TA scrolled somewhere unexpected. */
+input,
+textarea,
+select,
+button {
+  font: inherit;
+  font-size: 16px;
+}
+
+/* The station is a tool, not a document — text selection on tap is friction. */
+.kq-tap {
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}

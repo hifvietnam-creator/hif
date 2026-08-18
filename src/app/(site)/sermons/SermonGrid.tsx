@@ -68,7 +68,10 @@ export default async function SermonGrid({ filters }: { filters: SermonFilters }
   const res = await payload.find({
     collection: 'sermons',
     where: { and },
-    sort: '-date',
+    // sortDate, not date: undated sermons carry a 1900 sentinel so they land at
+    // the end. Sorting on `date` would surface them first, because Postgres
+    // orders NULLs first on a descending sort.
+    sort: '-sortDate',
     depth: 1,
     limit: SERMONS_PER_PAGE,
     page,
@@ -80,6 +83,8 @@ export default async function SermonGrid({ filters }: { filters: SermonFilters }
       scripture: true,
       description: true,
       youtubeURL: true,
+      audioURL: true,
+      audioUnavailable: true,
       thumbnail: true,
       speaker: true,
       series: true,
@@ -143,11 +148,17 @@ export default async function SermonGrid({ filters }: { filters: SermonFilters }
                   ) : (
                     <div className="sermon-thumb-placeholder" aria-hidden="true" />
                   )}
-                  {videoId && (
+                  {videoId ? (
                     <span className="sermon-play-btn" aria-hidden="true">
                       ▶
                     </span>
-                  )}
+                  ) : sermon.audioURL && !sermon.audioUnavailable ? (
+                    // Audio-only archive sermons. Without this they look like
+                    // broken cards — a blank thumbnail and no affordance at all.
+                    <span className="sermon-play-btn sermon-audio-btn" aria-hidden="true">
+                      🎧
+                    </span>
+                  ) : null}
                 </div>
               </Link>
               <div className="sermon-meta">

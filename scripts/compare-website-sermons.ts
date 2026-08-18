@@ -364,12 +364,22 @@ function extractHeading(beforeRaw: string): { title: string | null; speaker: str
   let speaker: string | null = null
   let campus: string | null = null
 
+  // Parts that are neither a campus nor obviously a person. Recent entries read
+  // "Psalm 110 | JV" — a bare name with no honorific to recognise it by. Taking
+  // only the first leftover as the title silently dropped every such speaker.
+  const leftovers: string[] = []
+
   for (const p of parts) {
     if (campusRe.test(p)) { campus ??= p; continue }
     if (speakerLead.test(p)) { speaker ??= p.replace(speakerLead, '').trim(); continue }
     if (titleRe.test(p) && !speaker) { speaker = p; continue }
-    title ??= p
+    leftovers.push(p)
   }
+
+  // The site writes "Title | Speaker | Date"; the date is the anchor and is
+  // already excluded, so at most two leftovers remain, in that order.
+  if (leftovers.length > 0) title = leftovers[0]!
+  if (!speaker && leftovers.length > 1) speaker = leftovers[1]!
 
   // "PLAY MP3 by Pastor X" can land in `title` when no pipe separated it.
   if (!speaker && title && speakerLead.test(title)) {
@@ -961,6 +971,7 @@ async function main() {
     console.log(`Payload: ${payloadTotal} sermons (${byVideo.size} with video, ${byAudio.size} with audio)`)
 
     const usedVideo = new Set<string>()
+    const usedAudio = new Set<string>()
 
     for (const w of website) {
       const doc = (w.videoId && byVideo.get(w.videoId)) || (w.audioUrl && byAudio.get(w.audioUrl)) || null
@@ -973,6 +984,7 @@ async function main() {
         continue
       }
       if (w.videoId) usedVideo.add(w.videoId)
+      if (w.audioUrl) usedAudio.add(w.audioUrl)
 
       const proposed: ComparisonRow['proposed'] = []
       if (w.slidesUrl && doc.sermonPdfUrl !== w.slidesUrl) {
@@ -1005,8 +1017,16 @@ async function main() {
         title: d.title,
         date: typeof d.date === 'string' ? d.date.slice(0, 10) : null,
         videoId: extractVideoId(d.youtubeURL),
+        audioUrl: (d.audioURL as string | null) ?? null,
       }))
-      .filter((p) => !p.videoId || !usedVideo.has(p.videoId as string))
+      // A sermon counts as seen if EITHER key was matched. Checking only the
+      // video id reported all 174 audio-only sermons as missing from the
+      // website, when in fact they had matched on audioURL.
+      .filter((p) => {
+        const seenByVideo = p.videoId ? usedVideo.has(p.videoId) : false
+        const seenByAudio = p.audioUrl ? usedAudio.has(p.audioUrl) : false
+        return !seenByVideo && !seenByAudio
+      })
   } else {
     for (const w of website) {
       rows.push({

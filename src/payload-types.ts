@@ -446,6 +446,10 @@ export interface Category {
 export interface User {
   id: number;
   name?: string | null;
+  /**
+   * Administrator manages the roster and reaches the CMS. Teacher can check in, check out and approve a collection override. Teaching assistant can check in and out for their assigned room only.
+   */
+  kqRole?: ('admin' | 'teacher' | 'ta') | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -827,6 +831,10 @@ export interface Sermon {
    */
   audioURL?: string | null;
   /**
+   * Set automatically by `pnpm audit:audio --apply` when the link does not resolve. The player is hidden and the sermon is presented as having no media.
+   */
+  audioUnavailable?: boolean | null;
+  /**
    * Sermon card image for the listing page.
    */
   thumbnail?: (number | null) | Media;
@@ -862,9 +870,10 @@ export interface Sermon {
     description?: string | null;
   };
   /**
-   * Sermon date — used for year filter and sorting.
+   * Sermon date — drives the year filter and ordering. Leave empty if genuinely unknown; the sermon will sort to the end rather than the top.
    */
-  date: string;
+  date?: string | null;
+  sortDate?: string | null;
   /**
    * Drives the speaker filter on /sermons.
    */
@@ -1786,6 +1795,7 @@ export interface CategoriesSelect<T extends boolean = true> {
  */
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
+  kqRole?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
@@ -1812,6 +1822,7 @@ export interface SermonsSelect<T extends boolean = true> {
   description?: T;
   youtubeURL?: T;
   audioURL?: T;
+  audioUnavailable?: T;
   thumbnail?: T;
   discussionQuestions?:
     | T
@@ -1831,6 +1842,7 @@ export interface SermonsSelect<T extends boolean = true> {
         description?: T;
       };
   date?: T;
+  sortDate?: T;
   speaker?: T;
   series?: T;
   scripture?: T;

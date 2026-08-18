@@ -1,0 +1,1108 @@
+{
+  "_instructions": [
+    "Generated — overwritten on every run. Record decisions in",
+    "config/sermon-series-overrides.json instead, keyed by postSlug.",
+    "  link   — use seriesId",
+    "  create — make a series titled seriesTitle",
+    "  review — the importer refuses to run while any remain"
+  ],
+  "generatedAt": "2026-08-12T07:01:07.262Z",
+  "sourceReport": ".\\reports\\sermon-reconciliation-full-2026-08-12.json",
+  "posts": [
+    {
+      "postSlug": "turn-it-to-praise",
+      "postTitle": "Turn it to praise",
+      "action": "link",
+      "seriesId": "1",
+      "seriesTitle": "Story of The Psalms",
+      "confidence": "override",
+      "sermonCount": 9,
+      "year": 2026,
+      "activeBetween": [
+        "2026-06-14",
+        "2026-08-09"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "pass-it-on",
+      "postTitle": "Pass It On",
+      "action": "link",
+      "seriesId": "2",
+      "seriesTitle": "PASS IT ON",
+      "confidence": "exact",
+      "sermonCount": 7,
+      "year": 2026,
+      "activeBetween": [
+        "2026-04-26",
+        "2026-06-07"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "the-king-has-come",
+      "postTitle": "The King has Come",
+      "action": "link",
+      "seriesId": "3",
+      "seriesTitle": "THE KING HAS COME",
+      "confidence": "exact",
+      "sermonCount": 6,
+      "year": 2026,
+      "activeBetween": [
+        "2026-03-01",
+        "2026-04-05"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "heavens-favor",
+      "postTitle": "New Sermon Series : Heaven’s Favor",
+      "action": "link",
+      "seriesId": "4",
+      "seriesTitle": "Heaven's Favor",
+      "confidence": "exact",
+      "sermonCount": 7,
+      "year": 2026,
+      "activeBetween": [
+        "2026-01-11",
+        "2026-02-22"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "christmas-2025",
+      "postTitle": "Christmas 2025",
+      "action": "link",
+      "seriesId": "5",
+      "seriesTitle": "Christmas 2025",
+      "confidence": "exact",
+      "sermonCount": 5,
+      "year": 2025,
+      "activeBetween": [
+        "2025-11-30",
+        "2026-01-04"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "ephesians",
+      "postTitle": "Ephesians",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Ephesians",
+      "confidence": "none",
+      "sermonCount": 12,
+      "year": 2025,
+      "activeBetween": [
+        "2025-09-07",
+        "2025-11-23"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "breakthrough-prayer",
+      "postTitle": "Breakthrough Prayer",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Breakthrough Prayer",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2025,
+      "activeBetween": [
+        "2025-08-03",
+        "2025-08-31"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "jonah-2",
+      "postTitle": "JONAH",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Jonah's Journey",
+      "confidence": "none",
+      "sermonCount": 6,
+      "year": 2025,
+      "activeBetween": [
+        "2025-06-22",
+        "2025-07-27"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "beyond",
+      "postTitle": "BEYOND",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "BEYOND",
+      "confidence": "none",
+      "sermonCount": 7,
+      "year": 2025,
+      "activeBetween": [
+        "2025-05-04",
+        "2025-06-15"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "remarkable",
+      "postTitle": "REMARKABLE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "REMARKABLE",
+      "confidence": "none",
+      "sermonCount": 17,
+      "year": 2025,
+      "activeBetween": [
+        "2025-01-05",
+        "2025-04-27"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "christmas-good-news-of-great-joy",
+      "postTitle": "CHRISTMAS GOOD NEWS OF GREAT JOY",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "CHRISTMAS GOOD NEWS OF GREAT JOY",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2024,
+      "activeBetween": [
+        "2024-12-01",
+        "2024-12-29"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "good-news",
+      "postTitle": "GOOD NEWS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "GOOD NEWS",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": 2024,
+      "activeBetween": [
+        "2024-11-03",
+        "2024-11-24"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "prayer-revolution",
+      "postTitle": "PRAYER REVOLUTION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "PRAYER REVOLUTION",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": 2024,
+      "activeBetween": [
+        "2024-09-01",
+        "2024-10-27"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "character-counts-2",
+      "postTitle": "CHARACTER COUNTS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Character Counts (2024)",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": 2024,
+      "activeBetween": [
+        "2024-06-30",
+        "2024-08-25"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "servant-leadership",
+      "postTitle": "SERVANT LEADERSHIP",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "SERVANT LEADERSHIP",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": 2024,
+      "activeBetween": [
+        "2024-06-02",
+        "2024-06-23"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "undefeated",
+      "postTitle": "UNDEFEATED",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "UNDEFEATED",
+      "confidence": "none",
+      "sermonCount": 16,
+      "year": 2024,
+      "activeBetween": [
+        "2024-02-18",
+        "2024-05-26"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "walk-like-jesus",
+      "postTitle": "WALK LIKE JESUS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "WALK LIKE JESUS",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": 2024,
+      "activeBetween": [
+        "2024-01-21",
+        "2024-02-11"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "god-with-us-2",
+      "postTitle": "GOD WITH US",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "God With Us (2024)",
+      "confidence": "none",
+      "sermonCount": 2,
+      "year": 2024,
+      "activeBetween": [
+        "2024-01-07",
+        "2024-01-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "god-with-us",
+      "postTitle": "GOD WITH US",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "God With Us (2023)",
+      "confidence": "none",
+      "sermonCount": 6,
+      "year": 2023,
+      "activeBetween": [
+        "2023-11-26",
+        "2023-12-31"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "nehemiah-sermon-series",
+      "postTitle": "Nehemiah Sermon Series",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Nehemiah",
+      "confidence": "none",
+      "sermonCount": 6,
+      "year": 2023,
+      "activeBetween": [
+        "2023-10-15",
+        "2023-11-19"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "mission-vision",
+      "postTitle": "Mission & Vision",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Mission & Vision",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": 2023,
+      "activeBetween": [
+        "2023-08-06",
+        "2023-10-08"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "kingdom-vision",
+      "postTitle": "KINGDOM VISION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "KINGDOM VISION",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2023,
+      "activeBetween": [
+        "2023-07-02",
+        "2023-07-30"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "faith-in-action",
+      "postTitle": "FAITH IN ACTION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "FAITH IN ACTION",
+      "confidence": "none",
+      "sermonCount": 11,
+      "year": 2023,
+      "activeBetween": [
+        "2023-04-16",
+        "2023-06-25"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "the-blessed-life",
+      "postTitle": "The Blessed Life",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "The Blessed Life (2023)",
+      "confidence": "none",
+      "sermonCount": 14,
+      "year": 2023,
+      "activeBetween": [
+        "2023-01-08",
+        "2023-04-09"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "christmas-around-the-world",
+      "postTitle": "Christmas Around the World",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Christmas Around the World",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2022,
+      "activeBetween": [
+        "2022-11-27",
+        "2022-12-24"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "parables-of-jesus",
+      "postTitle": "Parables of Jesus",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Parables of Jesus",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": 2022,
+      "activeBetween": [
+        "2022-06-19",
+        "2022-08-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "servant-king",
+      "postTitle": "SERVANT KING",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "SERVANT KING",
+      "confidence": "none",
+      "sermonCount": 15,
+      "year": 2022,
+      "activeBetween": [
+        "2022-01-09",
+        "2022-04-17"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "the-weary-world-rejoices",
+      "postTitle": "THE WEARY WORLD REJOICES",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "THE WEARY WORLD REJOICES",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": 2021,
+      "activeBetween": [
+        "2021-11-28",
+        "2021-12-19"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "hope-under-pressure",
+      "postTitle": "HOPE UNDER PRESSURE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "HOPE UNDER PRESSURE",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": 2021,
+      "activeBetween": [
+        "2021-09-05",
+        "2021-11-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "summer-in-the-psalms",
+      "postTitle": "SUMMER IN THE PSALMS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "SUMMER IN THE PSALMS",
+      "confidence": "none",
+      "sermonCount": 11,
+      "year": 2021,
+      "activeBetween": [
+        "2021-06-20",
+        "2021-08-22"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "deuteronomy",
+      "postTitle": "Deuteronomy",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Deuteronomy",
+      "confidence": "none",
+      "sermonCount": 7,
+      "year": 2021,
+      "activeBetween": [
+        "2021-04-18",
+        "2021-06-06"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "redemption",
+      "postTitle": "REDEMPTION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "REDEMPTION",
+      "confidence": "none",
+      "sermonCount": 15,
+      "year": 2021,
+      "activeBetween": [
+        "2021-02-21",
+        "2021-06-06"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "james",
+      "postTitle": "JAMES",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "JAMES",
+      "confidence": "none",
+      "sermonCount": 13,
+      "year": 2021,
+      "activeBetween": [
+        "2021-01-10",
+        "2021-04-11"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "bookends",
+      "postTitle": "BOOKENDS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "BOOKENDS",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2021,
+      "activeBetween": [
+        "2021-01-10",
+        "2021-02-07"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "songs-of-advent",
+      "postTitle": "SONGS OF ADVENT",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "SONGS OF ADVENT",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": 2020,
+      "activeBetween": [
+        "2020-11-29",
+        "2020-12-27"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "book-of-ruth",
+      "postTitle": "BOOK OF RUTH",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "BOOK OF RUTH",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2020,
+      "activeBetween": [
+        "2020-10-25",
+        "2020-11-22"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "come-to-me",
+      "postTitle": "COME TO ME",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "COME TO ME",
+      "confidence": "none",
+      "sermonCount": 5,
+      "year": 2020,
+      "activeBetween": [
+        "2020-10-25",
+        "2020-11-22"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "race-reconciliation",
+      "postTitle": "Race Reconciliation",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Race Reconciliation",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": 2020,
+      "activeBetween": [
+        "2020-08-16",
+        "2020-10-18"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "together",
+      "postTitle": "TOGETHER",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "TOGETHER",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": 2020,
+      "activeBetween": [
+        "2020-08-16",
+        "2020-10-18"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "by-faith",
+      "postTitle": "BY FAITH",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "BY FAITH",
+      "confidence": "none",
+      "sermonCount": 12,
+      "year": 2020,
+      "activeBetween": [
+        "2020-06-21",
+        "2020-08-09"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "no-greater-love",
+      "postTitle": "THE GOSPEL OF JOHN",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "The Gospel of John",
+      "confidence": "none",
+      "sermonCount": 36,
+      "year": 2020,
+      "activeBetween": [
+        "2020-01-12",
+        "2020-06-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "messiah-in-a-manger",
+      "postTitle": "MESSIAH IN A MANGER",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "MESSIAH IN A MANGER",
+      "confidence": "none",
+      "sermonCount": 8,
+      "year": 2019,
+      "activeBetween": [
+        "2019-12-01",
+        "2019-12-22"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "suffering",
+      "postTitle": "SUFFERING",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "SUFFERING",
+      "confidence": "none",
+      "sermonCount": 14,
+      "year": 2019,
+      "activeBetween": [
+        "2019-10-06",
+        "2019-11-24"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "multiply",
+      "postTitle": "MULTIPLY",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "MULTIPLY",
+      "confidence": "none",
+      "sermonCount": 11,
+      "year": 2019,
+      "activeBetween": [
+        "2019-09-08",
+        "2019-10-13"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "love-hanoi",
+      "postTitle": "LOVE HANOI",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "LOVE HANOI",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": 2016,
+      "activeBetween": [
+        "2016-10-23",
+        "2016-11-20"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "faith-at-work",
+      "postTitle": "FAITH AT WORK",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "FAITH AT WORK",
+      "confidence": "none",
+      "sermonCount": 18,
+      "year": 2016,
+      "activeBetween": [
+        "2016-08-21",
+        "2016-10-16"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "standing-firm",
+      "postTitle": "STANDING-FIRM",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "STANDING-FIRM",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": 2016,
+      "activeBetween": [
+        "2016-07-03",
+        "2016-08-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "re-imagine",
+      "postTitle": "RE-IMAGINE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "RE-IMAGINE",
+      "confidence": "none",
+      "sermonCount": 18,
+      "year": 2016,
+      "activeBetween": [
+        "2016-04-24",
+        "2016-06-26"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "no-doubt",
+      "postTitle": "NO DOUBT",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "NO DOUBT",
+      "confidence": "none",
+      "sermonCount": 16,
+      "year": 2016,
+      "activeBetween": [
+        "2016-02-21",
+        "2016-04-10"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "the-blessed-life-sermon-series",
+      "postTitle": "THE BLESSED LIFE SERMON SERIES",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "The Blessed Life (2016)",
+      "confidence": "none",
+      "sermonCount": 13,
+      "year": 2016,
+      "activeBetween": [
+        "2016-01-03",
+        "2016-02-14"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "is-it-christmas-yet",
+      "postTitle": "IS IT CHRISTMAS YET?",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "IS IT CHRISTMAS YET?",
+      "confidence": "none",
+      "sermonCount": 7,
+      "year": 2015,
+      "activeBetween": [
+        "2015-11-29",
+        "2015-12-27"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "character-counts",
+      "postTitle": "CHARACTER COUNTS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "Character Counts (2015)",
+      "confidence": "none",
+      "sermonCount": 20,
+      "year": 2015,
+      "activeBetween": [
+        "2015-09-06",
+        "2015-11-15"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "upside-down-movement",
+      "postTitle": "UPSIDE DOWN MOVEMENT",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "UPSIDE DOWN MOVEMENT",
+      "confidence": "none",
+      "sermonCount": 19,
+      "year": 2015,
+      "activeBetween": [
+        "2015-06-14",
+        "2015-08-30"
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "ends-of-earth",
+      "postTitle": "ENDS OF EARTH",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "ENDS OF EARTH",
+      "confidence": "none",
+      "sermonCount": 30,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "proverbs-the-way-of-wisdom",
+      "postTitle": "PROVERBS – THE WAY OF WISDOM",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "PROVERBS – THE WAY OF WISDOM",
+      "confidence": "none",
+      "sermonCount": 14,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "phillipians",
+      "postTitle": "PHILLIPIANS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "PHILLIPIANS",
+      "confidence": "none",
+      "sermonCount": 16,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "kingdom-life",
+      "postTitle": "KINGDOM LIFE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "KINGDOM LIFE",
+      "confidence": "none",
+      "sermonCount": 12,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "independent-sermon",
+      "postTitle": "INDEPENDENT SERMON",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "INDEPENDENT SERMON",
+      "confidence": "none",
+      "sermonCount": 14,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "living-on-purpose",
+      "postTitle": "LIVING ON PURPOSE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "LIVING ON PURPOSE",
+      "confidence": "none",
+      "sermonCount": 8,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "exodus",
+      "postTitle": "EXODUS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "EXODUS",
+      "confidence": "none",
+      "sermonCount": 31,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "christmas-hope",
+      "postTitle": "CHRISTMAS HOPE",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "CHRISTMAS HOPE",
+      "confidence": "none",
+      "sermonCount": 8,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "the-jesus-i-never-knew",
+      "postTitle": "THE JESUS I NEVER KNEW",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "THE JESUS I NEVER KNEW",
+      "confidence": "none",
+      "sermonCount": 14,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "heart-to-heart",
+      "postTitle": "HEART TO HEART",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "HEART TO HEART",
+      "confidence": "none",
+      "sermonCount": 22,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "kingdom-come",
+      "postTitle": "KINGDOM COME",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "KINGDOM COME",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "what-child-is-this",
+      "postTitle": "WHAT CHILD IS THIS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "WHAT CHILD IS THIS",
+      "confidence": "none",
+      "sermonCount": 8,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "beyond-imagination",
+      "postTitle": "BEYOND IMAGINATION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "BEYOND IMAGINATION",
+      "confidence": "none",
+      "sermonCount": 27,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "walk-the-talk",
+      "postTitle": "WALK THE TALK",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "WALK THE TALK",
+      "confidence": "none",
+      "sermonCount": 10,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "light-to-the-nations",
+      "postTitle": "LIGHT TO THE NATIONS",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "LIGHT TO THE NATIONS",
+      "confidence": "none",
+      "sermonCount": 6,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "jonah",
+      "postTitle": "JONAH",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "JONAH",
+      "confidence": "none",
+      "sermonCount": 4,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "chosen",
+      "postTitle": "CHOSEN",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "CHOSEN",
+      "confidence": "none",
+      "sermonCount": 17,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "conversation",
+      "postTitle": "CONVERSATION",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "CONVERSATION",
+      "confidence": "none",
+      "sermonCount": 13,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "on-your-mark",
+      "postTitle": "ON YOUR MARK",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "ON YOUR MARK",
+      "confidence": "none",
+      "sermonCount": 13,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    },
+    {
+      "postSlug": "lights-of-home",
+      "postTitle": "LIGHTS OF HOME",
+      "action": "create",
+      "seriesId": null,
+      "seriesTitle": "LIGHTS OF HOME",
+      "confidence": "none",
+      "sermonCount": 9,
+      "year": null,
+      "activeBetween": [
+        null,
+        null
+      ],
+      "notes": []
+    }
+  ]
+}

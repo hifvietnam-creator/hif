@@ -10,6 +10,8 @@ import {
   OverviewField,
 } from '@payloadcms/plugin-seo/fields'
 
+import { revalidateSermon, revalidateSermonDelete } from './hooks/revalidateSermon'
+
 export const Sermons: CollectionConfig = {
   slug: 'sermons',
   access: {
@@ -62,6 +64,27 @@ export const Sermons: CollectionConfig = {
               admin: {
                 description:
                   'For archive sermons that pre-date the YouTube channel and exist only as an MP3. Leave empty when a video exists.',
+              },
+            },
+            {
+              /**
+               * Every archive MP3 lives on Dropbox's old Public-folder scheme,
+               * which Dropbox switched off in March 2017. An audit of all 174
+               * links found 0 reachable (123×404, 28×403, the rest error pages).
+               *
+               * The URL is kept rather than cleared because it is the only
+               * unique key these sermons have — they have no video — and the
+               * importer uses it to recognise them. Clearing it would make them
+               * unrecognisable and the next import would duplicate all 185.
+               */
+              name: 'audioUnavailable',
+              type: 'checkbox',
+              label: 'Audio file is no longer available',
+              defaultValue: false,
+              admin: {
+                description:
+                  'Set automatically by `pnpm audit:audio --apply` when the link does not resolve. The player is hidden and the sermon is presented as having no media.',
+                condition: (data) => Boolean(data?.audioURL),
               },
             },
             {
@@ -163,13 +186,35 @@ export const Sermons: CollectionConfig = {
     {
       name: 'date',
       type: 'date',
-      required: true,
-      // Every listing query sorts by date and the year filter ranges over it.
+      // Deliberately optional. ~286 archive sermons have no recoverable date:
+      // the website never printed a year, no file path contains one, and their
+      // WordPress publish date is a bulk-migration artefact. Leaving the field
+      // empty says "unknown"; inventing a date would have said something false.
       index: true,
       admin: {
         position: 'sidebar',
         date: { pickerAppearance: 'dayOnly', displayFormat: 'd MMM yyyy' },
-        description: 'Sermon date — used for year filter and sorting.',
+        description:
+          'Sermon date — drives the year filter and ordering. Leave empty if genuinely unknown; the sermon will sort to the end rather than the top.',
+      },
+    },
+    {
+      /**
+       * Sort key, not a real date. Postgres orders NULLs FIRST on a descending
+       * sort, so sorting the listing by `date` would put every undated archive
+       * sermon above this month's. Payload has no way to express NULLS LAST, so
+       * undated sermons get a sentinel far in the past and the listing sorts on
+       * this instead. Kept in sync automatically — never edit it by hand.
+       */
+      name: 'sortDate',
+      type: 'date',
+      index: true,
+      admin: { hidden: true },
+      hooks: {
+        beforeChange: [
+          ({ siblingData }) =>
+            (siblingData as { date?: string | null })?.date ?? new Date('1900-01-01').toISOString(),
+        ],
       },
     },
     {
@@ -208,6 +253,10 @@ export const Sermons: CollectionConfig = {
     },
     slugField(),
   ],
+  hooks: {
+    afterChange: [revalidateSermon],
+    afterDelete: [revalidateSermonDelete],
+  },
   versions: {
     drafts: true,
   },

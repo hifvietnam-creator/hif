@@ -18,6 +18,12 @@ public/sitemap*.xml
 /diagnose-out/
 /diagnose-report.txt
 
+# KidzQuest roster imports — names, ages and contact details of 138 CHILDREN,
+# plus their guardians' emails and phone numbers. The single most sensitive
+# data in this repo. Never commit, and note that the generated HTML preview
+# lists every child by name.
+/data/kq/
+
 # Playwright
 node_modules/
 /test-results/
