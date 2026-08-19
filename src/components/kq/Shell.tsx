@@ -22,10 +22,10 @@ const NAV: { heading: string; items: NavItem[] }[] = [
     heading: 'Admin',
     items: [
       { href: '/kq/dashboard', label: 'Dashboard', sunday: true, ready: true },
+      { href: '/kq/kids', label: 'Kids', sunday: true, ready: true },
       { href: '/kq/register', label: 'Register', sunday: true },
-      { href: '/kq/kids', label: 'Kids', sunday: true },
-      { href: '/kq/teachers', label: 'Teachers' },
-      { href: '/kq/assistants', label: 'Assistants' },
+      { href: '/kq/teachers', label: 'Teachers', ready: true },
+      { href: '/kq/assistants', label: 'Assistants', ready: true },
     ],
   },
 ]

@@ -51,13 +51,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'clientUuid required' }, { status: 400 })
       }
 
-      const securityCode = await checkIn({
+      const { attendanceId, securityCode } = await checkIn({
         sessionId, childId, guardianId,
         actorUserId: user.id,
         clientUuid: body.clientUuid,
         stationId,
       })
-      return NextResponse.json({ ok: true, securityCode })
+      // attendanceId is what the station prints from. Returned even on a retry,
+      // where it points at the original row and therefore the original code.
+      return NextResponse.json({ ok: true, attendanceId, securityCode })
     }
 
     if (body.action === 'check_out') {

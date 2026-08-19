@@ -829,6 +829,29 @@ em { font-style: italic; }
   transition: background .15s;
 }
 .series-playlist-link:hover { background: #fff0f0; }
+
+/* ── Series grouped by year (collapsible, no JS) ─────────────────────────── */
+.filter-years { margin-top: 6px; }
+.filter-year-group { border-top: 1px solid #ececec; }
+.filter-year-group:last-child { border-bottom: 1px solid #ececec; }
+.filter-year-summary {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 7px 10px; cursor: pointer; list-style: none;
+  font-size: 0.86rem; font-weight: 600; color: #333;
+  border-radius: 6px; transition: background .15s, color .15s;
+}
+.filter-year-summary::-webkit-details-marker { display: none; }
+.filter-year-summary:hover { background: #f0f0f0; color: var(--red); }
+.filter-year-summary::before {
+  content: '▸'; font-size: .7rem; color: var(--grey);
+  transition: transform .15s; margin-right: 2px;
+}
+.filter-year-group[open] > .filter-year-summary::before { transform: rotate(90deg); }
+.filter-year-summary > span:first-of-type { flex: 1; }
+.filter-year-count { font-size: 0.72rem; color: var(--grey); font-weight: 500; }
+.filter-year-group[open] > .filter-year-summary { color: var(--red); }
+.filter-year-group .filter-list { padding: 2px 0 8px 14px; }
+.filter-year-summary:focus-visible { outline: 2px solid var(--red); outline-offset: 2px; }
 /* minmax(0, 1fr) rather than 1fr: plain `1fr` means minmax(auto, 1fr), and that
    `auto` floor is the item's min-content width. The thumbnail image reports a
    large minimum, so the first track stretched to fit it and the second was left

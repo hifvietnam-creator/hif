@@ -258,7 +258,9 @@ export type CheckInArgs = {
  * back — including the same security code, which matters because it is already
  * printed on a label in a parent's hand.
  */
-export async function checkIn(args: CheckInArgs): Promise<RosterChild['securityCode']> {
+export async function checkIn(
+  args: CheckInArgs,
+): Promise<{ attendanceId: number; securityCode: string | null }> {
   const db = getPool()
   const client = await db.connect()
 
@@ -271,7 +273,12 @@ export async function checkIn(args: CheckInArgs): Promise<RosterChild['securityC
     )
     if (existing.rows[0]) {
       await client.query('commit')
-      return existing.rows[0].security_code
+      // A retry returns the ORIGINAL code, never a fresh one — the first is
+      // already printed and in a parent's hand.
+      return {
+        attendanceId: parseInt(existing.rows[0].id, 10),
+        securityCode: existing.rows[0].security_code,
+      }
     }
 
     // Retry on a code collision rather than widening the alphabet. With 9,261
@@ -310,7 +317,7 @@ export async function checkIn(args: CheckInArgs): Promise<RosterChild['securityC
       { securityCode: code }, args.stationId ?? null)
 
     await client.query('commit')
-    return code
+    return { attendanceId, securityCode: code }
   } catch (e) {
     await client.query('rollback')
     throw e

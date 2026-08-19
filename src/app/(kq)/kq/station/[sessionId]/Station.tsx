@@ -44,7 +44,20 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
   const [query, setQuery] = useState('')
   const [active, setActive] = useState<RosterChild | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [lastCode, setLastCode] = useState<{ name: string; code: string } | null>(null)
+  const [lastCode, setLastCode] = useState<
+    { name: string; code: string; attendanceId: number } | null
+  >(null)
+
+  // Printing goes through a hidden iframe rather than a new tab. A tab would
+  // pull the TA off the register mid-queue and leave them to find their way
+  // back with a parent waiting.
+  const printFrame = useRef<HTMLIFrameElement | null>(null)
+  const [autoPrint, setAutoPrint] = useState(true)
+
+  const printLabel = useCallback((attendanceId: number) => {
+    if (!printFrame.current) return
+    printFrame.current.src = `/kq/label/${attendanceId}`
+  }, [])
 
   // Writes that have not reached the server yet. Held in state and retried, so
   // a dropped connection mid-service degrades to "saving" rather than to a lost
@@ -92,7 +105,17 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
           const data = await res.json().catch(() => ({}))
 
           if (res.ok) {
-            if (data.securityCode) setLastCode({ name: item.label, code: data.securityCode })
+            if (data.securityCode && data.attendanceId) {
+              setLastCode({
+                name: item.label,
+                code: data.securityCode,
+                attendanceId: data.attendanceId,
+              })
+              // Only print once the write has actually landed. Printing
+              // optimistically would put a code on a label that no row in the
+              // database agrees with if the request then failed.
+              if (autoPrint) printLabel(data.attendanceId)
+            }
             setQueue((q) => q.filter((x) => x.clientUuid !== item.clientUuid))
           } else if (res.status >= 400 && res.status < 500) {
             // The server refused on the merits — retrying will not help, and
@@ -216,13 +239,20 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
       )}
 
       {lastCode && (
-        <div className="flex items-center gap-3 border-b border-ok/30 bg-ok-soft px-4 py-3 text-sm text-ok-ink">
-          <span className="flex-1">
+        <div className="flex items-center gap-2.5 border-b border-ok/30 bg-ok-soft px-4 py-3 text-sm text-ok-ink">
+          <span className="min-w-0 flex-1 truncate">
             <b>{lastCode.name}</b> checked in
           </span>
           <span className="rounded bg-ink px-2 py-1 font-mono font-bold tracking-widest text-white">
             {lastCode.code}
           </span>
+          <button
+            onClick={() => printLabel(lastCode.attendanceId)}
+            className="kq-tap rounded border border-ok/40 px-2 py-1 text-xs font-bold"
+            title="Print these tags again"
+          >
+            Reprint
+          </button>
           <button onClick={() => setLastCode(null)} className="font-bold">✕</button>
         </div>
       )}
@@ -296,10 +326,33 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
               ? 'All saved'
               : 'Offline — taps are being held'}
         </span>
-        {stillHere > 0 && mode === 'out' && (
-          <span className="font-semibold text-flag">{stillHere} still in the room</span>
-        )}
+        <span className="flex items-center gap-3">
+          {stillHere > 0 && mode === 'out' && (
+            <span className="font-semibold text-flag">{stillHere} still in the room</span>
+          )}
+          <label className="kq-tap flex cursor-pointer items-center gap-1.5 text-ink-2">
+            <input
+              type="checkbox"
+              checked={autoPrint}
+              onChange={(e) => setAutoPrint(e.target.checked)}
+              className="h-3.5 w-3.5 accent-[#1f6b85]"
+            />
+            Print labels
+          </label>
+        </span>
       </footer>
+
+      {/*
+        Off-screen rather than display:none — a hidden iframe does not always
+        lay out, and printing an unlaid-out document yields a blank label.
+      */}
+      <iframe
+        ref={printFrame}
+        title="Label printing"
+        aria-hidden="true"
+        tabIndex={-1}
+        className="pointer-events-none fixed left-[-9999px] top-0 h-[400px] w-[300px] border-0"
+      />
 
       {active && (
         <GuardianSheet

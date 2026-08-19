@@ -60,17 +60,19 @@ export const getFacets = unstable_cache(
       ),
     ].sort((a, b) => Number(b) - Number(a))
 
-    const speakerIdsWithSermons = new Set(
-      index.docs
-        .map((s) =>
-          s.speaker && typeof s.speaker === 'object'
-            ? String((s.speaker as { id: unknown }).id)
-            : s.speaker != null
-              ? String(s.speaker)
-              : null,
-        )
-        .filter(Boolean) as string[],
-    )
+    // Counted, not just collected: with 60 speakers the sidebar needs to lead
+    // with the ones who actually preach here rather than list a 2016 visitor
+    // with one sermon alongside a pastor with 300.
+    const sermonsPerSpeaker = new Map<string, number>()
+    for (const s of index.docs) {
+      const id =
+        s.speaker && typeof s.speaker === 'object'
+          ? String((s.speaker as { id: unknown }).id)
+          : s.speaker != null
+            ? String(s.speaker)
+            : null
+      if (id) sermonsPerSpeaker.set(id, (sermonsPerSpeaker.get(id) ?? 0) + 1)
+    }
 
     return {
       years,
@@ -92,8 +94,13 @@ export const getFacets = unstable_cache(
           return a.title.localeCompare(b.title)
         }),
       speakers: teamRes.docs
-        .filter((sp) => speakerIdsWithSermons.has(String(sp.id)))
-        .map((sp) => ({ id: String(sp.id), name: sp.name as string })),
+        .filter((sp) => sermonsPerSpeaker.has(String(sp.id)))
+        .map((sp) => ({
+          id: String(sp.id),
+          name: sp.name as string,
+          count: sermonsPerSpeaker.get(String(sp.id)) ?? 0,
+        }))
+        .sort((a, b) => b.count - a.count || a.name.localeCompare(b.name)),
     }
   },
   ['sermon-filter-facets'],
@@ -127,11 +134,36 @@ export default async function FilterSidebar({ filters }: { filters: SermonFilter
   const activeSpeaker = filters.speaker ?? null
   const currentSeries = activeSeries ? allSeries.find((s) => s.id === activeSeries) : null
 
+  // Series bucketed by year. allSeries arrives sorted newest-first with
+  // year-less ones last, so insertion order gives the right group order too.
+  const seriesGroups: Array<{ label: string; items: typeof allSeries }> = []
+  for (const s of allSeries) {
+    // Series whose sermons are all undated have no year to show. "Earlier"
+    // rather than "Unknown": it is true, and it reads as an archive rather
+    // than as missing data.
+    const label = s.year ? String(s.year) : 'Earlier'
+    const group = seriesGroups.find((g) => g.label === label)
+    if (group) group.items.push(s)
+    else seriesGroups.push({ label, items: [s] })
+  }
+
+  const openGroupLabel = currentSeries
+    ? (currentSeries.year ? String(currentSeries.year) : 'Earlier')
+    : (seriesGroups[0]?.label ?? null)
+
+  // speakers arrives sorted by sermon count. The regulars are a handful; the
+  // rest is a long tail of one-off guests going back a decade.
+  const TOP_SPEAKERS = 10
+  const topSpeakers = speakers.slice(0, TOP_SPEAKERS)
+  const restSpeakers = speakers.slice(TOP_SPEAKERS)
+  const activeSpeakerIsInTail = restSpeakers.some((sp) => sp.id === activeSpeaker)
+
   return (
     <aside className="sermons-sidebar">
       {allSeries.length > 0 && (
         <div className="filter-group">
           <h3 className="filter-title">Series</h3>
+
           <ul className="filter-list">
             <li>
               <Link
@@ -142,18 +174,45 @@ export default async function FilterSidebar({ filters }: { filters: SermonFilter
                 All series
               </Link>
             </li>
-            {allSeries.map((s) => (
-              <li key={s.id}>
-                <Link
-                  href={buildHref(filters, { series: s.id })}
-                  className={`filter-link${activeSeries === s.id ? ' active' : ''}`}
-                  scroll={false}
-                >
-                  {s.title}
-                </Link>
-              </li>
-            ))}
           </ul>
+
+          {/*
+            73 series in one flat list meant scrolling past a decade of archive
+            to change any other filter. Grouped by year and collapsed, that is
+            ~14 rows. <details> rather than state: it works without JavaScript,
+            keeps every series a real link, and needs no client component.
+
+            Only one group is open — the one holding the active series, or the
+            newest when nothing is selected.
+          */}
+          <div className="filter-years">
+            {seriesGroups.map((group) => (
+              <details
+                key={group.label}
+                className="filter-year-group"
+                open={group.label === openGroupLabel}
+              >
+                <summary className="filter-year-summary">
+                  <span>{group.label}</span>
+                  <span className="filter-year-count">{group.items.length}</span>
+                </summary>
+                <ul className="filter-list">
+                  {group.items.map((s) => (
+                    <li key={s.id}>
+                      <Link
+                        href={buildHref(filters, { series: s.id })}
+                        className={`filter-link${activeSeries === s.id ? ' active' : ''}`}
+                        scroll={false}
+                      >
+                        {s.title}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ))}
+          </div>
+
           {currentSeries?.youtubePlaylistId && (
             <a
               href={`https://www.youtube.com/playlist?list=${currentSeries.youtubePlaylistId}`}
@@ -208,7 +267,7 @@ export default async function FilterSidebar({ filters }: { filters: SermonFilter
                 All speakers
               </Link>
             </li>
-            {speakers.map((sp) => (
+            {topSpeakers.map((sp) => (
               <li key={sp.id}>
                 <Link
                   href={buildHref(filters, { speaker: sp.id })}
@@ -220,6 +279,34 @@ export default async function FilterSidebar({ filters }: { filters: SermonFilter
               </li>
             ))}
           </ul>
+
+          {/*
+            The long tail is mostly one-off visiting preachers from years ago.
+            Collapsed rather than cut, so they stay reachable — and forced open
+            when the active speaker is one of them, otherwise selecting a guest
+            speaker would hide the very filter you just applied.
+          */}
+          {restSpeakers.length > 0 && (
+            <details className="filter-year-group" open={activeSpeakerIsInTail}>
+              <summary className="filter-year-summary">
+                <span>More speakers</span>
+                <span className="filter-year-count">{restSpeakers.length}</span>
+              </summary>
+              <ul className="filter-list">
+                {restSpeakers.map((sp) => (
+                  <li key={sp.id}>
+                    <Link
+                      href={buildHref(filters, { speaker: sp.id })}
+                      className={`filter-link${activeSpeaker === sp.id ? ' active' : ''}`}
+                      scroll={false}
+                    >
+                      {sp.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
         </div>
       )}
     </aside>
