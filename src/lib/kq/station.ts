@@ -163,15 +163,28 @@ export async function getRoster(sessionId: number): Promise<RosterChild[]> {
     attendance_id: string | null; status: string | null; security_code: string | null
     checked_in_at: Date | null; checked_out_at: Date | null
   }>(
-    `select r.child_id, r.first_name, r.last_name, r.preferred_name,
-            r.allergies, r.provisional,
+    // Two sources, unioned: children currently enrolled in this room, AND any
+    // child with an attendance row for this session.
+    //
+    // The second half is a safety property, not a convenience. If someone
+    // archives a child from the Kids page while that child is physically in the
+    // room and already checked in, a roster built only from current_roster would
+    // make them disappear — no way to check them out, and nothing on screen
+    // saying they were ever there. You cannot un-see a child who is in the room.
+    `select c.id as child_id, c.first_name, c.last_name, c.preferred_name,
+            c.allergies,
+            coalesce(e.provisional, false) as provisional,
             a.id as attendance_id, a.status, a.security_code,
             a.checked_in_at, a.checked_out_at
-       from kq.current_roster r
+       from kq.children c
+       left join kq.enrollments e
+              on e.child_id = c.id and e.ended_on is null
        left join kq.attendance a
-              on a.child_id = r.child_id and a.session_id = $1
-      where r.group_code = (select group_code from kq.sessions where id = $1)
-      order by lower(coalesce(r.preferred_name, r.first_name)), lower(r.last_name)`,
+              on a.child_id = c.id and a.session_id = $1
+      where a.id is not null
+         or (c.active
+             and e.group_code = (select group_code from kq.sessions where id = $1))
+      order by lower(coalesce(c.preferred_name, c.first_name)), lower(c.last_name)`,
     [sessionId],
   )
 

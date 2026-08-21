@@ -14,7 +14,9 @@ export default async function KidsPage() {
   if (!user) redirect('/admin/login?redirect=/kq/kids')
   if (user.role !== 'admin') redirect('/kq/station')
 
-  const children = await listChildren()
+  // Archived children are loaded too — the "Left" filter needs them, and the
+  // table hides them from every other view.
+  const children = await listChildren(true)
 
   return (
     <Shell current="/kq/kids" user={{ name: user.name ?? user.email, role: user.role }}>

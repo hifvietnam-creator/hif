@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from 'react'
 
-import type { ChildRow } from '@/lib/kq/children'
+// From child-fields, not children: the latter imports the Postgres pool, and a
+// client component importing it pulls `pg` into the browser bundle.
+import { CHILD_STATUSES, STATUS_LABEL, type ChildRow, type ChildStatus } from '@/lib/kq/child-fields'
+
+const GROUP_CODES = ['explorers', 'voyagers', 'trailblazers', 'pathfinders', 'aftershock']
 
 const GROUP_LABEL: Record<string, string> = {
   explorers: 'Explorers',
@@ -25,7 +29,9 @@ type Save = 'idle' | 'saving' | 'saved' | 'error'
 export default function KidsTable({ initial }: { initial: ChildRow[] }) {
   const [rows, setRows] = useState(initial)
   const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<'all' | 'no-collector' | 'no-grade' | 'no-guardian'>('all')
+  const [filter, setFilter] =
+    useState<'all' | 'no-collector' | 'no-grade' | 'no-guardian' | 'archived'>('all')
+  const [archiving, setArchiving] = useState<ChildRow | null>(null)
   const [expanded, setExpanded] = useState<number | null>(null)
   const [save, setSave] = useState<Save>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -58,16 +64,26 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
   const local = (childId: number, patchRow: Partial<ChildRow>) =>
     setRows((rs) => rs.map((r) => (r.childId === childId ? { ...r, ...patchRow } : r)))
 
-  const counts = useMemo(() => ({
-    noCollector: rows.filter((r) => !r.guardians.some((g) => g.canPickup)).length,
-    noGrade: rows.filter((r) => r.grade === null).length,
-    noGuardian: rows.filter((r) => r.guardians.length === 0).length,
-  }), [rows])
+  const counts = useMemo(() => {
+    const live = rows.filter((r) => r.status === 'active')
+    return {
+      active: live.length,
+      noCollector: live.filter((r) => !r.guardians.some((g) => g.canPickup)).length,
+      noGrade: live.filter((r) => r.grade === null).length,
+      noGuardian: live.filter((r) => r.guardians.length === 0).length,
+      archived: rows.filter((r) => r.status !== 'active').length,
+    }
+  }, [rows])
 
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
     return rows
       .filter((r) => {
+        // Archived children are hidden from every other view. They are not on
+        // the register, and leaving them in the default list is how a roster
+        // count quietly overstates itself.
+        if (filter === 'archived') return r.status !== 'active'
+        if (r.status !== 'active') return false
         if (filter === 'no-collector') return !r.guardians.some((g) => g.canPickup)
         if (filter === 'no-grade') return r.grade === null
         if (filter === 'no-guardian') return r.guardians.length === 0
@@ -90,7 +106,7 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
           className="w-56 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand"
         />
         <Chip on={filter === 'all'} onClick={() => setFilter('all')}>
-          All {rows.length}
+          On the register {counts.active}
         </Chip>
         <Chip on={filter === 'no-collector'} onClick={() => setFilter('no-collector')} alert>
           No collector {counts.noCollector}
@@ -100,6 +116,9 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
         </Chip>
         <Chip on={filter === 'no-grade'} onClick={() => setFilter('no-grade')}>
           No grade {counts.noGrade}
+        </Chip>
+        <Chip on={filter === 'archived'} onClick={() => setFilter('archived')}>
+          Left {counts.archived}
         </Chip>
 
         <span className="ml-auto text-xs text-hifmuted">
@@ -129,6 +148,7 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
               <Th className="w-20">Sex</Th>
               <Th>Allergies</Th>
               <Th className="w-28">Collector</Th>
+              <Th className="w-24">Status</Th>
             </tr>
           </thead>
           <tbody>
@@ -202,14 +222,38 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
                       />
                     </Td>
                     <Td>
-                      <span
-                        className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
-                          GROUP_TINT[r.groupCode] ?? 'bg-mist text-hifmuted'
-                        }`}
-                      >
-                        {GROUP_LABEL[r.groupCode] ?? r.groupCode}
-                        {r.provisional && <span title="Unconfirmed placement">?</span>}
-                      </span>
+                      <div className="flex items-center gap-1.5">
+                        <select
+                          value={r.groupCode}
+                          onChange={async (e) => {
+                            const groupCode = e.target.value
+                            local(r.childId, { groupCode, groupManual: true, provisional: false })
+                            await patch({
+                              action: 'group', enrollmentId: r.enrollmentId, groupCode,
+                            })
+                          }}
+                          className={`w-full rounded border border-transparent px-1.5 py-1 text-xs font-semibold hover:border-line focus:border-brand focus:outline-none ${
+                            GROUP_TINT[r.groupCode] ?? 'bg-mist text-hifmuted'
+                          }`}
+                        >
+                          {GROUP_CODES.map((c) => (
+                            <option key={c} value={c}>
+                              {GROUP_LABEL[c] ?? c}
+                            </option>
+                          ))}
+                        </select>
+                        {r.groupManual && (
+                          <span
+                            title="Placed by hand — the August promotion will leave this child where they are"
+                            className="shrink-0 text-[10px] font-bold text-hifmuted"
+                          >
+                            📌
+                          </span>
+                        )}
+                        {r.provisional && (
+                          <span title="Unconfirmed placement" className="shrink-0 text-flag">?</span>
+                        )}
+                      </div>
                     </Td>
                     <Td>
                       <select
@@ -250,11 +294,39 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
                         </button>
                       )}
                     </Td>
+                    <Td>
+                      {r.status === 'active' ? (
+                        <button
+                          onClick={() => setArchiving(r)}
+                          className="rounded-full bg-mist px-2 py-1 text-xs font-semibold text-hifmuted hover:brightness-95"
+                        >
+                          Archive
+                        </button>
+                      ) : (
+                        <div className="flex flex-col items-start gap-0.5">
+                          <span
+                            className="rounded-full bg-flag-soft px-2 py-0.5 text-[11px] font-bold text-flag"
+                            title={r.statusNote ?? undefined}
+                          >
+                            {STATUS_LABEL[r.status]}
+                          </span>
+                          <button
+                            onClick={async () => {
+                              local(r.childId, { status: 'active', leftOn: null })
+                              await patch({ action: 'status', childId: r.childId, status: 'active' })
+                            }}
+                            className="text-[11px] font-semibold text-brand-dark underline"
+                          >
+                            Restore
+                          </button>
+                        </div>
+                      )}
+                    </Td>
                   </tr>
 
                   {open && (
                     <tr key={`${r.childId}-g`} className="border-t border-line/70 bg-brand-soft/25">
-                      <td colSpan={9} className="px-4 py-3">
+                      <td colSpan={10} className="px-4 py-3">
                         <GuardianPanel
                           row={r}
                           onTogglePickup={async (guardianId, next) => {
@@ -297,8 +369,8 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
 
             {visible.length === 0 && (
               <tr>
-                <td colSpan={9} className="px-4 py-12 text-center text-hifmuted">
-                  Nobody matches that.
+                <td colSpan={10} className="px-4 py-12 text-center text-hifmuted">
+                  {filter === 'archived' ? 'Nobody has left.' : 'Nobody matches that.'}
                 </td>
               </tr>
             )}
@@ -309,8 +381,122 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
       <p className="mt-3 text-xs text-hifmuted">
         Cells save when you click away. There is no undo — every change is recorded in the
         child&rsquo;s history with your name against it, which is how a mistake gets found.
+        Archiving is never a delete: attendance and history survive, and Restore brings a
+        child back into the group they were in.
       </p>
+
+      {archiving && (
+        <ArchiveDialog
+          child={archiving}
+          onCancel={() => setArchiving(null)}
+          onConfirm={async (status, note) => {
+            local(archiving.childId, { status, statusNote: note })
+            const ok = await patch({
+              action: 'status', childId: archiving.childId, status, note,
+            })
+            setArchiving(null)
+            return !!ok
+          }}
+        />
+      )}
     </>
+  )
+}
+
+/**
+ * Archiving asks WHY, and the options are not interchangeable.
+ *
+ * "Left Hanoi" and "stopped attending" look similar and mean opposite things
+ * for follow-up: one family is gone from the country, the other is still down
+ * the road and worth a phone call. A single "inactive" flag buries the second
+ * inside the first.
+ */
+function ArchiveDialog({
+  child, onCancel, onConfirm,
+}: {
+  child: ChildRow
+  onCancel: () => void
+  onConfirm: (status: ChildStatus, note: string) => Promise<boolean>
+}) {
+  const [status, setStatus] = useState<ChildStatus>('left_hanoi')
+  const [note, setNote] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const name = `${child.preferredName || child.firstName} ${child.lastName}`.trim()
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" onClick={onCancel}>
+      <div
+        className="w-full max-w-md rounded-card bg-paper p-5 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-bold text-ink">Take {name} off the register</h3>
+        <p className="mt-1 text-sm text-hifmuted">
+          Nothing is deleted. Their attendance and history stay, and you can restore them
+          at any time.
+        </p>
+
+        <div className="mt-4 space-y-1.5">
+          {CHILD_STATUSES.filter((s) => s !== 'active').map((s) => (
+            <label
+              key={s}
+              className={`flex cursor-pointer items-center gap-2.5 rounded-card border p-2.5 text-sm ${
+                status === s ? 'border-brand bg-brand-soft' : 'border-line'
+              }`}
+            >
+              <input
+                type="radio"
+                checked={status === s}
+                onChange={() => setStatus(s)}
+                className="h-4 w-4 accent-[#1f6b85]"
+              />
+              <span>
+                <span className="block font-semibold text-ink">{STATUS_LABEL[s]}</span>
+                <span className="block text-xs text-hifmuted">
+                  {s === 'left_hanoi' && 'The family has moved away. No follow-up needed.'}
+                  {s === 'stopped_attending' && 'Still in the city but no longer coming. Worth a call.'}
+                  {s === 'moved_to_aftershock' && 'Graduated to youth. Not attrition.'}
+                  {s === 'duplicate' && 'Same child recorded twice. Keep the other record.'}
+                </span>
+              </span>
+            </label>
+          ))}
+        </div>
+
+        <label className="mt-3 block">
+          <span className="mb-1 block text-sm font-semibold text-ink">
+            Anything worth noting?
+          </span>
+          <textarea
+            value={note}
+            onChange={(e) => setNote(e.target.value)}
+            rows={2}
+            placeholder="e.g. Family returned to Manila in July — mother let Grace know."
+            className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand"
+          />
+        </label>
+
+        <div className="mt-4 flex justify-end gap-2">
+          <button
+            onClick={onCancel}
+            className="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink-2"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!note.trim() || busy}
+            onClick={async () => {
+              setBusy(true)
+              await onConfirm(status, note.trim())
+              setBusy(false)
+            }}
+            className="rounded-lg bg-brand-dark px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40"
+          >
+            Take off the register
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
 

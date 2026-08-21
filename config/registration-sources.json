@@ -1,0 +1,97 @@
+{
+  "_instructions": [
+    "Maps each registration export onto ops.registrations. Hand-maintained:",
+    "these forms were written independently by different ministries and share",
+    "almost no structure, so there is nothing sensible to infer automatically.",
+    "",
+    "map      — target column -> the exact header text in that sheet",
+    "answers  — every column NOT mapped or ignored is kept in the answers jsonb,",
+    "           so a question nobody anticipated is still queryable later",
+    "ignore   — spreadsheet scaffolding: helper columns, blank spacers, tallies",
+    "",
+    "Add a new export by adding an entry. Nothing else needs changing."
+  ],
+
+  "sources": [
+    {
+      "file": "2025  Fall- ALPHA Registration.xlsx",
+      "sheet": "Participants",
+      "eventLabel": "Alpha Fall 2025",
+      "ministry": "Alpha Course",
+      "map": {
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "phone": "Mobile Phone",
+        "nationality": "Nationality"
+      },
+      "ignore": ["x", "Select"],
+      "note": "Trailing columns are weekly session dates — attendance, not registration. Kept in answers for now; they belong in ops.ministry_events once Alpha is modelled as a course with sessions."
+    },
+    {
+      "file": "2025 Spring -ALPHA Beyond Registration.xlsx",
+      "sheet": "Alpha Guests",
+      "eventLabel": "Alpha Spring 2025",
+      "ministry": "Alpha Course",
+      "map": {
+        "first_name": "First Name",
+        "last_name": "Last Name",
+        "email": "Email",
+        "phone": "Mobile Phone",
+        "nationality": "Nationality"
+      },
+      "note": "Has 'Who invited you?' — the only file in the folder that records how someone arrived. Worth surfacing on the dashboard."
+    },
+    {
+      "file": "2025-12-07_PASKONG_PINOY_2025-12-06_05_46_56_1.xlsx",
+      "sheet": "Sheet1",
+      "eventLabel": "Paskong Pinoy 2025",
+      "ministry": "Filipino Fellowship",
+      "registeredAtColumn": "Submission Date",
+      "map": {
+        "full_name": "Name",
+        "email": "Email",
+        "phone": "Phone Number"
+      },
+      "note": "Prayer Request is pastoral, not analytics. It lands in answers — review who can read this table before exposing it."
+    },
+    {
+      "file": "2026-03-09 - Pickleball.xlsx",
+      "sheet": "HANOI QR RESPONSES",
+      "eventLabel": "Pickleball Hanoi 2026",
+      "ministry": "Sports Outreach",
+      "registeredAtColumn": "Timestamp",
+      "map": {
+        "full_name": "Full Name / Họ và tên đầy đủ",
+        "email": ["Email", "Email Address", "Email Address 2"],
+        "phone": "Phone Number / Số điện thoại"
+      },
+      "ignore": ["Column 18"],
+      "note": "Three email columns from successive form edits, and the data is not all in the first one. Tried in order, first non-empty per row wins — assuming a single authoritative column produced 0% coverage on 81 people."
+    },
+    {
+      "file": "2026-03-09 - Pickleball.xlsx",
+      "sheet": "ECOPARK QR RESPONSES_pickleball",
+      "eventLabel": "Pickleball Ecopark 2026",
+      "ministry": "Sports Outreach",
+      "registeredAtColumn": "Timestamp",
+      "map": {
+        "full_name": "Full Name",
+        "email": "Email Address",
+        "phone": "Zalo Phone Number"
+      }
+    },
+    {
+      "file": "2026-04-04_Pinoy Family Day Registration Form (Responses) (1) (1).xlsx",
+      "sheet": "Form Responses 1",
+      "eventLabel": "Pinoy Family Day 2026",
+      "ministry": "Filipino Fellowship",
+      "registeredAtColumn": "Timestamp",
+      "map": {
+        "full_name": "Name",
+        "phone": "Contact Number"
+      },
+      "note": "No email column at all, so these people cannot be matched to Planning Center records. Name and phone only — the match rate here will be near zero, and that is the file's limitation rather than a bug."
+    }
+  ]
+}

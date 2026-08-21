@@ -15,22 +15,36 @@ import { NextRequest, NextResponse } from 'next/server'
 
 import { getKqUser } from '@/lib/kq/auth'
 import {
+  CHILD_STATUSES,
   EDITABLE_CHILD_FIELDS,
   addGuardian,
   setChildGrade,
+  setChildGroup,
+  setChildStatus,
   setPickup,
   updateChildField,
+  type ChildStatus,
   type EditableChildField,
 } from '@/lib/kq/children'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * Status is the one action teachers and assistants may take here.
+ *
+ * They are the people who actually know a family has moved away, and making
+ * them email an administrator means the register stays wrong for weeks. It is
+ * safe to delegate because archiving is not a delete: history survives, restore
+ * is one tap, and every change is logged with a name against it.
+ *
+ * Everything else — names, allergies, grade, guardians, pickup rights — stays
+ * admin-only.
+ */
+const STATUS_ROLES = new Set(['admin', 'teacher', 'ta'])
+
 export async function PATCH(req: NextRequest) {
   const user = await getKqUser(req.headers)
   if (!user) return NextResponse.json({ error: 'Not signed in' }, { status: 401 })
-  if (user.role !== 'admin') {
-    return NextResponse.json({ error: 'Administrators only' }, { status: 403 })
-  }
 
   let body: Record<string, unknown>
   try {
@@ -39,8 +53,41 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ error: 'Malformed body' }, { status: 400 })
   }
 
+  const action = String(body.action ?? '')
+  const allowed = action === 'status' ? STATUS_ROLES.has(user.role) : user.role === 'admin'
+  if (!allowed) {
+    return NextResponse.json(
+      { error: action === 'status' ? 'Not permitted' : 'Administrators only' },
+      { status: 403 },
+    )
+  }
+
   try {
     switch (body.action) {
+      case 'status': {
+        const status = String(body.status) as ChildStatus
+        if (!CHILD_STATUSES.includes(status)) {
+          return NextResponse.json({ error: 'Unknown status' }, { status: 400 })
+        }
+        const note = body.note ? String(body.note).trim() : null
+        // A reason is required to archive but not to restore. Recording why a
+        // child left is the whole point; welcoming one back needs no excuse.
+        if (status !== 'active' && !note) {
+          return NextResponse.json({ error: 'Please say why' }, { status: 400 })
+        }
+        await setChildStatus(Number(body.childId), status, note, user.id)
+        return NextResponse.json({ ok: true })
+      }
+
+      case 'group': {
+        const groupCode = String(body.groupCode ?? '')
+        if (!groupCode) {
+          return NextResponse.json({ error: 'groupCode required' }, { status: 400 })
+        }
+        await setChildGroup(Number(body.enrollmentId), groupCode, user.id)
+        return NextResponse.json({ ok: true })
+      }
+
       case 'field': {
         const field = String(body.field) as EditableChildField
         // Allowlist, not a check on shape. The field name is interpolated into

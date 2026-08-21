@@ -9,40 +9,18 @@
 
 import { getPool } from '../db'
 
-export type ChildRow = {
-  childId: number
-  enrollmentId: number
-  firstName: string
-  lastName: string
-  preferredName: string | null
-  gender: string | null
-  birthdate: string | null
-  grade: number | null
-  groupCode: string
-  groupManual: boolean
-  provisional: boolean
-  allergies: string | null
-  careNotes: string | null
-  photoConsent: boolean | null
-  active: boolean
-  guardians: {
-    id: number
-    fullName: string
-    relationship: string | null
-    canPickup: boolean
-    isPrimary: boolean
-    email: string | null
-    phone: string | null
-  }[]
-}
+// Shapes and constants live in child-fields.ts, which imports no database code.
+// Client components must import from there directly: importing them from here
+// pulls in the Postgres pool and fails the browser build on `require('dns')`.
+// Re-exported so existing server-side imports keep working.
+export {
+  CHILD_STATUSES,
+  EDITABLE_CHILD_FIELDS,
+  STATUS_LABEL,
+} from './child-fields'
+export type { ChildRow, ChildStatus, EditableChildField } from './child-fields'
 
-/** Flat fields a cell may edit. Anything not here is rejected by the API. */
-export const EDITABLE_CHILD_FIELDS = [
-  'first_name', 'last_name', 'preferred_name',
-  'gender', 'birthdate', 'allergies', 'care_notes',
-  'photo_consent', 'active',
-] as const
-export type EditableChildField = (typeof EDITABLE_CHILD_FIELDS)[number]
+import type { ChildRow, ChildStatus, EditableChildField } from './child-fields'
 
 export async function listChildren(includeInactive = false): Promise<ChildRow[]> {
   const db = getPool()
@@ -55,14 +33,25 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     group_manual: boolean; provisional: boolean
     allergies: string | null; care_notes: string | null
     photo_consent: boolean | null; active: boolean
+    status: string; left_on: Date | null; status_note: string | null
   }>(
+    // LEFT JOIN LATERAL rather than an inner join on the open enrolment: an
+    // archived child's enrolment is closed, so an inner join would hide exactly
+    // the rows the "archived" filter exists to show.
     `select c.id as child_id, e.id as enrollment_id,
             c.first_name, c.last_name, c.preferred_name,
             c.gender, c.birthdate,
             e.grade, e.group_code, e.group_manual, e.provisional,
-            c.allergies, c.care_notes, c.photo_consent, c.active
+            c.allergies, c.care_notes, c.photo_consent, c.active,
+            c.status, c.left_on, c.status_note
        from kq.children c
-       join kq.enrollments e on e.child_id = c.id and e.ended_on is null
+       left join lateral (
+         select id, grade, group_code, group_manual, provisional
+           from kq.enrollments
+          where child_id = c.id
+          order by (ended_on is null) desc, started_on desc
+          limit 1
+       ) e on true
       where ($1::boolean or c.active)
       order by lower(c.first_name), lower(c.last_name)`,
     [includeInactive],
@@ -102,7 +91,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
 
   return rows.map((r) => ({
     childId: parseInt(r.child_id, 10),
-    enrollmentId: parseInt(r.enrollment_id, 10),
+    enrollmentId: r.enrollment_id ? parseInt(r.enrollment_id, 10) : 0,
     firstName: r.first_name,
     lastName: r.last_name,
     preferredName: r.preferred_name,
@@ -116,6 +105,9 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     careNotes: r.care_notes,
     photoConsent: r.photo_consent,
     active: r.active,
+    status: r.status as ChildStatus,
+    leftOn: r.left_on ? r.left_on.toISOString().slice(0, 10) : null,
+    statusNote: r.status_note,
     guardians: byChild.get(parseInt(r.child_id, 10)) ?? [],
   }))
 }
@@ -151,16 +143,17 @@ export async function updateChildField(
     )
     const newValue = (after[0] as { v: string | null }).v
 
+    // Only log a real change. A blur that saves the same value is not history,
+    // and a log full of no-ops is a log nobody reads when it matters.
+    //
+    // Always 'field_change' — leaving is no longer expressible here. It goes
+    // through setChildStatus, which records a reason and closes the enrolment.
     if (oldValue !== newValue) {
       await client.query(
         `insert into kq.child_events
            (child_id, event_type, field, old_value, new_value, actor_user_id)
-         values ($1, $2, $3, $4, $5, $6)`,
-        [
-          childId,
-          field === 'active' && newValue === 'false' ? 'deactivated' : 'field_change',
-          field, oldValue, newValue, actorUserId,
-        ],
+         values ($1, 'field_change', $2, $3, $4, $5)`,
+        [childId, field, oldValue, newValue, actorUserId],
       )
     }
 
@@ -252,6 +245,161 @@ export async function setChildGrade(
 
     await client.query('commit')
     return { groupCode, provisional }
+  } catch (e) {
+    await client.query('rollback')
+    throw e
+  } finally {
+    client.release()
+  }
+}
+
+/**
+ * Move a child to a group by hand.
+ *
+ * Sets group_manual, which is not a side effect — it is the point. A child may
+ * sit outside their grade's group for maturity, additional needs, or to stay
+ * with a sibling, and the annual promotion skips manual placements precisely so
+ * that decision is not silently undone every August.
+ *
+ * The cost is that their group stops tracking their grade. That is visible in
+ * the table as a "manual" badge, so whoever wonders in a year's time why this
+ * child did not move up has the answer in front of them.
+ */
+export async function setChildGroup(
+  enrollmentId: number,
+  groupCode: string,
+  actorUserId: number,
+): Promise<void> {
+  const db = getPool()
+  const client = await db.connect()
+  try {
+    await client.query('begin')
+
+    const { rows } = await client.query<{ child_id: string; group_code: string; grade: number | null }>(
+      `select child_id, group_code, grade from kq.enrollments where id = $1 for update`,
+      [enrollmentId],
+    )
+    if (rows.length === 0) throw new Error('No such enrolment')
+    const row = rows[0]!
+    const childId = parseInt(row.child_id, 10)
+
+    // Moving a child by hand is also a confirmation that they belong there, so
+    // the placement stops being provisional even without a grade.
+    await client.query(
+      `update kq.enrollments
+          set group_code   = $2,
+              group_manual = true,
+              provisional  = false,
+              confirmed_by = $3,
+              confirmed_at = now()
+        where id = $1`,
+      [enrollmentId, groupCode, actorUserId],
+    )
+
+    if (row.group_code !== groupCode) {
+      await client.query(
+        `insert into kq.child_events
+           (child_id, event_type, field, old_value, new_value, actor_user_id, detail)
+         values ($1,'group_change','group_code',$2,$3,$4,$5)`,
+        [childId, row.group_code, groupCode, actorUserId,
+         JSON.stringify({ manual: true, gradeAtTime: row.grade })],
+      )
+    }
+
+    await client.query('commit')
+  } catch (e) {
+    await client.query('rollback')
+    throw e
+  } finally {
+    client.release()
+  }
+}
+
+/**
+ * Archive a child, or bring them back.
+ *
+ * Never a delete. Attendance history, the enrolment trail and the audit log all
+ * survive — a child who returns in six months should reappear with their past
+ * intact, and a safeguarding question about last March must still be answerable
+ * about somebody who has since left.
+ *
+ * Archiving closes the open enrolment, which is what removes them from every
+ * register. Restoring opens a fresh one in the group they were last in.
+ */
+export async function setChildStatus(
+  childId: number,
+  status: ChildStatus,
+  note: string | null,
+  actorUserId: number,
+): Promise<void> {
+  const db = getPool()
+  const client = await db.connect()
+  try {
+    await client.query('begin')
+
+    const { rows: cur } = await client.query<{ status: string }>(
+      `select status from kq.children where id = $1 for update`,
+      [childId],
+    )
+    if (cur.length === 0) throw new Error('No such child')
+    const wasStatus = cur[0]!.status
+    const leaving = status !== 'active'
+
+    await client.query(
+      `update kq.children
+          set status      = $2,
+              left_on     = case when $3 then coalesce(left_on, current_date) else null end,
+              status_note = $4
+        where id = $1`,
+      [childId, status, leaving, note],
+    )
+
+    if (leaving) {
+      await client.query(
+        `update kq.enrollments
+            set ended_on = coalesce(ended_on, current_date),
+                reason   = case when $2 = 'moved_to_aftershock'
+                                then 'moved to aftershock' else 'left' end
+          where child_id = $1 and ended_on is null`,
+        [childId, status],
+      )
+    } else if (wasStatus !== 'active') {
+      // Coming back. Reopen in whatever group they were last in — a returning
+      // child is not a new registration, and making someone re-place them by
+      // hand is how a child ends up on no register at all.
+      const { rows: last } = await client.query<{
+        academic_year: string; grade: number | null; group_code: string; group_manual: boolean
+      }>(
+        `select academic_year, grade, group_code, group_manual
+           from kq.enrollments where child_id = $1
+          order by started_on desc limit 1`,
+        [childId],
+      )
+      if (last[0]) {
+        const { rows: year } = await client.query<{ code: string }>(
+          `select code from kq.academic_years where is_current limit 1`,
+        )
+        await client.query(
+          `insert into kq.enrollments
+             (child_id, academic_year, grade, group_code, group_manual,
+              started_on, reason, provisional, note)
+           values ($1,$2,$3,$4,$5,current_date,'registration',true,$6)`,
+          [childId, year[0]?.code ?? last[0].academic_year, last[0].grade,
+           last[0].group_code, last[0].group_manual,
+           'restored after being marked ' + wasStatus],
+        )
+      }
+    }
+
+    await client.query(
+      `insert into kq.child_events
+         (child_id, event_type, field, old_value, new_value, actor_user_id, detail)
+       values ($1, $2, 'status', $3, $4, $5, $6)`,
+      [childId, leaving ? 'deactivated' : 'note', wasStatus, status, actorUserId,
+       JSON.stringify({ note })],
+    )
+
+    await client.query('commit')
   } catch (e) {
     await client.query('rollback')
     throw e
