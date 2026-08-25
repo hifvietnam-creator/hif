@@ -43,6 +43,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
   const [mode, setMode] = useState<'in' | 'out'>('in')
   const [query, setQuery] = useState('')
   const [active, setActive] = useState<RosterChild | null>(null)
+  const [adding, setAdding] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [lastCode, setLastCode] = useState<
     { name: string; code: string; attendanceId: number } | null
@@ -202,7 +203,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">
           <Stat label="Expected" value={counts.expected} />
           <Stat label="Here" value={counts.present} />
-          <Stat label="Collected" value={counts.collected} />
+          <Stat label="Dismissed" value={counts.collected} />
         </div>
       </header>
 
@@ -216,7 +217,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
               mode === m ? 'border-brand text-brand-dark' : 'border-transparent text-hifmuted'
             }`}
           >
-            {m === 'in' ? 'Check in' : 'Check out'}
+            {m === 'in' ? 'Check in' : 'Dismiss'}
           </button>
         ))}
       </div>
@@ -299,7 +300,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
                 onClick={() => setActive(c)}
                 className="kq-tap rounded-lg bg-brand-deep px-4 py-3 text-sm font-bold text-white active:brightness-95"
               >
-                Check out
+                Dismiss
               </button>
             )}
           </li>
@@ -307,7 +308,22 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
 
         {visible.length === 0 && (
           <li className="px-4 py-12 text-center text-sm text-hifmuted">
-            {mode === 'in' ? 'Everybody has been collected.' : 'Nobody is checked in yet.'}
+            {mode === 'in'
+              ? roster.length === 0
+                ? 'Nobody is on this register yet.'
+                : 'Everybody has been dismissed.'
+              : 'Nobody is checked in yet.'}
+          </li>
+        )}
+
+        {mode === 'in' && (
+          <li className="p-3">
+            <button
+              onClick={() => setAdding(true)}
+              className="kq-tap w-full rounded-card border border-dashed border-line py-3 text-sm font-semibold text-ink-2"
+            >
+              + Add a child who isn&rsquo;t on the list
+            </button>
           </li>
         )}
       </ul>
@@ -354,6 +370,37 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
         className="pointer-events-none fixed left-[-9999px] top-0 h-[400px] w-[300px] border-0"
       />
 
+      {adding && (
+        <WalkInSheet
+          groupLabel={session.groupLabel}
+          onCancel={() => setAdding(false)}
+          onSave={async (input) => {
+            setError(null)
+            try {
+              const res = await fetch('/api/kq/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...input, sessionId: session.id }),
+              })
+              const data = await res.json().catch(() => ({}))
+              if (!res.ok) {
+                setError(data.error ?? 'That did not save.')
+                return false
+              }
+              // Reload rather than splice the row in: the server decides the
+              // child's id and whether their guardian merged with an existing
+              // one, and a guessed row would then fail to check in.
+              await refresh()
+              setAdding(false)
+              return true
+            } catch {
+              setError('No connection. A child cannot be registered offline.')
+              return false
+            }
+          }}
+        />
+      )}
+
       {active && (
         <GuardianSheet
           child={active}
@@ -380,7 +427,133 @@ function Stat({ label, value }: { label: string; value: number }) {
 const sheetBtn =
   'kq-tap flex w-full items-center gap-3 rounded-card border p-3.5 text-left transition'
 
-/** Who is dropping off, or who is collecting. */
+/**
+ * Registering a child at the door.
+ *
+ * Five fields, no more. Everything else — grade, birthdate, photo consent, a
+ * second authorised adult — is chased during the week from the Kids page. A
+ * longer form at a door with a queue behind it gets abandoned or filled with
+ * guesses, and a guess about who may collect a child is worse than a gap.
+ *
+ * Unlike check-in, this does NOT queue offline: it needs the server to assign
+ * an id and to decide whether this adult is already on file. Better to say so
+ * than to accept a registration that silently never happened.
+ */
+function WalkInSheet({
+  groupLabel, onCancel, onSave,
+}: {
+  groupLabel: string
+  onCancel: () => void
+  onSave: (input: {
+    firstName: string; lastName: string
+    guardianName: string; guardianPhone: string; allergies: string
+  }) => Promise<boolean>
+}) {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [guardianName, setGuardianName] = useState('')
+  const [guardianPhone, setGuardianPhone] = useState('')
+  const [allergies, setAllergies] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const field =
+    'w-full rounded-lg border border-line px-3 py-2.5 outline-none focus:border-brand'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end bg-ink/60" onClick={onCancel}>
+      <div
+        className="max-h-[90vh] w-full overflow-auto rounded-t-2xl bg-paper p-4"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-lg font-bold text-ink">New child — {groupLabel}</h2>
+        <p className="mt-0.5 text-sm text-hifmuted">
+          Just enough to check them in safely. The office fills in the rest this week.
+        </p>
+
+        <div className="mt-4 space-y-3">
+          <div className="grid grid-cols-2 gap-2">
+            <label className="block">
+              <span className="mb-1 block text-sm font-semibold text-ink">First name</span>
+              <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={field} />
+            </label>
+            <label className="block">
+              <span className="mb-1 block text-sm font-semibold text-ink">Last name</span>
+              <input value={lastName} onChange={(e) => setLastName(e.target.value)} className={field} />
+            </label>
+          </div>
+
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">
+              Adult who brought them
+            </span>
+            <input
+              value={guardianName}
+              onChange={(e) => setGuardianName(e.target.value)}
+              placeholder="Full name"
+              className={field}
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Their phone</span>
+            <input
+              value={guardianPhone}
+              onChange={(e) => setGuardianPhone(e.target.value)}
+              inputMode="tel"
+              placeholder="09xx xxx xxx"
+              className={field}
+            />
+          </label>
+
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">
+              Allergies <span className="font-normal text-hifmuted">— ask, don&rsquo;t assume</span>
+            </span>
+            <input
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="Leave blank if none"
+              className={field}
+            />
+          </label>
+        </div>
+
+        <p className="mt-3 rounded-card bg-flag-soft px-3 py-2 text-xs text-flag">
+          The adult you name here will be the one allowed to pick this child up today.
+          Anyone else will need a teacher to approve it.
+        </p>
+
+        <div className="mt-4 flex gap-2">
+          <button
+            disabled={!firstName.trim() || !guardianName.trim() || busy}
+            onClick={async () => {
+              setBusy(true)
+              await onSave({
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                guardianName: guardianName.trim(),
+                guardianPhone: guardianPhone.trim(),
+                allergies: allergies.trim(),
+              })
+              setBusy(false)
+            }}
+            className="kq-tap flex-1 rounded-lg bg-ok py-3.5 font-bold text-white disabled:opacity-40"
+          >
+            {busy ? 'Adding…' : 'Add to the register'}
+          </button>
+          <button
+            onClick={onCancel}
+            className="kq-tap rounded-lg border border-line px-5 py-3.5 font-semibold text-ink-2"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/** Who is dropping off, or who is picking up. */
 function GuardianSheet({
   child, mode, mayOverride, onCancel, onCheckIn, onCheckOut,
 }: {
@@ -405,10 +578,12 @@ function GuardianSheet({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-lg font-bold text-ink">
-          {mode === 'in' ? 'Check in' : 'Check out'} — {displayName(child)}
+          {mode === 'in' ? 'Check in' : 'Dismiss'} — {displayName(child)}
         </h2>
+        {/* "Dismissed" is the status; the prompt asks about a person, and
+            "who is dismissing?" would be asking the wrong question. */}
         <p className="mt-0.5 text-sm text-hifmuted">
-          {mode === 'in' ? 'Who is dropping off?' : 'Who is collecting?'}
+          {mode === 'in' ? 'Who is dropping off?' : 'Who is picking up?'}
         </p>
 
         {mode === 'out' && child.securityCode && (
@@ -445,14 +620,14 @@ function GuardianSheet({
 
             {mode === 'out' && authorised.length === 0 && (
               <p className="rounded-card bg-alert-soft p-3 text-sm text-alert-deep">
-                Nobody on file is authorised to collect this child. Releasing them
+                Nobody on file is authorised to pick up this child. Dismissing them
                 needs an override from a teacher.
               </p>
             )}
 
             {mode === 'out' && others.length > 0 && (
               <p className="pt-1 text-xs text-hifmuted">
-                On file but <b>not</b> authorised to collect:{' '}
+                On file but <b>not</b> authorised to pick up:{' '}
                 {others.map((g) => g.fullName).join(', ')}
               </p>
             )}
@@ -479,7 +654,7 @@ function GuardianSheet({
               >
                 <span>
                   <span className="block font-semibold text-alert-deep">
-                    Someone else is collecting
+                    Someone else is picking up
                   </span>
                   <span className="block text-xs text-hifmuted">
                     {mayOverride

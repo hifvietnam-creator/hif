@@ -33,6 +33,13 @@ export default function KqRootLayout({ children }: { children: React.ReactNode }
   return (
     <html className={inter.variable} lang="en" suppressHydrationWarning>
       <head>
+        {/*
+          Belt and braces with `color-scheme: light` in kq.css. Some Chrome
+          builds honour the meta tag when they ignore the CSS property, and a
+          station force-darkened by the operator's OS theme is a station where
+          the allergy warning stops being red.
+        */}
+        <meta name="color-scheme" content="light" />
         <link href="/favicon.ico" rel="icon" sizes="32x32" />
       </head>
       <body className="font-[family-name:var(--font-inter)] antialiased">{children}</body>

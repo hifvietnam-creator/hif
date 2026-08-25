@@ -3,12 +3,15 @@ import React from 'react'
 import { Bars, Section, Stat, Table, Warning } from '../../_components/ui'
 import {
   getAttendanceByMonth,
+  getContactGap,
   getEventsByMonth,
   getImports,
   getMetricCoverage,
   getMinistryAttendance,
   getMinistryHeadline,
   getMonthlyMetricCells,
+  getRegistrationEvents,
+  getReturningRegistrants,
   type MetricCell,
 } from '@/lib/queries/ministries'
 
@@ -44,7 +47,18 @@ function Cell({ cell }: { cell: MetricCell | undefined }) {
 }
 
 export default async function MinistriesPage() {
-  const [headline, attendance, byMonth, events, cells, coverage, imports] = await Promise.all([
+  const [
+    headline,
+    attendance,
+    byMonth,
+    events,
+    cells,
+    coverage,
+    imports,
+    regEvents,
+    returning,
+    gap,
+  ] = await Promise.all([
     getMinistryHeadline(),
     getMinistryAttendance(),
     getAttendanceByMonth(),
@@ -52,6 +66,9 @@ export default async function MinistriesPage() {
     getMonthlyMetricCells(),
     getMetricCoverage(),
     getImports(),
+    getRegistrationEvents(),
+    getReturningRegistrants(),
+    getContactGap(),
   ])
 
   const months = [...new Set(cells.map((c) => c.period_month))].sort()
@@ -241,6 +258,66 @@ export default async function MinistriesPage() {
         <p className="mt-3 text-xs text-neutral-500">
           {headcountMetrics.length} of {coverage.length} metrics are headcounts with no underlying
           system. Importing cannot produce them — they only exist if someone enters them.
+        </p>
+      </Section>
+
+      <Section
+        title="Events and registrations"
+        caveat="Alpha, Pickleball and the Filipino events are where people meet HIF for the first time. Known means the email matches a Planning Center record; new contact means it does not."
+      >
+        <Table
+          rows={regEvents}
+          columns={[
+            { key: 'event_label', header: 'Event' },
+            { key: 'people', header: 'Registered', align: 'right' },
+            {
+              key: 'with_email',
+              header: 'Gave email',
+              align: 'right',
+              render: (r) => (
+                <span className={r.with_email === 0 ? 'text-amber-700 dark:text-amber-500' : ''}>
+                  {r.with_email}
+                </span>
+              ),
+            },
+            { key: 'known', header: 'Already known', align: 'right' },
+            {
+              key: 'new_contacts',
+              header: 'New contacts',
+              align: 'right',
+              render: (r) => <span className="font-medium">{r.new_contacts}</span>,
+            },
+          ]}
+        />
+
+        <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          <Stat label="Already known" value={gap.already_known} note="matched to a church record" />
+          <Stat
+            label="Reachable, unknown"
+            value={gap.distinct_people}
+            note="gave an email, no record"
+            tone="warn"
+          />
+          <Stat label="No email given" value={gap.no_email_at_all} note="cannot be followed up" />
+          <Stat label="Registrations total" value={regEvents.reduce((n, r) => n + r.people, 0)} />
+        </div>
+
+        <p className="mt-3 max-w-3xl text-xs leading-relaxed text-neutral-500">
+          The middle figure is the one worth acting on. Those people handed over a working email
+          address at an event and no church record exists for them — they can be contacted today,
+          and nobody currently knows they exist. It is a list, not a modelling exercise.
+        </p>
+      </Section>
+
+      <Section
+        title="Did they come back?"
+        caveat="Counted by distinct email across events, so anyone who used two addresses is undercounted. Undercounting is the safe direction here."
+      >
+        <Bars rows={returning} labelWidth="w-40" />
+        <p className="mt-3 max-w-3xl text-xs leading-relaxed text-neutral-500">
+          Someone appearing at two events did not simply attend twice — they came back. That is the
+          closest thing to a journey signal these files contain, and it is invisible while each
+          registration list lives in its own spreadsheet.
         </p>
       </Section>
 

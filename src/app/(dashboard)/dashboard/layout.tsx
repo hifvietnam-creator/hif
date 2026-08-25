@@ -13,6 +13,7 @@ export const dynamic = 'force-dynamic'
 const NAV = [
   { href: '/dashboard', label: 'Congregation' },
   { href: '/dashboard/ministries', label: 'Ministries' },
+  { href: '/dashboard/reachability', label: 'Reachability' },
   { href: '/dashboard/serving', label: 'Serving' },
   // Further sections are added as each is confirmed with the staff who own
   // the underlying data.

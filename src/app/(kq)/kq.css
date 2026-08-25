@@ -44,6 +44,34 @@
   --color-flag: #b7791f;
   --color-flag-soft: #fdf3e2;
 
+  /* ── Group colours ─────────────────────────────────────────────────────────
+     Set by the ministry: Explorers light blue, Voyagers yellow, Trailblazers
+     pink, Pathfinders green.
+
+     Each has three values, not one, because yellow and pink are close to
+     invisible as text on white — yellow is roughly 1.1:1. The base is a FILL
+     only; -ink is the darkened variant for any type sitting on it.
+
+     These are deliberately separate tokens from --color-ok / --color-alert.
+     Those carry meaning (present, problem) and happen to overlap in hue with
+     Pathfinders and Trailblazers. Group colours only ever appear as a labelled
+     pill, so the word does the identifying and the colour is reinforcement. */
+  --color-exp: #3aa6c9;
+  --color-exp-soft: #e8f4f8;
+  --color-exp-ink: #14536b;
+
+  --color-voy: #f2c230;
+  --color-voy-soft: #fdf6e0;
+  --color-voy-ink: #7a5605;
+
+  --color-tra: #e8748c;
+  --color-tra-soft: #fdecef;
+  --color-tra-ink: #9c2740;
+
+  --color-pat: #6fa22a;
+  --color-pat-soft: #f0f7e4;
+  --color-pat-ink: #47690f;
+
   /* Neutrals */
   --color-ink: #1a1b1e;
   --color-ink-2: #3d3f44;

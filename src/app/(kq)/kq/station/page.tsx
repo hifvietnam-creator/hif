@@ -74,7 +74,7 @@ export default async function StationPicker() {
                   ) : (
                     <>
                       {expected} on the register
-                      {started && ` · ${present} here · ${collected} collected`}
+                      {started && ` · ${present} here · ${collected} dismissed`}
                     </>
                   )}
                 </div>

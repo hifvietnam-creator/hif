@@ -46,6 +46,7 @@ const MODULES = [
   { name: 'congregation', path: '../src/lib/queries/congregation' },
   { name: 'serving', path: '../src/lib/queries/serving' },
   { name: 'ministries', path: '../src/lib/queries/ministries' },
+  { name: 'reachability', path: '../src/lib/queries/reachability' },
 ]
 
 function summarise(value: unknown): string {

@@ -9,11 +9,12 @@ import { getOverview } from '@/lib/kq/dashboard'
 
 export const dynamic = 'force-dynamic'
 
+/** Group fills, set by the ministry. Mirrors the tokens in kq.css. */
 const GROUP_COLOUR: Record<string, string> = {
-  explorers: '#3aa6c9',
-  voyagers: '#6fa22a',
-  trailblazers: '#b7791f',
-  pathfinders: '#702e6f',
+  explorers: '#3aa6c9',   // light blue
+  voyagers: '#f2c230',    // yellow
+  trailblazers: '#e8748c', // pink
+  pathfinders: '#6fa22a', // green
 }
 
 const fmt = (iso: string) =>

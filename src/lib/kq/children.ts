@@ -408,6 +408,133 @@ export async function setChildStatus(
   }
 }
 
+/**
+ * Register a child who is not on any register.
+ *
+ * Two callers, same function: a TA at the door on Sunday, and an admin adding a
+ * family they know is coming. The `source` differs and that is the whole
+ * distinction — a door-side registration is created under time pressure by
+ * somebody holding a clipboard, so it always lands in the review queue.
+ *
+ * THE WEAK POINT, STATED PLAINLY
+ *
+ * Everywhere else in this system the authorised-pickup list was written in
+ * advance by an administrator, and the station only checks against it. Here the
+ * same person creates the list and later releases the child against it. That is
+ * structurally weaker and cannot be designed away at a door with a queue behind
+ * it — the paper system has exactly the same property. What we can do is make
+ * it visible: source = 'manual', a review row, and the adult recorded by name.
+ */
+export async function registerChild(
+  input: {
+    firstName: string
+    lastName: string
+    groupCode: string
+    gender?: string | null
+    allergies?: string | null
+    guardianName?: string | null
+    guardianPhone?: string | null
+    guardianEmail?: string | null
+  },
+  actorUserId: number,
+  origin: 'station' | 'admin',
+): Promise<{ childId: number }> {
+  const db = getPool()
+  const client = await db.connect()
+  try {
+    await client.query('begin')
+
+    const { rows: child } = await client.query<{ id: string }>(
+      `insert into kq.children
+         (first_name, last_name, gender, allergies, source, status)
+       values ($1,$2,$3,$4,'manual','active') returning id`,
+      [input.firstName, input.lastName, input.gender ?? null, input.allergies ?? null],
+    )
+    const childId = parseInt(child[0]!.id, 10)
+
+    // Provisional and grade-less: nobody asked for a school grade at the door,
+    // and inventing one would silently place the child in next August's
+    // promotion. The Kids page chases it.
+    const { rows: year } = await client.query<{ code: string }>(
+      `select code from kq.academic_years where is_current limit 1`,
+    )
+    await client.query(
+      `insert into kq.enrollments
+         (child_id, academic_year, grade, group_code, started_on, reason, provisional, note)
+       values ($1,$2,null,$3,current_date,'registration',true,$4)`,
+      [childId, year[0]?.code ?? '2026-27', input.groupCode,
+       origin === 'station' ? 'registered at the door' : 'added by an administrator'],
+    )
+
+    if (input.guardianName?.trim()) {
+      const digits = (input.guardianPhone ?? '').replace(/\D/g, '')
+      const e164 = /^0[35789]\d{8}$/.test(digits) ? '+84' + digits.slice(1) : null
+
+      // Match an existing adult on phone or email first — a sibling's parent is
+      // almost certainly already here, and creating a second copy would split
+      // the family across two records.
+      let guardianId: number | null = null
+      if (input.guardianEmail || digits) {
+        const { rows } = await client.query<{ id: string }>(
+          `select id from kq.guardians
+            where ($1::citext is not null and email = $1::citext)
+               or ($2::text <> '' and (phone = $2 or e164 = $3))
+            limit 1`,
+          [input.guardianEmail ?? null, digits, e164],
+        )
+        if (rows[0]) guardianId = parseInt(rows[0].id, 10)
+      }
+
+      if (guardianId === null) {
+        const { rows } = await client.query<{ id: string }>(
+          `insert into kq.guardians (full_name, email, phone, e164)
+           values ($1,$2,$3,$4) returning id`,
+          [input.guardianName.trim(), input.guardianEmail ?? null,
+           input.guardianPhone ?? null, e164],
+        )
+        guardianId = parseInt(rows[0]!.id, 10)
+      }
+
+      // can_pickup TRUE: the adult who brought the child is the adult who takes
+      // them home. Refusing that would force an override on the first dismissal
+      // of every walk-in, which teaches everybody that overrides are routine.
+      await client.query(
+        `insert into kq.child_guardians (child_id, guardian_id, relationship, is_primary, can_pickup)
+         values ($1,$2,'brought them today',true,true)
+         on conflict (child_id, guardian_id) do nothing`,
+        [childId, guardianId],
+      )
+    }
+
+    await client.query(
+      `insert into kq.child_events
+         (child_id, event_type, new_value, actor_user_id, detail)
+       values ($1,'created',$2,$3,$4)`,
+      [childId, `${input.firstName} ${input.lastName}`.trim(), actorUserId,
+       JSON.stringify({ origin, groupCode: input.groupCode })],
+    )
+
+    await client.query(
+      `insert into kq.import_review
+         (source, raw, match_confidence, match_notes, status, proposed_child_id)
+       values ('cognito', $1, 'none', $2, 'pending', $3)`,
+      [JSON.stringify(input),
+       origin === 'station'
+         ? 'Registered at the door. Confirm the details and who may pick them up.'
+         : 'Added by an administrator ahead of Sunday. Confirm grade and guardians.',
+       childId],
+    )
+
+    await client.query('commit')
+    return { childId }
+  } catch (e) {
+    await client.query('rollback')
+    throw e
+  } finally {
+    client.release()
+  }
+}
+
 /** Turn a guardian's authority to collect on or off. */
 export async function setPickup(
   childId: number,

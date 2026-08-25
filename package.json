@@ -9,6 +9,7 @@
     "postbuild": "next-sitemap --config next-sitemap.config.cjs",
     "check:apis": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/check-connections.ts",
     "check:dashboard": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/check-dashboard.ts",
+    "check:coverage": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/check-audience-coverage.ts",
     "survey:raw": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/survey-raw-data.ts",
     "import:attendance": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/import-group-attendance.ts",
     "import:metrics": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/import-monthly-metrics.ts",

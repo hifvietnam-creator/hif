@@ -218,6 +218,89 @@ export async function getMetricCoverage(): Promise<CoverageRow[]> {
   `)
 }
 
+// ── Registrations: who we met, and whether we knew them ──────────────────────
+
+export type RegistrationEventRow = {
+  event_label: string
+  people: number
+  with_email: number
+  known: number
+  new_contacts: number
+  first_at: string | null
+  last_at: string | null
+}
+
+export async function getRegistrationEvents(): Promise<RegistrationEventRow[]> {
+  return rows<RegistrationEventRow>(`
+    select event_label,
+           count(*)::int                                                              as people,
+           count(email)::int                                                          as with_email,
+           count(pco_person_id)::int                                                  as known,
+           -- Gave a working address, no church record. Reachable and unknown:
+           -- the only group here that can actually be followed up.
+           count(*) filter (where email is not null and pco_person_id is null)::int   as new_contacts,
+           min(registered_at)::text                                                   as first_at,
+           max(registered_at)::text                                                   as last_at
+      from ops.registrations
+     group by event_label
+     order by count(*) desc
+  `)
+}
+
+/**
+ * People who registered for more than one event.
+ *
+ * This is the closest thing to a journey signal in the data: someone who came
+ * to Pickleball and then Alpha did not merely attend twice, they came back.
+ * Counted by distinct email, so it undercounts anyone who used two addresses —
+ * undercounting is the safe direction.
+ */
+export async function getReturningRegistrants(): Promise<CountRow[]> {
+  return rows<CountRow>(`
+    with by_person as (
+      select lower(email::text) as em, count(distinct event_label)::int as events
+        from ops.registrations
+       where email is not null
+       group by 1
+    )
+    select case when events = 1 then 'One event only'
+                when events = 2 then 'Two events'
+                else 'Three or more'
+           end                as label,
+           count(*)::int      as count
+      from by_person
+     group by 1
+     order by min(events)
+  `)
+}
+
+export type ContactGap = {
+  rows_with_email: number
+  distinct_people: number
+  already_known: number
+  no_email_at_all: number
+}
+
+export async function getContactGap(): Promise<ContactGap> {
+  const [r] = await rows<Record<string, string>>(`
+    select
+      count(*) filter (where email is not null and pco_person_id is null)::text          as rows_with_email,
+      count(distinct lower(email::text)) filter
+        (where email is not null and pco_person_id is null)::text                        as distinct_people,
+      count(distinct pco_person_id) filter (where pco_person_id is not null)::text       as already_known,
+      count(*) filter (where email is null)::text                                        as no_email_at_all
+      from ops.registrations
+  `)
+  return {
+    rows_with_email: parseInt(r?.rows_with_email ?? '0', 10),
+    distinct_people: parseInt(r?.distinct_people ?? '0', 10),
+    already_known: parseInt(r?.already_known ?? '0', 10),
+    no_email_at_all: parseInt(r?.no_email_at_all ?? '0', 10),
+  }
+}
+
+type CountRow = { label: string; count: number }
+
 /** Where every figure came from — a dashboard nobody can audit gets ignored. */
 export type ImportRow = {
   id: string

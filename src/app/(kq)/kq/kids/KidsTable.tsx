@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
 // From child-fields, not children: the latter imports the Postgres pool, and a
@@ -17,10 +18,10 @@ const GROUP_LABEL: Record<string, string> = {
 }
 
 const GROUP_TINT: Record<string, string> = {
-  explorers: 'bg-brand-soft text-[#14536b]',
-  voyagers: 'bg-ok-soft text-ok-ink',
-  trailblazers: 'bg-flag-soft text-flag',
-  pathfinders: 'bg-[#efeaf8] text-[#5b2a5a]',
+  explorers: 'bg-exp-soft text-exp-ink',
+  voyagers: 'bg-voy-soft text-voy-ink',
+  trailblazers: 'bg-tra-soft text-tra-ink',
+  pathfinders: 'bg-pat-soft text-pat-ink',
   aftershock: 'bg-mist text-hifmuted',
 }
 
@@ -32,6 +33,8 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
   const [filter, setFilter] =
     useState<'all' | 'no-collector' | 'no-grade' | 'no-guardian' | 'archived'>('all')
   const [archiving, setArchiving] = useState<ChildRow | null>(null)
+  const [adding, setAdding] = useState(false)
+  const router = useRouter()
   const [expanded, setExpanded] = useState<number | null>(null)
   const [save, setSave] = useState<Save>('idle')
   const [error, setError] = useState<string | null>(null)
@@ -96,7 +99,23 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
 
   return (
     <>
-      {/* Toolbar */}
+      {/* Primary action on its own row. It was in the filter toolbar with
+          ml-auto, which wraps out of sight the moment the chips fill the line. */}
+      <div className="mb-3 flex items-center justify-end gap-3">
+        <span className="text-xs text-hifmuted">
+          {save === 'saving' && 'Saving…'}
+          {save === 'saved' && <span className="text-ok-ink">Saved</span>}
+          {save === 'error' && <span className="text-alert">Not saved</span>}
+        </span>
+        <button
+          onClick={() => setAdding(true)}
+          className="rounded-lg bg-brand-dark px-4 py-2.5 text-sm font-bold text-white"
+        >
+          + Add a child
+        </button>
+      </div>
+
+      {/* Filters */}
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <input
           type="search"
@@ -121,11 +140,6 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
           Left {counts.archived}
         </Chip>
 
-        <span className="ml-auto text-xs text-hifmuted">
-          {save === 'saving' && 'Saving…'}
-          {save === 'saved' && <span className="text-ok-ink">Saved</span>}
-          {save === 'error' && <span className="text-alert">Not saved</span>}
-        </span>
       </div>
 
       {error && (
@@ -136,19 +150,23 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
       )}
 
       <div className="overflow-x-auto rounded-card border border-line bg-paper shadow-sm">
-        <table className="w-full min-w-[900px] text-sm">
+        {/* Wider than it was: at 900px the name columns collapsed far enough to
+            truncate real surnames, and the sex dropdown clipped "Female". The
+            container scrolls, so a wider minimum costs nothing but a scrollbar
+            on narrow screens. */}
+        <table className="w-full min-w-[1120px] text-sm">
           <thead>
             <tr className="bg-mist/60 text-[11px] uppercase tracking-wider text-hifmuted">
               <Th className="w-8" />
-              <Th>First name</Th>
-              <Th>Last name</Th>
-              <Th>Goes by</Th>
-              <Th className="w-20">Grade</Th>
-              <Th className="w-32">Group</Th>
-              <Th className="w-20">Sex</Th>
-              <Th>Allergies</Th>
-              <Th className="w-28">Collector</Th>
-              <Th className="w-24">Status</Th>
+              <Th className="min-w-[130px]">First name</Th>
+              <Th className="min-w-[130px]">Last name</Th>
+              <Th className="min-w-[110px]">Goes by</Th>
+              <Th className="w-[70px]">Grade</Th>
+              <Th className="w-[150px]">Group</Th>
+              <Th className="w-[100px]">Sex</Th>
+              <Th className="min-w-[150px]">Allergies</Th>
+              <Th className="w-[110px]">Pick-up</Th>
+              <Th className="w-[110px]">Status</Th>
             </tr>
           </thead>
           <tbody>
@@ -385,6 +403,40 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
         child back into the group they were in.
       </p>
 
+      {adding && (
+        <AddChildDialog
+          onCancel={() => setAdding(false)}
+          onSave={async (input) => {
+            setError(null)
+            setSave('saving')
+            try {
+              const res = await fetch('/api/kq/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(input),
+              })
+              const data = await res.json().catch(() => ({}))
+              if (!res.ok) {
+                setSave('error')
+                setError(data.error ?? 'That did not save.')
+                return false
+              }
+              setSave('saved')
+              setAdding(false)
+              // Re-fetch from the server: it decides the child's id and whether
+              // the guardian merged into an existing record. A row invented here
+              // would drift from what actually landed.
+              router.refresh()
+              return true
+            } catch {
+              setSave('error')
+              setError('No connection. Nothing was saved.')
+              return false
+            }
+          }}
+        />
+      )}
+
       {archiving && (
         <ArchiveDialog
           child={archiving}
@@ -400,6 +452,140 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
         />
       )}
     </>
+  )
+}
+
+/**
+ * Add a child ahead of Sunday.
+ *
+ * Same endpoint the station uses, without a sessionId — which is what makes it
+ * an administrator's registration rather than a door-side one, and why the
+ * group has to be chosen here instead of coming from the room.
+ *
+ * Worth doing for every family you know is coming. A child registered on a
+ * Tuesday has a guardian entered carefully by someone with time; the same child
+ * registered at the door on Sunday has one typed in twenty seconds by a TA with
+ * a queue behind them. Both work. Only one is unhurried.
+ */
+function AddChildDialog({
+  onCancel, onSave,
+}: {
+  onCancel: () => void
+  onSave: (input: Record<string, string>) => Promise<boolean>
+}) {
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [groupCode, setGroupCode] = useState('explorers')
+  const [gender, setGender] = useState('')
+  const [allergies, setAllergies] = useState('')
+  const [guardianName, setGuardianName] = useState('')
+  const [guardianPhone, setGuardianPhone] = useState('')
+  const [guardianEmail, setGuardianEmail] = useState('')
+  const [busy, setBusy] = useState(false)
+
+  const field = 'w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand'
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink/60 p-4" onClick={onCancel}>
+      <div
+        className="max-h-[90vh] w-full max-w-lg overflow-auto rounded-card bg-paper p-5 shadow-lg"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h3 className="text-lg font-bold text-ink">Add a child</h3>
+        <p className="mt-1 text-sm text-hifmuted">
+          They appear on the register straight away. Grade is left blank — set it in the
+          table afterwards and the group will follow from it.
+        </p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">First name</span>
+            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} className={field} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Last name</span>
+            <input value={lastName} onChange={(e) => setLastName(e.target.value)} className={field} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Group</span>
+            <select value={groupCode} onChange={(e) => setGroupCode(e.target.value)} className={field}>
+              {GROUP_CODES.map((c) => (
+                <option key={c} value={c}>{GROUP_LABEL[c] ?? c}</option>
+              ))}
+            </select>
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Sex</span>
+            <select value={gender} onChange={(e) => setGender(e.target.value)} className={field}>
+              <option value="">—</option>
+              <option>Female</option>
+              <option>Male</option>
+            </select>
+          </label>
+          <label className="block sm:col-span-2">
+            <span className="mb-1 block text-sm font-semibold text-ink">Allergies</span>
+            <input
+              value={allergies}
+              onChange={(e) => setAllergies(e.target.value)}
+              placeholder="Leave blank if none"
+              className={field}
+            />
+          </label>
+        </div>
+
+        <h4 className="mt-4 text-sm font-bold text-ink">Parent or guardian</h4>
+        <p className="text-xs text-hifmuted">
+          They will be allowed to pick this child up. Add anyone else from the row
+          afterwards.
+        </p>
+        <div className="mt-2 grid gap-3 sm:grid-cols-2">
+          <label className="block sm:col-span-2">
+            <span className="mb-1 block text-sm font-semibold text-ink">Full name</span>
+            <input value={guardianName} onChange={(e) => setGuardianName(e.target.value)} className={field} />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Phone</span>
+            <input
+              value={guardianPhone}
+              onChange={(e) => setGuardianPhone(e.target.value)}
+              inputMode="tel"
+              placeholder="09xx xxx xxx"
+              className={field}
+            />
+          </label>
+          <label className="block">
+            <span className="mb-1 block text-sm font-semibold text-ink">Email</span>
+            <input value={guardianEmail} onChange={(e) => setGuardianEmail(e.target.value)} className={field} />
+          </label>
+        </div>
+
+        <div className="mt-5 flex justify-end gap-2">
+          <button
+            onClick={onCancel}
+            className="rounded-lg border border-line px-4 py-2.5 text-sm font-semibold text-ink-2"
+          >
+            Cancel
+          </button>
+          <button
+            disabled={!firstName.trim() || busy}
+            onClick={async () => {
+              setBusy(true)
+              await onSave({
+                firstName: firstName.trim(), lastName: lastName.trim(),
+                groupCode, gender, allergies: allergies.trim(),
+                guardianName: guardianName.trim(),
+                guardianPhone: guardianPhone.trim(),
+                guardianEmail: guardianEmail.trim(),
+              })
+              setBusy(false)
+            }}
+            className="rounded-lg bg-brand-dark px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40"
+          >
+            {busy ? 'Adding…' : 'Add to the register'}
+          </button>
+        </div>
+      </div>
+    </div>
   )
 }
 
@@ -639,7 +825,7 @@ function GuardianPanel({
                 className="h-4 w-4 accent-[#6fa22a]"
               />
               <span className={g.canPickup ? 'text-ok-ink' : 'text-hifmuted'}>
-                May collect
+                May pick up
               </span>
             </label>
           </div>
@@ -668,10 +854,10 @@ function GuardianPanel({
               onChange={(e) => setCanPickup(e.target.checked)}
               className="h-4 w-4 accent-[#6fa22a]"
             />
-            May collect this child
+            May pick up this child
           </label>
           <p className="mt-1 text-xs text-hifmuted">
-            Being a contact and being allowed to collect are separate. Leave this
+            Being a contact and being allowed to pick up are separate. Leave this
             unticked for someone who should be reachable but not hand the child over.
           </p>
           <div className="mt-3 flex gap-2">
