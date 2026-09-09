@@ -1,0 +1,7 @@
+{
+  "//": "PCO full name → folder name under the archive root.",
+  "//2": "An entry here always wins over auto-matching, and counts as your confirmation.",
+  "//3": "Add a leader whenever the probe or downloader reports them as skipped.",
+  "//4": "Example:  \"Ngoc Pearl Ngo\": \"Pearl\"",
+  "//5": "Leave a value empty and that leader stays skipped."
+}

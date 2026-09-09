@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<title>KidzQuest — running it</title>
+<style>
+:root{
+  --blue:#3AA6C9; --blue-dark:#1F6B85; --blue-soft:#E8F4F8;
+  --green:#6FA22A; --green-soft:#F0F7E4; --green-ink:#47690F;
+  --red:#C01E27; --red-deep:#9C171E; --red-soft:#FBECEC;
+  --amber:#B7791F; --amber-soft:#FDF3E2;
+  --yellow:#F2C230; --pink:#E8748C;
+  --ink:#1A1B1E; --ink-2:#3D3F44; --muted:#6B6E74;
+  --line:#E7E4DF; --mist:#F6F4F1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);
+  font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.page{max-width:800px;margin:0 auto;padding:32px 36px 56px}
+
+.cover{border-bottom:3px solid var(--green);padding-bottom:20px;margin-bottom:24px}
+.badge{display:inline-block;background:var(--green);color:#fff;font-size:11px;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px}
+h1{font-size:30px;margin:11px 0 5px;letter-spacing:-.02em}
+.cover p{margin:0;color:var(--muted)}
+
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#fff;background:var(--blue-dark);
+  margin:32px 0 16px;padding:7px 13px;border-radius:6px}
+h3{font-size:18px;margin:22px 0 6px;letter-spacing:-.01em}
+p{margin:0 0 10px}
+ol,ul{margin:0 0 10px;padding-left:20px}
+li{margin-bottom:5px}
+
+.step{display:flex;gap:20px;align-items:flex-start;margin:0 0 24px;page-break-inside:avoid}
+.step .left{flex:1;min-width:0}
+.step .right{flex:0 0 270px}
+.step.rev{flex-direction:row-reverse}
+.stitle{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.num{flex:0 0 30px;height:30px;border-radius:50%;background:var(--blue-dark);color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:14px}
+.stitle h3{font-size:19px;margin:0}
+.do{font-size:16px;margin:0 0 8px}
+.do b{background:#FFF3B0;padding:1px 5px;border-radius:3px}
+
+.win{border:1px solid #D5D1CA;border-radius:9px;overflow:hidden;background:#fff;
+  box-shadow:0 3px 12px rgba(0,0,0,.11);position:relative;font-size:9px}
+.win .bar{background:#E9E5E0;padding:5px 8px;font-size:8px;color:var(--muted);
+  border-bottom:1px solid #D5D1CA}
+.win .body{display:flex}
+.win .side{width:66px;background:#16202B;color:#93A3B3;padding:7px 5px;flex:0 0 auto}
+.win .side .lg{color:#fff;font-weight:800;font-size:8.5px;margin-bottom:7px}
+.win .side div.i{padding:3px 4px;border-radius:3px;margin-bottom:1px;font-size:7.5px}
+.win .side div.on{background:var(--blue);color:#fff;font-weight:700}
+.win .main{flex:1;padding:8px;background:var(--mist);min-width:0}
+.card{background:#fff;border:1px solid var(--line);border-radius:5px;padding:5px 6px}
+.stat b{display:block;font-size:14px;line-height:1.1}
+.stat span{font-size:6.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);
+  font-weight:700}
+.chip{display:inline-block;font-size:6.5px;font-weight:800;padding:2px 5px;border-radius:9px}
+.c-exp{background:var(--blue-soft);color:#14536B}
+.c-voy{background:#FDF6E0;color:#7A5605}
+.c-tra{background:#FDECEF;color:#9C2740}
+.c-pat{background:var(--green-soft);color:var(--green-ink)}
+.c-red{background:var(--red-soft);color:var(--red-deep)}
+.c-grey{background:#ECEFF3;color:var(--muted)}
+table.mini{width:100%;border-collapse:collapse;font-size:7.5px}
+table.mini th{background:#F2EFEA;padding:3px 4px;border:none;border-bottom:1px solid var(--line);
+  font-size:6px;text-align:left;color:var(--muted);letter-spacing:.04em}
+table.mini td{padding:3px 4px;border:none;border-bottom:1px solid #F1EEE9}
+
+.co{position:absolute;width:22px;height:22px;border-radius:50%;background:var(--red);
+  color:#fff;font-weight:800;font-size:11px;display:grid;place-items:center;
+  border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:5}
+.cap{font-size:11px;color:var(--muted);text-align:center;margin-top:7px}
+
+.key{list-style:none;padding:0;margin:8px 0 0}
+.key li{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin-bottom:6px}
+.key .n{flex:0 0 20px;height:20px;border-radius:50%;background:var(--red);color:#fff;
+  font-size:11px;font-weight:800;display:grid;place-items:center;margin-top:2px}
+
+.note,.warn,.tip{border-radius:9px;padding:11px 14px;margin:12px 0;font-size:14.5px;
+  page-break-inside:avoid}
+.note{background:var(--blue-soft);border:1px solid #C4DDE7;color:#14536B}
+.warn{background:var(--red-soft);border:1px solid #F0C4C0;color:var(--red-deep)}
+.tip{background:var(--amber-soft);border:1px solid #F0DCB4;color:#7C5510}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th{text-align:left;background:var(--mist);padding:7px 10px;border:1px solid var(--line);
+  font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td{padding:7px 10px;border:1px solid var(--line);vertical-align:top}
+
+code{background:var(--mist);border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+  font-family:ui-monospace,Menlo,monospace;font-size:13px}
+pre{background:#1B1C20;color:#E4E1DB;padding:12px 14px;border-radius:8px;overflow-x:auto;
+  font-size:12.5px;line-height:1.5}
+pre code{background:none;border:none;color:inherit;padding:0}
+
+.big{background:var(--ink);color:#fff;border-radius:11px;padding:16px;text-align:center;margin:18px 0}
+.big b{display:block;font-size:20px}
+
+footer{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted)}
+
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  .page{max-width:none;padding:0}
+  .pagebreak{page-break-before:always}
+  .win{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <span class="badge">Ate</span>
+  <h1>Running KidzQuest</h1>
+  <p>Everything on the admin side, and the handful of jobs that come round each week.</p>
+</header>
+
+<div class="note">
+  <b>You're the only person who can do any of this.</b> Teachers and helpers see the
+  check-in screen and nothing else, which keeps their Sunday simple and keeps the
+  children's details in one pair of hands. Yours.
+</div>
+
+<p>There are four screens down the left. <b>Dashboard</b> for how things are going,
+<b>Kids</b> for the children, and <b>Teachers</b> and <b>Assistants</b> for who's helping
+where.</p>
+
+<!-- ═══════════ weekly ═══════════ -->
+<h2>The weekly rhythm</h2>
+
+<table>
+  <tr><th style="width:150px">When</th><th>What</th></tr>
+  <tr><td><b>Once, at the start</b></td><td>Make an account for each teacher and helper</td></tr>
+  <tr><td><b>Each week</b></td><td>Put people in rooms for Sunday</td></tr>
+  <tr><td><b>Each week</b></td><td>Add any children you know are coming</td></tr>
+  <tr><td><b>When you have time</b></td><td>Work through children with nobody to collect them</td></tr>
+  <tr><td><b>Every August</b></td><td>Move everyone up a group</td></tr>
+</table>
+
+<!-- ═══════════ accounts ═══════════ -->
+<h2>Giving people access</h2>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">1</span><h3>Make an account</h3></div>
+    <p class="do">Go to <code>/admin</code>, then <b>Users</b>, then <b>Create New</b>.</p>
+    <p>You'll need their name, their email, and a temporary password to send them. Then
+    pick their role on the right hand side.</p>
+    <table>
+      <tr><td><b>Administrator</b></td><td>Everything. You, and anyone standing in for you.</td></tr>
+      <tr><td><b>Teacher</b></td><td>Check-in screen, and can approve a new person collecting.</td></tr>
+      <tr><td><b>Teaching assistant</b></td><td>Check-in screen for their own room.</td></tr>
+    </table>
+    <div class="warn">
+      Do give everyone a role. Without one they can sign in but every screen will be
+      empty, which looks like the app is broken.
+    </div>
+    <p>Ask them to change the password the first time they sign in.</p>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">/admin · Users · Create New</div>
+      <div class="main" style="background:#fff;padding:9px">
+        <div style="font-size:7.5px;font-weight:700;margin-bottom:2px">Name</div>
+        <div style="border:1px solid var(--line);border-radius:4px;height:17px;margin-bottom:5px"></div>
+        <div style="font-size:7.5px;font-weight:700;margin-bottom:2px">Email</div>
+        <div style="border:1px solid var(--line);border-radius:4px;height:17px;margin-bottom:5px"></div>
+        <div style="font-size:7.5px;font-weight:700;margin-bottom:2px">Password</div>
+        <div style="border:1px solid var(--line);border-radius:4px;height:17px;margin-bottom:8px"></div>
+        <div style="background:var(--mist);border:1px solid var(--line);border-radius:5px;padding:6px">
+          <div style="font-size:7.5px;font-weight:800;margin-bottom:3px">Role</div>
+          <div style="border:1px solid var(--line);background:#fff;border-radius:4px;
+            padding:3px 5px;font-size:8px">Teaching assistant ⌄</div>
+        </div>
+      </div>
+      <span class="co" style="bottom:14px;right:-10px">1</span>
+    </div>
+    <p class="cap"><b>1</b> is the part people forget</p>
+  </div>
+</div>
+
+<div class="step rev">
+  <div class="left">
+    <div class="stitle"><span class="num">2</span><h3>Put people in rooms</h3></div>
+    <p class="do">Open <b>Teachers</b> or <b>Assistants</b> and tap the room chips.</p>
+    <p>Four little buttons next to each person, one per group. Tap to put them in, tap
+    again to take them out.</p>
+    <div class="warn">
+      This is the one that stops Sunday working if it's missed. Without a room, a
+      helper signs in and every room tells them it isn't theirs.
+    </div>
+    <p>A yellow line at the top tells you how many people still have nowhere to go.</p>
+    <p>The little green squares show the last eight Sundays each person served. Handy for
+      spotting someone who's quietly stopped coming, or someone doing rather too much.</p>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Assistants</div>
+      <div class="main" style="background:#fff;padding:8px">
+        <div style="background:#FDF3E2;border-radius:4px;padding:4px 6px;font-size:7.5px;
+          color:#7C5510;margin-bottom:6px"><b>3</b> not in a room this Sunday</div>
+        <table class="mini">
+          <tr><th>Name</th><th>Room</th><th>Sundays</th></tr>
+          <tr><td><b>Minh Pham</b></td>
+            <td><span class="chip c-grey">Exp</span> <span class="chip"
+              style="background:#1F6B85;color:#fff">Voy</span> <span class="chip c-grey">Trail</span></td>
+            <td>14</td></tr>
+          <tr><td><b>Sarah Lim</b></td>
+            <td><span class="chip c-grey">Exp</span> <span class="chip c-grey">Voy</span>
+              <span class="chip c-grey">Trail</span></td>
+            <td>9</td></tr>
+          <tr><td><b>Tuan Do</b></td>
+            <td><span class="chip" style="background:#1F6B85;color:#fff">Exp</span>
+              <span class="chip c-grey">Voy</span> <span class="chip c-grey">Trail</span></td>
+            <td>17</td></tr>
+        </table>
+      </div>
+      <span class="co" style="top:46px;left:78px">1</span>
+    </div>
+    <p class="cap"><b>1</b> tap a chip to put someone in that room</p>
+  </div>
+</div>
+
+<!-- ═══════════ kids ═══════════ -->
+<div class="pagebreak"></div>
+<h2>The children</h2>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">3</span><h3>Editing anything</h3></div>
+    <p class="do">Open <b>Kids</b> and type straight into any box.</p>
+    <p>Changes save when you click away. There's no Save button and nothing to submit.</p>
+    <ul class="key">
+      <li><span class="n">1</span><span>The buttons along the top are shortcuts to the
+        children who need something</span></li>
+      <li><span class="n">2</span><span>Type a school grade and the group sorts itself
+        out</span></li>
+      <li><span class="n">3</span><span>The little arrow opens the adults for that
+        child</span></li>
+    </ul>
+    <div class="tip">
+      Press <b>Escape</b> while you're still in a box to undo. Once you click away it's
+      saved, though every change is kept with your name on it, so nothing is ever
+      really lost.
+    </div>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Kids</div>
+      <div class="main" style="background:#fff;padding:8px">
+        <div style="margin-bottom:6px">
+          <span class="chip" style="background:#1F6B85;color:#fff">On the register 138</span>
+          <span class="chip c-red">No collector 26</span>
+          <span class="chip c-grey">No grade 107</span>
+        </div>
+        <table class="mini">
+          <tr><th></th><th>First</th><th>Grade</th><th>Group</th><th>Pick-up</th></tr>
+          <tr><td>▸</td><td>Abigail</td><td>2</td>
+            <td><span class="chip c-voy">Voyagers ⌄</span></td><td>1 ok</td></tr>
+          <tr><td>▸</td><td>Adam</td><td>—</td>
+            <td><span class="chip c-voy">Voyagers ⌄</span></td><td>1 ok</td></tr>
+          <tr><td>▾</td><td>Angela</td><td>1</td>
+            <td><span class="chip c-voy">Voyagers ⌄</span></td>
+            <td><span class="chip c-red">nobody</span></td></tr>
+        </table>
+      </div>
+      <span class="co" style="top:32px;left:64px">1</span>
+      <span class="co" style="top:70px;left:56px">2</span>
+      <span class="co" style="bottom:14px;left:6px">3</span>
+    </div>
+    <p class="cap">Everything is editable in place</p>
+  </div>
+</div>
+
+<div class="step rev">
+  <div class="left">
+    <div class="stitle"><span class="num">4</span><h3>Grades do the sorting</h3></div>
+    <p class="do">Type a grade and the child moves into the right group on their own.</p>
+    <table>
+      <tr><td><span class="chip c-exp">Explorers</span></td><td>Grade 0, pre-school</td></tr>
+      <tr><td><span class="chip c-voy">Voyagers</span></td><td>Grades 1 and 2</td></tr>
+      <tr><td><span class="chip c-tra">Trailblazers</span></td><td>Grades 3 and 4</td></tr>
+      <tr><td><span class="chip c-pat">Pathfinders</span></td><td>Grades 5, 6 and 7</td></tr>
+    </table>
+    <p>It also clears the little <b>?</b> that means nobody has confirmed where that
+    child belongs.</p>
+    <p>You can always pick a group by hand instead, if a child is better off with a
+    sibling or a different year. A small pin appears next to them, and August leaves
+    them where they are.</p>
+    <div class="note">
+      <b>107 children have no grade yet.</b> They came across from the spreadsheets,
+      which never recorded one. Every grade you fill in is one less to sort out next
+      August.
+    </div>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Kids · one row</div>
+      <div class="main" style="background:#fff;padding:10px">
+        <table class="mini">
+          <tr><th>Child</th><th>Grade</th><th>Group</th></tr>
+          <tr><td><b>Alma Tumwine</b></td>
+            <td><span style="border:1px solid var(--blue);border-radius:3px;padding:1px 6px">3</span></td>
+            <td><span class="chip c-tra">Trailblazers</span></td></tr>
+        </table>
+        <div style="font-size:7.5px;color:var(--muted);margin-top:7px;text-align:center">
+          Typing 3 moved her from Voyagers to Trailblazers
+        </div>
+      </div>
+      <span class="co" style="top:40px;left:96px">1</span>
+    </div>
+    <p class="cap"><b>1</b> type here, the group follows</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">5</span><h3>Who can collect a child</h3></div>
+    <p class="do">Tap the arrow at the start of a row.</p>
+    <p>Each adult has a <b>May pick up</b> tick box. Being a contact and being allowed to
+    take a child home are two separate things, so a grandmother can be reachable without
+    being on the list at the door.</p>
+    <p><b>+ Add an adult</b> for anyone new. If their phone or email is already on
+    another child, they'll be joined up rather than duplicated.</p>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Kids · Angela</div>
+      <div class="main" style="background:#fff;padding:9px">
+        <div style="background:var(--red-soft);border-radius:4px;padding:5px 6px;
+          font-size:7.5px;color:var(--red-deep);margin-bottom:6px">
+          Nobody is on file. She can't be collected without a teacher approving it.
+        </div>
+        <div style="border:1px solid var(--line);border-radius:5px;padding:5px 6px;
+          display:flex;align-items:center;font-size:8px">
+          <div><b>Thu Nguyen</b><div style="font-size:7px;color:var(--muted)">Mother · 0912 345 678</div></div>
+          <span style="margin-left:auto;font-size:7px;font-weight:700">☑ May pick up</span>
+        </div>
+        <div style="border:1px dashed var(--line);border-radius:5px;padding:5px;
+          font-size:8px;text-align:center;margin-top:5px;color:var(--ink-2)">+ Add an adult</div>
+      </div>
+      <span class="co" style="bottom:36px;right:-10px">1</span>
+    </div>
+    <p class="cap"><b>1</b> this tick is what the door checks</p>
+  </div>
+</div>
+
+<div class="step rev">
+  <div class="left">
+    <div class="stitle"><span class="num">6</span><h3>Adding a child before Sunday</h3></div>
+    <p class="do"><b>+ Add a child</b>, top right of the Kids page.</p>
+    <p>Worth doing for any family you know is coming. A child added on a Tuesday gets
+    their details typed properly. The same child arriving at the door on Sunday gets
+    twenty seconds and a helper with a queue behind them.</p>
+    <div class="note">
+      <b>Explorers is empty at the moment.</b> All 31 of last year's moved up to Voyagers
+      in August and nobody has come in behind them. Anyone new joining pre-school needs
+      adding here, or their first Sunday will be a door registration.
+    </div>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Add a child</div>
+      <div class="main" style="background:#fff;padding:9px">
+        <div style="display:flex;gap:4px;margin-bottom:4px">
+          <div style="flex:1"><div style="font-size:7px;font-weight:700">First name</div>
+            <div style="border:1px solid var(--line);border-radius:4px;height:16px"></div></div>
+          <div style="flex:1"><div style="font-size:7px;font-weight:700">Last name</div>
+            <div style="border:1px solid var(--line);border-radius:4px;height:16px"></div></div>
+        </div>
+        <div style="font-size:7px;font-weight:700">Group</div>
+        <div style="border:1px solid var(--line);border-radius:4px;padding:2px 5px;
+          font-size:8px;margin-bottom:5px">Explorers ⌄</div>
+        <div style="font-size:7px;font-weight:700">Parent or guardian</div>
+        <div style="border:1px solid var(--line);border-radius:4px;height:16px;margin-bottom:5px"></div>
+        <div style="background:#1F6B85;color:#fff;text-align:center;border-radius:4px;
+          padding:5px;font-size:8px;font-weight:800">Add to the register</div>
+      </div>
+    </div>
+    <p class="cap">Leave the grade blank and set it after</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">7</span><h3>When a child stops coming</h3></div>
+    <p class="do">Tap <b>Archive</b> at the end of their row.</p>
+    <p>You'll be asked which of these it is, and the difference matters more than it
+    looks:</p>
+    <table>
+      <tr><td><b>Left Hanoi</b></td><td>Family moved away. Nothing to follow up.</td></tr>
+      <tr><td><b>Stopped attending</b></td><td>Still in town. <b>This is the one worth a
+        phone call.</b></td></tr>
+      <tr><td><b>Moved to Aftershock</b></td><td>Grown out of KidzQuest. Not a loss.</td></tr>
+      <tr><td><b>Duplicate</b></td><td>Same child twice. Keep the other one.</td></tr>
+    </table>
+    <p>Nothing is deleted. Their attendance stays, and <b>Restore</b> brings them back
+    into the group they were in if the family reappears.</p>
+    <p>Teachers and helpers can archive too, since they're usually the first to know a
+    family has moved. You'll see it on the <b>Left</b> tab.</p>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Take a child off the register</div>
+      <div class="main" style="background:#fff;padding:9px">
+        <div style="border:1px solid var(--line);border-radius:5px;padding:5px 6px;
+          font-size:8px;margin-bottom:4px">◯ Left Hanoi
+          <div style="font-size:7px;color:var(--muted)">Family moved away</div></div>
+        <div style="border:1.5px solid var(--blue);background:var(--blue-soft);border-radius:5px;
+          padding:5px 6px;font-size:8px;margin-bottom:4px">◉ Stopped attending
+          <div style="font-size:7px;color:var(--muted)">Still in town. Worth a call.</div></div>
+        <div style="border:1px solid var(--line);border-radius:5px;padding:5px 6px;
+          font-size:8px">◯ Moved to Aftershock</div>
+      </div>
+      <span class="co" style="top:48px;left:-10px">1</span>
+    </div>
+    <p class="cap"><b>1</b> the one that needs following up</p>
+  </div>
+</div>
+
+<!-- ═══════════ the big job ═══════════ -->
+<div class="pagebreak"></div>
+<h2>The job worth doing first</h2>
+
+<div class="big">
+  <b>26 children have nobody who can collect them</b>
+  <span style="display:block;margin-top:6px;font-size:15px;opacity:.85">
+    Roughly one in five
+  </span>
+</div>
+
+<p>These came across from the spreadsheets with a first name and nothing else. No
+parent, no phone number. Several of them have been attending all term.</p>
+
+<p>On a Sunday, each one needs a teacher to approve their going home. Twenty-six of
+those in one morning and everyone stops treating it as unusual, which is the one thing
+that would take the value out of the whole system.</p>
+
+<p><b>It's phone calls, not computer work.</b> Open <b>Kids</b>, tap <b>No collector</b>,
+and you have your list. A volunteer with a phone could clear most of it in an hour.</p>
+
+<p>For each one: expand the row, <b>+ Add an adult</b>, name and number, tick
+<b>May pick up</b>. Done.</p>
+
+<div class="tip">
+  Two phone numbers came across broken and can't be repaired, because a digit is
+  wrong and there's no way to tell which. <b>Prince Lanaban</b> and
+  <b>Sophia Patterson</b> both need asking again.
+</div>
+
+<!-- ═══════════ dashboard ═══════════ -->
+<h2>The dashboard</h2>
+
+<div class="step rev">
+  <div class="left">
+    <p>Four numbers at the top, then attendance by group, recent Sundays, and a
+    <b>Needs a look</b> list at the bottom.</p>
+    <p>The <b>Roster</b> column on recent Sundays is how many children were on the
+    register <i>that week</i>, not today. So a Sunday in May shows May's numbers even
+    though children have joined since.</p>
+    <div class="note">
+      <b>Something not seen for a few weeks isn't always a problem.</b> Families travel,
+      especially over Tet and the summer. The list is there to prompt a thought, not to
+      make anyone chase.
+    </div>
+  </div>
+  <div class="right">
+    <div class="win">
+      <div class="bar">Dashboard</div>
+      <div class="body">
+        <div class="side">
+          <div class="lg">KQ</div>
+          <div class="i">Attendance</div>
+          <div class="i on">Dashboard</div>
+          <div class="i">Kids</div>
+          <div class="i">Teachers</div>
+        </div>
+        <div class="main">
+          <div style="display:flex;gap:4px;margin-bottom:5px">
+            <div class="card stat" style="flex:1"><b>23</b><span>Attended</span></div>
+            <div class="card stat" style="flex:1"><b>138</b><span>Roster</span></div>
+          </div>
+          <div class="card">
+            <div style="font-size:7px;font-weight:800;margin-bottom:4px">By group</div>
+            <div style="font-size:6.5px;margin-bottom:2px">Explorers</div>
+            <div style="height:4px;background:#ECEFF3;border-radius:3px;margin-bottom:4px">
+              <div style="width:55%;height:100%;background:var(--blue);border-radius:3px"></div></div>
+            <div style="font-size:6.5px;margin-bottom:2px">Voyagers</div>
+            <div style="height:4px;background:#ECEFF3;border-radius:3px;margin-bottom:4px">
+              <div style="width:60%;height:100%;background:var(--yellow);border-radius:3px"></div></div>
+            <div style="font-size:6.5px;margin-bottom:2px">Trailblazers</div>
+            <div style="height:4px;background:#ECEFF3;border-radius:3px;margin-bottom:4px">
+              <div style="width:50%;height:100%;background:var(--pink);border-radius:3px"></div></div>
+            <div style="font-size:6.5px;margin-bottom:2px">Pathfinders</div>
+            <div style="height:4px;background:#ECEFF3;border-radius:3px">
+              <div style="width:62%;height:100%;background:var(--green);border-radius:3px"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="cap">Colours match the groups</p>
+  </div>
+</div>
+
+<!-- ═══════════ august ═══════════ -->
+<h2>Every August</h2>
+
+<p>KidzQuest moves everyone up on the <b>first Sunday of August</b>. Not everyone moves
+room, which is why the grades matter. Voyagers holds grades 1 and 2, so only the grade
+2s go up to Trailblazers and the grade 1s stay where they are.</p>
+
+<p>Grade 7s finish KidzQuest and go to Aftershock. Nobody is moved there automatically,
+because that's a conversation with a family rather than something the app should decide.</p>
+
+<div class="warn">
+  <b>This one needs the person who looks after the website.</b> It isn't a button yet.
+  Give them a few weeks' notice before August rather than the week before.
+</div>
+
+<!-- ═══════════ trouble ═══════════ -->
+<h2>If something breaks on a Sunday</h2>
+
+<p>Everything lives in the database, and that can be read even if every tablet in the
+building has died. This answers "who is still in the rooms right now":</p>
+
+<pre><code>select c.first_name, c.last_name, a.status,
+       a.checked_in_at, a.checked_out_at
+  from kq.attendance a
+  join kq.children c on c.id = a.child_id
+  join kq.sessions s on s.id = a.session_id
+ where s.service_date = current_date;</code></pre>
+
+<p>Worth having open in a tab on a Sunday morning. If you'd rather not touch it, whoever
+looks after the website can run it in a moment.</p>
+
+<h3>Somebody can't sign in</h3>
+<p>Check they have a role on their account. That's nearly always what it is.</p>
+
+<h3>A helper says every room is closed to them</h3>
+<p>They haven't been put in a room. Teachers or Assistants, tap the chip, done.</p>
+
+<h3>Somebody wants a change undone</h3>
+<p>Every edit is kept with a note of who made it and when. Ask whoever looks after the
+website and they can find the old value.</p>
+
+<div class="big">
+  <b>The three that matter</b>
+  <span style="display:block;margin-top:9px;font-size:15px;line-height:1.8">
+    Everyone needs a role, or nothing works<br>
+    Everyone needs a room, every week<br>
+    26 children still need someone who can collect them
+  </span>
+</div>
+
+<footer>
+  KidzQuest · Hanoi International Fellowship · admin guide<br>
+  Anything here not matching what you see? Let whoever looks after the website know.
+</footer>
+
+</div>
+</body>
+</html>

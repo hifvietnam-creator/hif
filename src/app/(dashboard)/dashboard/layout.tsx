@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
 
 const NAV = [
   { href: '/dashboard', label: 'Congregation' },
+  { href: '/dashboard/attendance', label: 'Attendance' },
   { href: '/dashboard/ministries', label: 'Ministries' },
   { href: '/dashboard/reachability', label: 'Reachability' },
   { href: '/dashboard/serving', label: 'Serving' },

@@ -1,0 +1,1888 @@
+{
+  "generatedAt": "2026-09-08T08:22:35.980Z",
+  "monthsSampled": 24,
+  "serviceTypesConsidered": [
+    {
+      "id": "957307",
+      "name": "Turn into Praise!"
+    }
+  ],
+  "positionNamesSeen": {
+    "Livestream/Videography": 137,
+    "Backup Singer 1": 137,
+    "Bass Guitarist": 136,
+    "Backup Singer 2": 133,
+    "Drummer": 132,
+    "Worship Leader": 126,
+    "Sound": 124,
+    "Acoustic Guitarist": 124,
+    "Pianist": 124,
+    "Slides & PPT Operations": 121,
+    "EmCee": 87,
+    "Photography": 10,
+    "Electric Guitarist": 3,
+    "Sunday Service Prayer": 2
+  },
+  "plans": [
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431287",
+      "date": "2026-10-11",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": []
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431286",
+      "date": "2026-10-04",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ],
+      "songCount": 0
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431285",
+      "date": "2026-09-27",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies"
+      ],
+      "songCount": 0
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431284",
+      "date": "2026-09-20",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ],
+      "songCount": 0
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431283",
+      "date": "2026-09-13",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ],
+      "songCount": 0
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "57780031",
+      "date": "2026-09-08",
+      "title": "No dates",
+      "times": [],
+      "leaders": [
+        "Anabella Alquisola"
+      ],
+      "songCount": 0
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431282",
+      "date": "2026-09-06",
+      "title": "Love in Motion",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ],
+      "songCount": 6
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431281",
+      "date": "2026-08-30",
+      "title": "Andrew's Invitation",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431280",
+      "date": "2026-08-23",
+      "title": "Love in Motion",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431279",
+      "date": "2026-08-16",
+      "title": "Season of Love",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431278",
+      "date": "2026-08-09",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "90431124",
+      "date": "2026-08-02",
+      "title": "Summer Service",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240570",
+      "date": "2026-07-26",
+      "title": "Summer Service",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Juliette Ellazo",
+        "Michael Walls"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240569",
+      "date": "2026-07-19",
+      "title": "Summer Series",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240568",
+      "date": "2026-07-12",
+      "title": "Summer Service",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon",
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240567",
+      "date": "2026-07-05",
+      "title": "Summer Service",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240566",
+      "date": "2026-06-28",
+      "title": "28 June 2026",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240565",
+      "date": "2026-06-21",
+      "title": "Summer Series",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240564",
+      "date": "2026-06-14",
+      "title": "Turn it to Praise!",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240563",
+      "date": "2026-06-07",
+      "title": "Finish Your Part",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240562",
+      "date": "2026-05-31",
+      "title": "Celebration Sunday",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240561",
+      "date": "2026-05-24",
+      "title": "Continue!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240560",
+      "date": "2026-05-17",
+      "title": "Run from Rot!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson",
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240559",
+      "date": "2026-05-10",
+      "title": "Pass it On!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240545",
+      "date": "2026-05-03",
+      "title": "3 May 2026",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "88240537",
+      "date": "2026-04-26",
+      "title": "Do Not Be Ashamed",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240585",
+      "date": "2026-04-19",
+      "title": "Pass it On!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero",
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240584",
+      "date": "2026-04-12",
+      "title": "Independent sermon",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon",
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240583",
+      "date": "2026-04-05",
+      "title": "EASTER SUNDAY - African Style Praise - The King Has Come!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Oluwatomisin Ogunbawo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "87297739",
+      "date": "2026-04-03",
+      "title": "GOOD FRIDAY SERVICE",
+      "times": [
+        "06:00",
+        "07:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240582",
+      "date": "2026-03-29",
+      "title": "Justice for All",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240581",
+      "date": "2026-03-22",
+      "title": "The King Has Come!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240580",
+      "date": "2026-03-15",
+      "title": "The King Has Come",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240579",
+      "date": "2026-03-08",
+      "title": "The King Has Come",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Elyciah Faith Klaartjies",
+        "Nadille Ngwemetah"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240578",
+      "date": "2026-03-01",
+      "title": "The King Has Come!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240577",
+      "date": "2026-02-22",
+      "title": "Heaven's Favour",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240576",
+      "date": "2026-02-15",
+      "title": "Heaven's Favour",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "86240531",
+      "date": "2026-02-08",
+      "title": "Heaven's Favour",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973095",
+      "date": "2026-02-01",
+      "title": "Heaven's Favour",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973094",
+      "date": "2026-01-25",
+      "title": "Heaven's Favour",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973093",
+      "date": "2026-01-18",
+      "title": "Heaven's Favour",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973092",
+      "date": "2026-01-11",
+      "title": "Receive Jesus, Receive Favor",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973091",
+      "date": "2026-01-04",
+      "title": "Purpose Broke Thru",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973090",
+      "date": "2025-12-28",
+      "title": "Remarkable",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mylene Dolteo",
+        "Juliette Ellazo",
+        "Elyciah Faith Klaartjies"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "85197530",
+      "date": "2025-12-24",
+      "title": "Christmas Eve Service",
+      "times": [
+        "05:30",
+        "07:00",
+        "08:30"
+      ],
+      "leaders": [
+        "Sarah Jackson",
+        "Oluwatomisin Ogunbawo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973089",
+      "date": "2025-12-21",
+      "title": "Love Broke Thru",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973088",
+      "date": "2025-12-14",
+      "title": "Love Broke Thru",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973087",
+      "date": "2025-12-07",
+      "title": "Love Broke Thru",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973086",
+      "date": "2025-11-30",
+      "title": "Love Broke Thru",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973085",
+      "date": "2025-11-23",
+      "title": "Peace, Love & Grace",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "83973084",
+      "date": "2025-11-16",
+      "title": "Stand Firm in Battle",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064412",
+      "date": "2025-11-09",
+      "title": "Christ at the Center of Relationships",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064411",
+      "date": "2025-11-02",
+      "title": "Shaped by Grace",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064410",
+      "date": "2025-10-26",
+      "title": "Stop the Spiral",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064409",
+      "date": "2025-10-19",
+      "title": "Walking Worthy Together",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064408",
+      "date": "2025-10-12",
+      "title": "A Prayer for Power & Love",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064407",
+      "date": "2025-10-05",
+      "title": "The Mystery Revealed",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064406",
+      "date": "2025-09-28",
+      "title": "One New Humanity",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064405",
+      "date": "2025-09-21",
+      "title": "Seated with Christ",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064404",
+      "date": "2025-09-14",
+      "title": "See Above & Beyond",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064403",
+      "date": "2025-09-07",
+      "title": "God's Done It! We've Won It!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064402",
+      "date": "2025-08-31",
+      "title": "Retreat to Prayer - Advance in Power!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064401",
+      "date": "2025-08-24",
+      "title": "God Who Restores",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064381",
+      "date": "2025-08-17",
+      "title": "God You Have a Problem Prayer",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon",
+        "Mylene Dolteo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064380",
+      "date": "2025-08-10",
+      "title": "Breakthrough Prayer",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064379",
+      "date": "2025-08-03",
+      "title": "Breakthrough Prayer",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064378",
+      "date": "2025-07-27",
+      "title": "Stage 5:  The Question",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064377",
+      "date": "2025-07-20",
+      "title": "Stage 4: The Turn",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064376",
+      "date": "2025-07-13",
+      "title": "The Prayer",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064375",
+      "date": "2025-07-06",
+      "title": "The Storm",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064374",
+      "date": "2025-06-29",
+      "title": "The Call",
+      "times": [
+        "09:00",
+        "10:30",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064373",
+      "date": "2025-06-22",
+      "title": "From Watching to Going (Are you ready?)",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064372",
+      "date": "2025-06-15",
+      "title": "Independent Sermon",
+      "times": [
+        "09:00",
+        "10:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064371",
+      "date": "2025-06-08",
+      "title": "BEYOND...",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero",
+        "Mylene Dolteo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064370",
+      "date": "2025-06-01",
+      "title": "Beyond",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "80064285",
+      "date": "2025-05-25",
+      "title": "HIF 30TH ANNIVERSARY",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Oluwatomisin Ogunbawo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "79783384",
+      "date": "2025-05-18",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "79783383",
+      "date": "2025-05-11",
+      "title": "8:30AM | 10AM | 11:30AM",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498810",
+      "date": "2025-05-04",
+      "title": "4 May 2025",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498809",
+      "date": "2025-04-27",
+      "title": "27 April 2025",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon",
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498808",
+      "date": "2025-04-20",
+      "title": "20 April 2025",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498807",
+      "date": "2025-04-13",
+      "title": "Remarkable",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498806",
+      "date": "2025-04-06",
+      "title": "6 April 2025",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498805",
+      "date": "2025-03-30",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498804",
+      "date": "2025-03-23",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498803",
+      "date": "2025-03-16",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498802",
+      "date": "2025-03-09",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498801",
+      "date": "2025-03-02",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "78498783",
+      "date": "2025-02-23",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606570",
+      "date": "2025-02-16",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606569",
+      "date": "2025-02-09",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606568",
+      "date": "2025-02-02",
+      "title": "10:00 | 11:30",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606567",
+      "date": "2025-01-26",
+      "title": "10:00 | 11:30",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606566",
+      "date": "2025-01-19",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mylene Dolteo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606565",
+      "date": "2025-01-12",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606564",
+      "date": "2025-01-05",
+      "title": "10:00 | 11:30",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606563",
+      "date": "2024-12-29",
+      "title": "10:00 | 11:30",
+      "times": [
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606585",
+      "date": "2024-12-24",
+      "title": "5:30 | 7:00 | 8:30",
+      "times": [
+        "05:30",
+        "07:00",
+        "08:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes",
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606562",
+      "date": "2024-12-22",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606561",
+      "date": "2024-12-15",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76606560",
+      "date": "2024-12-08",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mylene Dolteo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "76422176",
+      "date": "2024-12-01",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560658",
+      "date": "2024-11-24",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "74746181",
+      "date": "2024-11-17",
+      "title": "Do talk to strangers!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560657",
+      "date": "2024-11-10",
+      "title": "8:30 | 10:00 | 11:30",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560656",
+      "date": "2024-11-03",
+      "title": "Why the news is so good!",
+      "times": [
+        "08:30",
+        "10:00",
+        "11:30"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560655",
+      "date": "2024-10-27",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560654",
+      "date": "2024-10-20",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Mary Ann Japon"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560653",
+      "date": "2024-10-13",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Ngoc Pearl Ngo"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "75560652",
+      "date": "2024-10-06",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Jeaneth Caballero"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "74746174",
+      "date": "2024-09-29",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Judy Ann Torres-Reyes"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "74746173",
+      "date": "2024-09-22",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Sarah Morris"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "74746172",
+      "date": "2024-09-15",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Lovella Blanila- Dacles"
+      ]
+    },
+    {
+      "serviceType": "Turn into Praise!",
+      "serviceTypeId": "957307",
+      "planId": "72730317",
+      "date": "2024-09-08",
+      "title": "9AM & 11AM",
+      "times": [
+        "09:00",
+        "11:00"
+      ],
+      "leaders": [
+        "Sarah Jackson"
+      ]
+    }
+  ],
+  "archiveFolders": [
+    "Allie",
+    "Anabella",
+    "Angela",
+    "Anne",
+    "Caleb",
+    "Clayton",
+    "Deb",
+    "Elyciah",
+    "Grace",
+    "Gracia",
+    "Guest Helper (D.jksn)",
+    "Hyomi",
+    "Isaac",
+    "Jam",
+    "James",
+    "Jeaneth",
+    "Jochen",
+    "Josiah",
+    "Judy Ann",
+    "Juliete",
+    "Kelsey",
+    "Lauren",
+    "Louneh",
+    "Lovella",
+    "Marian",
+    "Michael W",
+    "Mikayla",
+    "Mylene",
+    "Nancy D",
+    "Nathan",
+    "Pearl",
+    "Richard",
+    "Robin",
+    "Samantha",
+    "Sarah Jackson",
+    "Sarah Morris",
+    "Shuqi",
+    "Solomon",
+    "Tomi",
+    "Vilma",
+    "Yurino"
+  ],
+  "proposedMapping": [
+    {
+      "pcoName": "Anabella Alquisola",
+      "folder": "Anabella",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Elyciah Faith Klaartjies",
+      "folder": "Elyciah",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Jeaneth Caballero",
+      "folder": "Jeaneth",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Judy Ann Torres-Reyes",
+      "folder": "Judy Ann",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Juliette Ellazo",
+      "folder": null,
+      "confidence": "none",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Lovella Blanila- Dacles",
+      "folder": "Lovella",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Mary Ann Japon",
+      "folder": "Judy Ann",
+      "confidence": "token",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Michael Walls",
+      "folder": "Michael W",
+      "confidence": "token",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Mylene Dolteo",
+      "folder": "Mylene",
+      "confidence": "prefix",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Nadille Ngwemetah",
+      "folder": null,
+      "confidence": "none",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Ngoc Pearl Ngo",
+      "folder": "Pearl",
+      "confidence": "token",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Oluwatomisin Ogunbawo",
+      "folder": null,
+      "confidence": "none",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Sarah Jackson",
+      "folder": "Sarah Jackson",
+      "confidence": "exact",
+      "alternatives": []
+    },
+    {
+      "pcoName": "Sarah Morris",
+      "folder": "Sarah Morris",
+      "confidence": "exact",
+      "alternatives": []
+    }
+  ],
+  "needsHandMapping": [
+    "Juliette Ellazo",
+    "Mary Ann Japon",
+    "Michael Walls",
+    "Nadille Ngwemetah",
+    "Ngoc Pearl Ngo",
+    "Oluwatomisin Ogunbawo"
+  ],
+  "sampleAttachmentAttributes": {
+    "allow_mp3_download": false,
+    "attachable_type": "Arrangement",
+    "content": null,
+    "content_type": "application/pdf",
+    "created_at": "2021-01-15T00:14:26Z",
+    "deleted_at": null,
+    "display_name": "Lord You Are Good - Israel Houghton F.pdf",
+    "downloadable": true,
+    "file_size": 38721,
+    "filename": "Lord You Are Good - Israel Houghton F.pdf",
+    "filetype": "pdf",
+    "has_preview": false,
+    "import_to_item_details": null,
+    "licenses_purchased": 0,
+    "licenses_remaining": -21,
+    "licenses_used": 21,
+    "linked_url": "https://services.planningcenteronline.com/songs/18597977/arrangements/21274964",
+    "page_order": [],
+    "pco_type": "AttachmentS3",
+    "remote_link": "42144aaed5c70230ae456e6e95c8ecd0",
+    "streamable": false,
+    "thumbnail_url": null,
+    "transposable": false,
+    "updated_at": "2021-01-15T00:14:28Z",
+    "url": "https://services.planningcenteronline.com/attachments/103043115",
+    "web_streamable": false
+  },
+  "sampleHasDirectUrl": false
+}

@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<title>KidzQuest — teacher's guide</title>
+<style>
+:root{
+  --blue:#3AA6C9; --blue-dark:#1F6B85; --blue-soft:#E8F4F8;
+  --green:#6FA22A; --green-soft:#F0F7E4; --green-ink:#47690F;
+  --red:#C01E27; --red-deep:#9C171E; --red-soft:#FBECEC;
+  --amber:#B7791F; --amber-soft:#FDF3E2;
+  --ink:#1A1B1E; --ink-2:#3D3F44; --muted:#6B6E74;
+  --line:#E7E4DF; --mist:#F6F4F1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#fff;color:var(--ink);
+  font:15.5px/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.page{max-width:780px;margin:0 auto;padding:32px 36px 56px}
+
+.cover{border-bottom:3px solid var(--red);padding-bottom:20px;margin-bottom:24px}
+.badge{display:inline-block;background:var(--red);color:#fff;font-size:11px;font-weight:800;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 10px;border-radius:20px}
+h1{font-size:30px;margin:11px 0 5px;letter-spacing:-.02em}
+.cover p{margin:0;color:var(--muted)}
+
+h2{font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:#fff;background:var(--blue-dark);
+  margin:32px 0 16px;padding:7px 13px;border-radius:6px}
+h2.red{background:var(--red-deep)}
+p{margin:0 0 10px}
+ol,ul{margin:0 0 10px;padding-left:20px}
+li{margin-bottom:5px}
+
+.step{display:flex;gap:20px;align-items:flex-start;margin:0 0 26px;page-break-inside:avoid}
+.step .left{flex:1;min-width:0}
+.step .right{flex:0 0 250px}
+.step.rev{flex-direction:row-reverse}
+.stitle{display:flex;align-items:center;gap:10px;margin-bottom:7px}
+.num{flex:0 0 32px;height:32px;border-radius:50%;background:var(--blue-dark);color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:15px}
+.num.red{background:var(--red-deep)}
+.stitle h3{font-size:19px;margin:0;letter-spacing:-.01em}
+.do{font-size:16px;margin:0 0 8px}
+.do b{background:#FFF3B0;padding:1px 5px;border-radius:3px}
+
+.screen{position:relative;border:8px solid #24262C;border-radius:20px;overflow:visible;
+  background:#fff;box-shadow:0 4px 14px rgba(0,0,0,.13)}
+.screen .inner{border-radius:12px;overflow:hidden}
+.sh{background:var(--blue-dark);color:#fff;padding:9px 11px}
+.sh .r1{display:flex;justify-content:space-between;font-size:9.5px;opacity:.9}
+.sh h4{margin:2px 0 0;font-size:13px}
+.counts{display:flex;gap:4px;margin-top:7px}
+.counts div{flex:1;background:rgba(255,255,255,.16);border-radius:5px;padding:4px 2px;text-align:center}
+.counts b{display:block;font-size:14px;line-height:1.1}
+.counts span{font-size:7.5px;text-transform:uppercase;letter-spacing:.04em;opacity:.85}
+.tabs{display:flex;border-bottom:1px solid var(--line)}
+.tabs div{flex:1;text-align:center;padding:7px 0;font-size:11px;font-weight:700;color:var(--muted);
+  border-bottom:2px solid transparent}
+.tabs div.on{color:var(--blue-dark);border-bottom-color:var(--blue)}
+.kid{display:flex;align-items:center;gap:7px;padding:7px 9px;border-bottom:1px solid #F1EEE9}
+.kid .av{width:22px;height:22px;border-radius:50%;background:var(--blue-soft);color:var(--blue-dark);
+  display:grid;place-items:center;font-size:8.5px;font-weight:800;flex:0 0 auto}
+.kid .nm{font-size:11.5px;font-weight:700;line-height:1.25}
+.kid .sub{font-size:8.5px;color:var(--muted)}
+.kid .btn{margin-left:auto;border-radius:5px;padding:5px 9px;font-size:9.5px;font-weight:800;color:#fff}
+.b-green{background:var(--green)} .b-grey{background:#ECEFF3;color:var(--muted)}
+.allergy{background:var(--red-soft);color:var(--red-deep);font-size:7.5px;font-weight:800;
+  padding:1px 5px;border-radius:10px;margin-left:4px}
+.foot-bar{display:flex;align-items:center;gap:5px;padding:6px 9px;background:var(--mist);
+  border-top:1px solid var(--line);font-size:9px;color:var(--ink-2)}
+.dot{width:7px;height:7px;border-radius:50%;display:inline-block}
+.sheet{padding:9px}
+.sheet h5{margin:0 0 2px;font-size:12px}
+.sheet .sub{font-size:9.5px;color:var(--muted);margin-bottom:7px}
+.pick{display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:7px;
+  padding:6px 7px;margin-bottom:5px}
+.pick.dash{border-style:dashed;border-color:#EFC4C0}
+.pick .nm{font-size:11px;font-weight:700}
+.pick .sub2{font-size:8.5px;color:var(--muted)}
+.ok{margin-left:auto;background:var(--green-soft);color:var(--green-ink);font-size:7.5px;
+  font-weight:800;padding:2px 6px;border-radius:10px}
+.codebox{background:#1A1B1E;color:#fff;font-family:ui-monospace,Menlo,monospace;font-weight:800;
+  letter-spacing:.14em;padding:2px 7px;border-radius:4px;font-size:11px}
+.av2{width:20px;height:20px;background:var(--blue-soft);color:var(--blue-dark);border-radius:50%;
+  display:grid;place-items:center;font-size:8px;font-weight:800;flex:0 0 auto}
+.fld{border:1px solid var(--line);border-radius:5px;padding:5px;height:22px;margin-bottom:5px}
+.lbl{font-size:8.5px;font-weight:700;margin-bottom:2px}
+
+.co{position:absolute;width:24px;height:24px;border-radius:50%;background:var(--red);
+  color:#fff;font-weight:800;font-size:12px;display:grid;place-items:center;
+  border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.3);z-index:5}
+.cap{font-size:11px;color:var(--muted);text-align:center;margin-top:7px;line-height:1.4}
+
+.key{list-style:none;padding:0;margin:8px 0 0}
+.key li{display:flex;gap:8px;align-items:flex-start;font-size:14px;margin-bottom:6px}
+.key .n{flex:0 0 20px;height:20px;border-radius:50%;background:var(--red);color:#fff;
+  font-size:11px;font-weight:800;display:grid;place-items:center;margin-top:2px}
+
+.note,.warn,.tip{border-radius:9px;padding:11px 14px;margin:12px 0;font-size:14.5px;
+  page-break-inside:avoid}
+.note{background:var(--blue-soft);border:1px solid #C4DDE7;color:#14536B}
+.warn{background:var(--red-soft);border:1px solid #F0C4C0;color:var(--red-deep)}
+.tip{background:var(--amber-soft);border:1px solid #F0DCB4;color:#7C5510}
+
+table{width:100%;border-collapse:collapse;font-size:14px;margin:10px 0}
+th{text-align:left;background:var(--mist);padding:7px 10px;border:1px solid var(--line);
+  font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+td{padding:7px 10px;border:1px solid var(--line);vertical-align:top}
+
+.say{margin:9px 0;padding:10px 14px;background:var(--mist);border-left:3px solid var(--blue);
+  border-radius:0 7px 7px 0;font-style:italic;color:var(--ink-2);font-size:14.5px}
+
+.ask{display:flex;gap:12px;align-items:flex-start;background:#fff;border:1px solid var(--line);
+  border-radius:10px;padding:13px 15px;margin-bottom:9px;page-break-inside:avoid}
+.ask .q{flex:0 0 34px;height:34px;border-radius:50%;background:var(--red-soft);color:var(--red-deep);
+  display:grid;place-items:center;font-weight:800;font-size:16px}
+.ask h4{margin:0 0 3px;font-size:16px}
+.ask p{margin:0;font-size:14.5px;color:var(--ink-2)}
+
+.big{background:var(--ink);color:#fff;border-radius:11px;padding:16px;text-align:center;margin:18px 0}
+.big b{display:block;font-size:20px;letter-spacing:-.01em}
+
+footer{margin-top:36px;padding-top:12px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--muted)}
+
+@page{size:A4;margin:14mm 12mm}
+@media print{
+  .page{max-width:none;padding:0}
+  .pagebreak{page-break-before:always}
+  .screen{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="page">
+
+<header class="cover">
+  <span class="badge">Teachers</span>
+  <h1>Your Sunday with KidzQuest</h1>
+  <p>The same tablet your helpers use, plus one thing that's yours.</p>
+</header>
+
+<div class="note">
+  <b>Thank you for teaching with KidzQuest.</b> This covers the tablet at the door. Most
+  of it is exactly what your helpers do, so it's worth a read even where it feels
+  familiar, because they'll come to you with questions. The last part is the bit only
+  you can do.
+</div>
+
+<!-- ═══════════ basics ═══════════ -->
+<h2>Getting going</h2>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">1</span><h3>Sign in and pick your room</h3></div>
+    <p class="do">Open the link Ate sends you, sign in, then <b>tap your room</b>.</p>
+    <p>You'll be asked to choose your own password the first time. Only the room you're
+    teaching in will open.</p>
+    <div class="tip">
+      Try signing in at home during the week. It's much easier than sorting it out on a
+      Sunday morning.
+    </div>
+    <p>If several of you are in the same room on different tablets, that's fine. You're
+    all looking at the same register and you'll each see what the others tap.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner" style="padding:10px;background:var(--mist)">
+        <div style="font-size:13px;font-weight:800;margin-bottom:2px">KidzQuest</div>
+        <div style="font-size:8.5px;color:var(--muted);margin-bottom:8px">Sunday 16 August</div>
+        <div style="background:#fff;border:2px solid var(--red);border-radius:8px;padding:8px;
+          margin-bottom:5px;display:flex;align-items:center">
+          <div><b style="font-size:12px">Voyagers</b>
+            <div style="font-size:8.5px;color:var(--muted)">39 on the register</div></div>
+          <span style="margin-left:auto;background:#ECEFF3;color:var(--muted);font-size:8px;
+            font-weight:800;padding:3px 7px;border-radius:10px">Start</span>
+        </div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;
+          margin-bottom:5px;display:flex;align-items:center;opacity:.5">
+          <div><b style="font-size:12px">Trailblazers</b>
+            <div style="font-size:8.5px;color:var(--muted)">29 on the register</div></div>
+        </div>
+        <div style="background:#fff;border:1px solid var(--line);border-radius:8px;padding:8px;
+          display:flex;align-items:center;opacity:.5">
+          <div><b style="font-size:12px">Pathfinders</b>
+            <div style="font-size:8.5px;color:var(--muted)">39 on the register</div></div>
+        </div>
+      </div>
+      <span class="co" style="top:36px;left:-11px">1</span>
+    </div>
+    <p class="cap"><b>1</b> is your room</p>
+  </div>
+</div>
+
+<div class="step rev">
+  <div class="left">
+    <div class="stitle"><span class="num">2</span><h3>The three numbers</h3></div>
+    <ul class="key">
+      <li><span class="n">1</span><span><b>Expected</b> is everyone on the register today</span></li>
+      <li><span class="n">2</span><span><b>Here</b> is who has arrived and is still with you</span></li>
+      <li><span class="n">3</span><span><b>Dismissed</b> is who has gone home</span></li>
+    </ul>
+    <p><b>Here</b> is the one to keep half an eye on. By the time you pack up it should
+    be back to zero.</p>
+    <p>If it isn't, either a child is still with you or someone was collected without
+    anyone tapping. Worth finding out which before people head off.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="sh">
+          <div class="r1"><span>← Rooms</span><span>Daniel O.</span></div>
+          <h4>Voyagers</h4>
+          <div class="counts">
+            <div><b>39</b><span>Expected</span></div>
+            <div><b>12</b><span>Here</span></div>
+            <div><b>3</b><span>Dismissed</span></div>
+          </div>
+        </div>
+        <div class="tabs"><div class="on">Check in</div><div>Dismiss</div></div>
+      </div>
+      <span class="co" style="top:52px;left:14px">1</span>
+      <span class="co" style="top:52px;left:96px">2</span>
+      <span class="co" style="top:52px;left:178px">3</span>
+    </div>
+    <p class="cap">The top of the screen</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">3</span><h3>Checking in and allergies</h3></div>
+    <p class="do">Find the child, tap <b>Check in</b>, tap the adult who brought them.</p>
+    <p>Two tags print with the same code. One goes on the child, the other goes to the
+    adult and comes back at the end.</p>
+    <p>A red badge means an allergy, and it prints on the child's tag too.</p>
+    <div class="tip">
+      Have a quick look down the register at the start and make sure everyone helping
+      knows who has an allergy. It's easier than remembering mid-morning.
+    </div>
+    <p>An empty allergy box only means nobody has told us yet. If a parent mentions
+    something, pass it to Ate so it's there next week.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="kid"><span class="av">AB</span>
+          <div><div class="nm">Abigail Bui</div><div class="sub">Hung Bui</div></div>
+          <span class="btn b-green">Check in</span></div>
+        <div class="kid"><span class="av">AA</span>
+          <div><div class="nm">Adam Adams <span class="allergy">PEANUTS</span></div>
+            <div class="sub">Naz Adams</div></div>
+          <span class="btn b-green">Check in</span></div>
+        <div class="kid"><span class="av">CL</span>
+          <div><div class="nm">Cherry Lee</div><div class="sub">Tan Lee</div></div>
+          <span class="btn b-grey">Here ✓</span></div>
+      </div>
+      <span class="co" style="top:46px;left:52px">1</span>
+    </div>
+    <p class="cap"><b>1</b> is an allergy badge</p>
+  </div>
+</div>
+
+<div class="pagebreak"></div>
+<div class="step rev">
+  <div class="left">
+    <div class="stitle"><span class="num">4</span><h3>A child who isn't on the list</h3></div>
+    <p class="do">Bottom of the check-in list, tap <b>Add a child who isn't on the list</b>.</p>
+    <p>Name, the adult who brought them, a phone number, and allergies. Ate fills in the
+    rest during the week.</p>
+    <div class="warn">
+      Whoever is named here is the person who can collect that child today. Anyone else
+      will need you to approve it, so it's worth a second look at the name and spelling.
+    </div>
+    <p>Your helpers can do this too. If one of them looks unsure, it's a nice moment to
+    stand next to them for the first one.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="sheet">
+          <h5>New child — Voyagers</h5>
+          <div class="sub">Just enough to check them in safely.</div>
+          <div style="display:flex;gap:5px">
+            <div style="flex:1"><div class="lbl">First name</div><div class="fld"></div></div>
+            <div style="flex:1"><div class="lbl">Last name</div><div class="fld"></div></div>
+          </div>
+          <div class="lbl">Adult who brought them</div><div class="fld"></div>
+          <div class="lbl">Their phone</div><div class="fld"></div>
+          <div class="lbl">Allergies</div><div class="fld"></div>
+          <div style="background:var(--green);color:#fff;text-align:center;border-radius:6px;
+            padding:7px;font-size:10.5px;font-weight:800;margin-top:5px">Add to the register</div>
+        </div>
+      </div>
+      <span class="co" style="top:96px;left:-11px">1</span>
+    </div>
+    <p class="cap"><b>1</b> decides who can collect them today</p>
+  </div>
+</div>
+
+<div class="step">
+  <div class="left">
+    <div class="stitle"><span class="num">5</span><h3>Handing children over</h3></div>
+    <ul class="key">
+      <li><span class="n">1</span><span>Tap <b>Dismiss</b> at the top</span></li>
+      <li><span class="n">2</span><span>Check the code on the adult's tag matches</span></li>
+      <li><span class="n">3</span><span>Tap the adult's name</span></li>
+    </ul>
+    <p>Only adults who can collect that child appear on the list. If the person in front
+    of you isn't there, that's the next section.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="tabs"><div>Check in</div><div class="on">Dismiss</div></div>
+        <div class="sheet">
+          <h5>Dismiss — Adam Adams</h5>
+          <div class="sub">Who is picking up?</div>
+          <div style="font-size:9.5px;margin-bottom:6px">Their label should read
+            <span class="codebox">K7M</span></div>
+          <div class="pick"><span class="av2">NA</span>
+            <div><div class="nm">Naz Adams</div><div class="sub2">Mother · authorised</div></div>
+            <span class="ok">✓</span></div>
+          <div class="pick dash"><span style="width:20px;height:20px;background:var(--red-soft);
+            color:var(--red);border-radius:50%;display:grid;place-items:center;font-size:10px;
+            font-weight:800">!</span>
+            <div><div class="nm" style="color:var(--red-deep)">Someone else is picking up</div>
+              <div class="sub2">You can approve this</div></div></div>
+        </div>
+      </div>
+      <span class="co" style="top:2px;right:44px">1</span>
+      <span class="co" style="top:60px;right:-11px">2</span>
+      <span class="co" style="top:88px;left:-11px">3</span>
+    </div>
+    <p class="cap">Only approved adults appear</p>
+  </div>
+</div>
+
+<!-- ═══════════ the teacher bit ═══════════ -->
+<div class="pagebreak"></div>
+<h2 class="red">When someone new comes to collect</h2>
+
+<p>A helper will come and find you when someone arrives who isn't on a child's list.
+This one is yours. Two people looking is simply safer, and it makes a mix-up far less
+likely.</p>
+
+<p>Nearly every time it's a grandmother, an auntie, a family friend or a driver, and
+everything is completely fine. The point isn't suspicion. It's just that somebody stops
+for thirty seconds and has a proper look.</p>
+
+<h3 style="margin-top:22px">Three things worth checking</h3>
+
+<div class="ask">
+  <div class="q">1</div>
+  <div>
+    <h4>Does the child know them?</h4>
+    <p>Ask the child rather than the adult. A little one who lights up and reaches for
+    someone tells you more than any piece of paper.</p>
+  </div>
+</div>
+
+<div class="ask">
+  <div class="q">2</div>
+  <div>
+    <h4>Can you reach a parent?</h4>
+    <p>The child's contact numbers are on the screen. A thirty second phone call settles
+    almost every one of these, and parents are usually glad you rang.</p>
+  </div>
+</div>
+
+<div class="ask">
+  <div class="q">3</div>
+  <div>
+    <h4>Does anything feel off?</h4>
+    <p>Someone in an unusual hurry, unwilling to wait a moment, or a story that shifts
+    while you're talking. You'll know it if you feel it, and it's worth paying attention
+    to.</p>
+  </div>
+</div>
+
+<div class="note">
+  <b>It's completely fine to ask someone to wait.</b> "Let me give Mum a quick ring, I
+  won't be a minute" is a perfectly normal thing to say, and nobody at HIF will think
+  twice about it. Any small awkwardness is over in a minute. Being careful with a child
+  is never something you'll regret.
+</div>
+
+<div class="step" style="margin-top:22px">
+  <div class="left">
+    <div class="stitle"><span class="num red">6</span><h3>Writing it down</h3></div>
+    <p class="do">Tap <b>Someone else is picking up</b>, then add their name and what
+    happened.</p>
+    <p>Write it the way you'd explain it to someone next week. A few words is plenty,
+    but "OK" doesn't help anybody later:</p>
+    <div class="say">
+      "Mum rang ahead at 10:15. This is Adam's auntie, Linh knows her, and she had the
+      collection tag."
+    </div>
+    <p>Your name and the time are saved with it. It can't be edited afterwards, which
+    is exactly what makes it useful if anyone ever asks.</p>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="sheet">
+          <div style="background:var(--red-soft);border-radius:6px;padding:6px 8px;
+            font-size:9px;color:var(--red-deep);margin-bottom:7px">
+            Adam Adams is going home with someone who isn't on his list.
+          </div>
+          <div class="lbl">Who is collecting?</div><div class="fld"></div>
+          <div class="lbl">What happened?</div>
+          <div style="border:1px solid var(--line);border-radius:5px;height:38px;margin-bottom:6px"></div>
+          <div style="background:var(--red);color:#fff;text-align:center;border-radius:6px;
+            padding:7px;font-size:10.5px;font-weight:800">Let Adam go home</div>
+        </div>
+      </div>
+      <span class="co" style="top:52px;left:-11px">1</span>
+    </div>
+    <p class="cap"><b>1</b> both are needed before the button works</p>
+  </div>
+</div>
+
+<h3>If you'd rather not</h3>
+<p>Then don't. Keep the child with you, stay friendly, and ring the parent. If you
+can't reach anyone, find Ate or one of the pastors.</p>
+<p>A child spending an extra twenty minutes in a warm room with you is a very small
+thing. Everyone would far rather that than the alternative.</p>
+
+<!-- ═══════════ things going wrong ═══════════ -->
+<div class="pagebreak"></div>
+<h2>If something goes wrong</h2>
+
+<div class="step rev">
+  <div class="left">
+    <h3 style="margin-top:0">The wifi drops out</h3>
+    <p class="do">Everyone carries on tapping. Nothing gets lost.</p>
+    <table>
+      <tr><th style="width:74px">Green</th><td>Everything is saved</td></tr>
+      <tr><th>Amber</th><td>A few taps are waiting. Carry on.</td></tr>
+      <tr><th>Grey</th><td>No connection, but still fine to tap</td></tr>
+    </table>
+    <div class="warn">
+      While the dot is amber, nobody should close the tab or refresh the page. Anything
+      still waiting would be lost. Worth mentioning to your helpers at the start rather
+      than in the moment.
+    </div>
+  </div>
+  <div class="right">
+    <div class="screen">
+      <div class="inner">
+        <div class="kid" style="opacity:.4"><span class="av">TV</span>
+          <div><div class="nm">Thao Vu</div></div><span class="btn b-grey">Here ✓</span></div>
+        <div class="foot-bar">
+          <span class="dot" style="background:var(--amber)"></span>
+          <b>2 waiting to save</b>
+        </div>
+      </div>
+      <span class="co" style="bottom:-9px;left:-11px">1</span>
+    </div>
+    <p class="cap"><b>1</b> is the dot to watch</p>
+  </div>
+</div>
+
+<h3>A tablet stops working</h3>
+<p>Switch to the paper register and write names down. If children had been checked in
+on that tablet while the dot was amber, assume those didn't save and rebuild the list
+from the room. Then let Ate know.</p>
+
+<h3>Someone made a mistake</h3>
+<p>Put it right and say so. Every change is kept with a note of who made it, which is
+the whole point. A record nobody can explain is a far bigger problem than a correction.</p>
+<p>Please don't let anyone leave something wrong because fixing it feels like admitting
+to something. Ate would much rather hear about it.</p>
+
+<h2>Who does what</h2>
+<table>
+  <tr><th>&nbsp;</th><th style="width:100px">Helpers</th><th style="width:100px">You</th></tr>
+  <tr><td>Checking a child in</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Handing a child to an approved adult</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Adding a child who isn't on the list</td><td>Yes</td><td>Yes</td></tr>
+  <tr><td>Approving someone new to collect</td><td>Comes to you</td><td>Yes</td></tr>
+  <tr><td>Changing a child's details</td><td>Ate</td><td>Ate</td></tr>
+</table>
+
+<div class="big">
+  <b>Three things worth remembering</b>
+  <span style="display:block;margin-top:9px;font-size:15px;line-height:1.8">
+    <b>Here</b> should be 0 before anyone leaves<br>
+    An approval needs a few real words, not "OK"<br>
+    It's always fine to ask someone to wait
+  </span>
+</div>
+
+<p style="background:var(--mist);padding:13px;border-radius:9px;font-size:14px">
+  <b>Ate:</b> ______________________________<br>
+  <b>Phone:</b> ______________________________<br>
+  <b>Pastor on duty:</b> ______________________________
+</p>
+
+<footer>
+  KidzQuest · Hanoi International Fellowship<br>
+  If something in here doesn't match what you see on the screen, do let Ate know.
+</footer>
+
+</div>
+</body>
+</html>

@@ -26,3 +26,8 @@ it should follow the structure :
 - - SERMON SERIES TAG/NAME
 - - - Sermon's pdf per week 
 
+----
+Complete Kidsquest app
+- Finalize kids list by comparing what we have currently with what is in Cognito
+- Find a way to wire cognito data with the app so that it takes direct input from there and insert or update data into our neon database
+

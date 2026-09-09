@@ -269,6 +269,164 @@ export async function getCampaignsByMonth(): Promise<CampaignMonth[]> {
   `)
 }
 
+// ── Named lists ──────────────────────────────────────────────────────────────
+//
+// Everything below returns people by name and address. It exists because a
+// count is not actionable: "23 bounced" cannot be fixed, but a list of 23
+// addresses can. Treat these queries as the point at which this section stops
+// being analytics and starts being personal data.
+
+export type SubscriberRow = {
+  id: string
+  email: string
+  status: string
+  clicks_count: number | null
+  sent: number | null
+  people: string | null
+  person_count: number
+}
+
+/**
+ * Subscribers in an audience, optionally filtered by status.
+ *
+ * One row per subscriber, not per person: a shared household address is one
+ * row listing both names. Splitting it into two rows would imply two mailboxes.
+ */
+export async function getAudienceSubscribers(
+  groupId: string,
+  status?: string,
+  limit = 2000,
+): Promise<SubscriberRow[]> {
+  return rows<SubscriberRow>(
+    `select s.id,
+            s.email::text                                        as email,
+            s.status,
+            s.clicks_count,
+            s.sent,
+            nullif(string_agg(distinct coalesce(p.name, trim(coalesce(p.first_name,'') || ' ' || coalesce(p.last_name,''))), ', '), '') as people,
+            count(distinct p.id)::int                            as person_count
+       from ml.group_subscribers gs
+       join ml.subscribers s on s.id = gs.subscriber_id
+       left join hif.email_links l on l.mailerlite_subscriber_id = s.id
+       left join pco.people p on p.id = l.pco_person_id
+      where gs.group_id = $1
+        and ($2::text is null or s.status = $2)
+      group by s.id, s.email, s.status, s.clicks_count, s.sent
+      order by s.clicks_count desc nulls last, s.email
+      limit $3`,
+    [groupId, status ?? null, limit],
+  )
+}
+
+export type GapRow = {
+  id: string
+  name: string | null
+  email: string | null
+  membership: string | null
+  campus: string | null
+}
+
+/**
+ * People with a usable email who are not in this audience.
+ *
+ * The audiences are frozen exports, so this is mostly people added to Planning
+ * Center since the export date — the cost of the list being a photograph. It
+ * excludes anyone whose address has bounced or who unsubscribed elsewhere,
+ * because adding them back would be both futile and rude.
+ */
+export async function getAudienceGaps(groupId: string, limit = 500): Promise<GapRow[]> {
+  return rows<GapRow>(
+    `select p.id::text                                   as id,
+            coalesce(p.name, trim(coalesce(p.first_name,'') || ' ' || coalesce(p.last_name,''))) as name,
+            e.address::text                              as email,
+            p.membership,
+            c.name                                       as campus
+       from pco.people p
+       join pco.emails e on e.person_id = p.id and coalesce(e.is_primary, true)
+       left join pco.campuses c on c.id = p.primary_campus_id
+      where p.status = 'active'
+        and coalesce(e.blocked, false) = false
+        and not exists (
+          select 1
+            from ml.group_subscribers gs
+            join hif.email_links l on l.mailerlite_subscriber_id = gs.subscriber_id
+           where gs.group_id = $1 and l.pco_person_id = p.id
+        )
+        and not exists (
+          select 1 from ml.subscribers s
+           where s.email = e.address
+             and s.status in ('unsubscribed','bounced','junk')
+        )
+      order by p.last_name nulls last, p.first_name
+      limit $2`,
+    [groupId, limit],
+  )
+}
+
+export type SharedInboxRow = {
+  email: string
+  status: string
+  people: string
+  person_count: number
+}
+
+export async function getSharedInboxes(groupId: string): Promise<SharedInboxRow[]> {
+  return rows<SharedInboxRow>(
+    `select s.email::text as email,
+            s.status,
+            string_agg(distinct coalesce(p.name, trim(coalesce(p.first_name,'') || ' ' || coalesce(p.last_name,''))), ', ') as people,
+            count(distinct p.id)::int as person_count
+       from ml.group_subscribers gs
+       join ml.subscribers s on s.id = gs.subscriber_id
+       join hif.email_links l on l.mailerlite_subscriber_id = s.id and l.is_ambiguous
+       join pco.people p on p.id = l.pco_person_id
+      where gs.group_id = $1
+      group by s.email, s.status
+     having count(distinct p.id) > 1
+      order by count(distinct p.id) desc, s.email`,
+    [groupId],
+  )
+}
+
+export async function getAudienceById(id: string): Promise<{ id: string; name: string } | null> {
+  const [g] = await rows<{ id: string; name: string }>(
+    `select id, name from ml.groups where id = $1`,
+    [id],
+  )
+  return g ?? null
+}
+
+// ── Single campaign ──────────────────────────────────────────────────────────
+
+export type CampaignDetail = {
+  id: string
+  name: string | null
+  subject: string | null
+  type: string | null
+  status: string | null
+  scheduled_for: string | null
+  finished_at: string | null
+  recipients: number | null
+  opens_count: number | null
+  clicks_count: number | null
+  open_rate: number | null
+  click_rate: number | null
+  unsubscribes: number | null
+  spam_count: number | null
+}
+
+export async function getCampaign(id: string): Promise<CampaignDetail | null> {
+  const [c] = await rows<CampaignDetail>(
+    `select id, name, subject, type, status,
+            scheduled_for::text, finished_at::text,
+            recipients, opens_count, clicks_count, open_rate, click_rate,
+            unsubscribes, spam_count
+       from ml.campaigns where id = $1`,
+    [id],
+  )
+  return c ?? null
+}
+
 export type CampaignRow = {
   id: string
   name: string | null

@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<title>KidzQuest — room card</title>
+<style>
+/*
+  Two A5 cards. Print on A4, cut in half, laminate, leave one in each room.
+  No screenshots on purpose. This is glanced at, not read.
+*/
+:root{
+  --blue:#1F6B85; --blue-soft:#E8F4F8;
+  --green:#6FA22A; --green-soft:#F0F7E4; --green-ink:#47690F;
+  --red:#C01E27; --red-deep:#9C171E; --red-soft:#FBECEC;
+  --amber:#B7791F; --amber-soft:#FDF3E2;
+  --ink:#1A1B1E; --muted:#6B6E74; --line:#E7E4DF; --mist:#F6F4F1;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#EDEAE5;
+  font:12.5px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  color:var(--ink)}
+.card{width:148mm;height:210mm;background:#fff;padding:11mm 10mm;
+  display:flex;flex-direction:column;
+  page-break-after:always;margin:10px auto;box-shadow:0 2px 12px rgba(0,0,0,.15)}
+.card:last-child{page-break-after:auto}
+
+.head{display:flex;align-items:center;gap:8px;border-bottom:2.5px solid var(--blue);
+  padding-bottom:7px;margin-bottom:9px}
+.logo{width:26px;height:26px;border-radius:7px;background:var(--blue);color:#fff;
+  display:grid;place-items:center;font-weight:800;font-size:11px}
+.head h1{font-size:16px;margin:0}
+.head .room{margin-left:auto;font-size:10px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.08em;font-weight:700}
+
+h2{font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--blue);
+  margin:10px 0 4px}
+ol{margin:0 0 6px;padding-left:16px}
+li{margin-bottom:3px}
+p{margin:0 0 6px}
+
+.box{border-radius:7px;padding:8px 10px;margin:6px 0;font-size:12px}
+.b-red{background:var(--red-soft);border:1px solid #F0C4C0;color:var(--red-deep)}
+.b-amber{background:var(--amber-soft);border:1px solid #F0DCB4;color:#7C5510}
+.b-green{background:var(--green-soft);border:1px solid #CFE3AC;color:var(--green-ink)}
+.b-blue{background:var(--blue-soft);border:1px solid #C4DDE7;color:#14536B}
+
+.dots{display:flex;gap:6px;margin:5px 0}
+.dot{flex:1;border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center}
+.dot i{display:block;width:10px;height:10px;border-radius:50%;margin:0 auto 3px}
+.dot b{display:block;font-size:10.5px}
+.dot span{font-size:9.5px;color:var(--muted);line-height:1.3;display:block}
+
+.big{background:var(--ink);color:#fff;border-radius:8px;padding:10px 12px;margin:8px 0;
+  text-align:center}
+.big b{display:block;font-size:15px}
+.big span{font-size:10.5px;opacity:.85}
+
+.say{font-style:italic;color:#3D3F44;background:var(--mist);border-left:3px solid var(--blue);
+  border-radius:0 6px 6px 0;padding:7px 10px;margin:6px 0;font-size:11.5px}
+
+.foot{margin-top:auto;border-top:1px solid var(--line);padding-top:7px;font-size:10.5px}
+.foot .line{display:flex;gap:6px;margin-bottom:4px}
+.foot .line b{width:80px;flex:0 0 auto;color:var(--muted)}
+.foot .line span{flex:1;border-bottom:1px dotted #BBB}
+
+@page{size:A4;margin:8mm}
+@media print{
+  body{background:#fff}
+  .card{box-shadow:none;border:1px dashed #CCC;margin:0 auto}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ card 1 ═══════════ -->
+<section class="card">
+  <div class="head">
+    <span class="logo">KQ</span>
+    <h1>KidzQuest · Sunday card</h1>
+    <span class="room">Room ____________</span>
+  </div>
+
+  <h2>Checking a child in</h2>
+  <ol>
+    <li>Find the child, tap <b>Check in</b></li>
+    <li>Tap the adult who brought them</li>
+    <li>Two tags print. One on the child, one to the adult.</li>
+  </ol>
+
+  <h2>Sending a child home</h2>
+  <ol>
+    <li>Tap <b>Dismiss</b> at the top</li>
+    <li>Check the code on their tag matches the screen</li>
+    <li>Tap the adult's name</li>
+  </ol>
+
+  <div class="box b-red">
+    <b>Someone new collecting? Go and grab a teacher.</b><br>
+    Two people looking is safer and makes a mix-up much less likely.
+  </div>
+
+  <div class="say">
+    "Let me just grab one of our teachers. We always check when someone new is
+    collecting. Won't be a moment."
+  </div>
+
+  <h2>The dot at the bottom</h2>
+  <div class="dots">
+    <div class="dot"><i style="background:var(--green)"></i><b>Green</b><span>All saved</span></div>
+    <div class="dot"><i style="background:var(--amber)"></i><b>Amber</b><span>Waiting, carry on</span></div>
+    <div class="dot"><i style="background:#9AA3AC"></i><b>Grey</b><span>Offline, still tap</span></div>
+  </div>
+  <div class="box b-amber">
+    While it's amber, please leave the tab open. Anything still waiting would be lost.
+  </div>
+
+  <div class="big">
+    <b>Check Here says 0 before you go</b>
+    <span>That's how we know everyone got home</span>
+  </div>
+
+  <div class="box b-green">
+    A red badge means an allergy, and it's on the child's tag too. Let the teacher know
+    at the start.
+  </div>
+
+  <div class="foot">
+    <div class="line"><b>Ate</b><span></span></div>
+    <div class="line"><b>Phone</b><span></span></div>
+    <div class="line"><b>Teacher today</b><span></span></div>
+  </div>
+</section>
+
+<!-- ═══════════ card 2 ═══════════ -->
+<section class="card">
+  <div class="head">
+    <span class="logo" style="background:var(--red)">KQ</span>
+    <h1>Teachers · approving a pick-up</h1>
+    <span class="room">Room ____________</span>
+  </div>
+
+  <p>Someone has come to collect a child and isn't on their list. Nearly always it's a
+  grandmother, an auntie or a family friend, and all is well.</p>
+
+  <h2>Three things worth checking</h2>
+  <ol>
+    <li><b>Does the child know them?</b> Ask the child, not the adult.</li>
+    <li><b>Can you reach a parent?</b> Numbers are on the screen. Thirty seconds usually
+      settles it.</li>
+    <li><b>Does anything feel off?</b> An unusual hurry, or a story that shifts. Worth
+      paying attention to.</li>
+  </ol>
+
+  <div class="box b-blue">
+    <b>It's completely fine to ask someone to wait.</b> "Let me give Mum a quick ring, I
+    won't be a minute." Nobody here will think twice about it.
+  </div>
+
+  <h2>If you're happy</h2>
+  <ol>
+    <li>Tap <b>Someone else is picking up</b></li>
+    <li>Add their name</li>
+    <li>Write what happened, in a few real words</li>
+  </ol>
+  <div class="say">
+    "Mum rang ahead at 10:15. Adam's auntie, Linh knows her, she had the collection tag."
+  </div>
+  <div class="box b-amber">
+    Your name and the time are saved with it, and it can't be edited later. That's what
+    makes it worth having.
+  </div>
+
+  <div class="box b-red">
+    <b>If you'd rather not, then don't.</b> Keep the child with you, stay friendly, ring
+    the parent. If nobody answers, find Ate or a pastor. Twenty extra minutes in a warm
+    room is a very small thing.
+  </div>
+
+  <div class="foot">
+    <div class="line"><b>Ate</b><span></span></div>
+    <div class="line"><b>Phone</b><span></span></div>
+    <div class="line"><b>Pastor today</b><span></span></div>
+  </div>
+</section>
+
+</body>
+</html>
