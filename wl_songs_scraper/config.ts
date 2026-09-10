@@ -45,5 +45,12 @@ export const MAPPING_FILE = 'wl_songs_scraper/mapping.json'
 /** Where the probe writes its findings. */
 export const PROBE_REPORT = 'wl_songs_scraper/probe-report.json'
 
+/**
+ * Where per-plan completeness is remembered, so the Saturday retries know
+ * whether Friday already finished. One small JSON file per plan date.
+ * Safe to delete — the next run simply rebuilds it.
+ */
+export const STATE_DIR = 'wl_songs_scraper/.state'
+
 /** Appended to a file being written; renamed into place only once complete. */
 export const PARTIAL_SUFFIX = '.part'

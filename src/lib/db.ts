@@ -183,6 +183,29 @@ export const nullIfEmpty = (v: unknown): string | null => {
   return s === '' ? null : s
 }
 
+/**
+ * Format a Postgres DATE as YYYY-MM-DD, using local components.
+ *
+ * node-postgres turns a `date` column into a JS Date at LOCAL midnight. Calling
+ * .toISOString() on that converts to UTC, which for anywhere east of Greenwich
+ * lands on the previous evening — so 2026-09-06 comes back as "2026-09-05".
+ *
+ * That is not a rounding error. The register asked the database for attendance
+ * on Sundays that do not exist, got nothing back, and showed every child in the
+ * ministry as absent for the whole term.
+ *
+ * Use this for any `date` column. Timestamps are unaffected: they carry a zone
+ * and toISOString is correct for them.
+ */
+export function isoDate(d: Date | string | null | undefined): string | null {
+  if (!d) return null
+  if (typeof d === 'string') return d.slice(0, 10)
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, '0')
+  const day = String(d.getDate()).padStart(2, '0')
+  return `${y}-${m}-${day}`
+}
+
 /** Parse an ISO timestamp defensively — bad values become null, not exceptions. */
 export const toDate = (v: unknown): Date | null => {
   if (!v) return null

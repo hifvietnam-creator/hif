@@ -11,21 +11,28 @@ import React from 'react'
  * `SUN` marks the screens needed for a Sunday to run. The rest can follow.
  */
 
-type NavItem = { href: string; label: string; sunday?: boolean; ready?: boolean }
+type NavItem = {
+  href: string; label: string
+  sunday?: boolean; ready?: boolean
+  /** Hidden from teachers and assistants, who would only be redirected away. */
+  adminOnly?: boolean
+}
 
 const NAV: { heading: string; items: NavItem[] }[] = [
   {
     heading: 'Sunday',
-    items: [{ href: '/kq/station', label: 'Attendance', sunday: true, ready: true }],
+    items: [
+      { href: '/kq/station', label: 'Attendance', sunday: true, ready: true },
+      { href: '/kq/register', label: 'Register', sunday: true, ready: true },
+    ],
   },
   {
     heading: 'Admin',
     items: [
-      { href: '/kq/dashboard', label: 'Dashboard', sunday: true, ready: true },
-      { href: '/kq/kids', label: 'Kids', sunday: true, ready: true },
-      { href: '/kq/register', label: 'Register', sunday: true },
-      { href: '/kq/teachers', label: 'Teachers', ready: true },
-      { href: '/kq/assistants', label: 'Assistants', ready: true },
+      { href: '/kq/dashboard', label: 'Dashboard', sunday: true, ready: true, adminOnly: true },
+      { href: '/kq/kids', label: 'Kids', sunday: true, ready: true, adminOnly: true },
+      { href: '/kq/teachers', label: 'Teachers', ready: true, adminOnly: true },
+      { href: '/kq/assistants', label: 'Assistants', ready: true, adminOnly: true },
     ],
   },
 ]
@@ -52,13 +59,16 @@ export default function Shell({
           </span>
         </div>
 
-        {NAV.map((section) => (
+        {NAV.map((section) => {
+          const items = section.items.filter((i) => !i.adminOnly || user.role === 'admin')
+          if (items.length === 0) return null
+          return (
           <div key={section.heading}>
             <div className="mb-1.5 mt-4 px-2 text-[11px] font-bold uppercase tracking-wider text-[#66788b]">
               {section.heading}
             </div>
             <nav className="flex flex-col gap-px">
-              {section.items.map((item) => {
+              {items.map((item) => {
                 const active = current === item.href
                 // Unbuilt screens are shown but not linked. Hiding them would
                 // make the app look finished; a dead link would waste a click.
@@ -97,7 +107,8 @@ export default function Shell({
               })}
             </nav>
           </div>
-        ))}
+          )
+        })}
 
         <div className="mt-auto border-t border-[#24313f] px-2 pt-3 text-xs">
           <div className="font-semibold text-white">{user.name}</div>

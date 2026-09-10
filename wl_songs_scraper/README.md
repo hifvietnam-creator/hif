@@ -186,7 +186,35 @@ Two defences, because one was clearly not enough:
    if a signed URL serves one, the file is skipped and reported rather than
    written.
 
-Probe section 7 now groups every attachment by `pco_type` / `filetype` /
+## What each attachment kind actually is
+
+Settled by evidence, not inference — `--test-open` opens one of every kind and
+follows the URL:
+
+| `pco_type` | filetype | what the signed URL serves | downloaded |
+|---|---|---|---|
+| `AttachmentS3` | pdf | a real file, `application/pdf` | **yes** |
+| `AttachmentYoutube` | video | a web page | no |
+| `AttachmentLink` | file | a web page (148 KB of HTML) | no |
+| `AttachmentChart::Lyric` | lyric | *nothing — `open` returns no URL* | no |
+
+`AttachmentS3` is the only kind with bytes behind it. The other three are
+correctly skipped, and nothing is being lost:
+
+- **`AttachmentLink`** is the `viewchordsheet` trap below.
+- **`AttachmentYoutube`** is a link by definition — 15 of them across 8 plans,
+  and the raw material for the playlist idea.
+- **`AttachmentChart::Lyric`** is PCO's generated lyric chart. The `open`
+  action declines to mint a URL for it at all, so there is nothing to fetch
+  through this route. If those lyric sheets are wanted, they need a different
+  mechanism — not a tweak to this one.
+
+`--test-open` cross-checks each kind's verdict against what its URL really
+serves, and complains in **both** directions: downloaded-but-serves-HTML, and
+skipped-but-serves-a-real-file. Testing one attachment only ever proved one kind
+worked, which is exactly how `viewchordsheet` slipped through.
+
+Probe section 7 groups every attachment by `pco_type` / `filetype` /
 `content_type` and says whether each kind would be downloaded — so the next
 surprise of this shape shows up in a table instead of in the archive.
 
@@ -242,6 +270,74 @@ noticed until a Sunday morning.
 | `lib/leaders.ts` | Name → folder matching |
 | `lib/paths.ts` | The one folder convention, and Windows-safe names |
 | `lib/attachments.ts` | Resolving an attachment to bytes — the one POST |
+
+## The weekly schedule
+
+Three Windows scheduled tasks, all running the same command:
+
+| | when | |
+|---|---|---|
+| `WL Songs - Friday` | Fri 15:00 | first attempt |
+| `WL Songs - Saturday AM` | Sat 10:00 | retry, only if Friday left songs missing |
+| `WL Songs - Saturday PM` | Sat 14:00 | last retry |
+
+Install once, from an **elevated** PowerShell in the project root:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\wl_songs_scraper\install-schedule.ps1
+```
+
+Remove them with `-Uninstall`. Logs append to `wl_songs_scraper\logs\YYYY-MM.log`.
+
+### Why the scheduler is dumb and the script is smart
+
+The Saturday tasks always fire. The *script* decides whether there is anything
+to do:
+
+```
+download.ts --sunday --skip-if-complete
+```
+
+`--sunday` picks the plan for the coming Sunday specifically — not "the next
+plan", which on a week with a midweek plan would grab the wrong one.
+`--skip-if-complete` reads `.state/<date>.json` and exits immediately, before
+any API call, if a previous run already found every song's files.
+
+Putting the decision in the script rather than in the schedule means you can
+check it by running the command yourself, and there is no scheduler state to
+drift out of step with what is actually on disk.
+
+### What "complete" means, and what it cannot mean
+
+A plan is complete when **every song has at least one downloadable file**.
+
+There is something this genuinely cannot distinguish: a chart nobody has
+uploaded *yet* looks exactly like a song that will never have one. PCO exposes
+no difference. Judy Ann's 13 September plan is a real example — `I Stand In
+Awe` and `Creator` have no files at all, so that plan reports incomplete and
+every scheduled run re-checks it.
+
+That is deliberate rather than a flaw. Re-checking is nearly free because
+existing files are skipped, and the run names the songs still missing — so
+whoever reads the log can see whether it is a chart that never arrived or a
+song that simply has none.
+
+### Exit codes
+
+| | |
+|---|---|
+| `0` | done, or nothing to do |
+| `3` | incomplete — some songs still have no files, retry later |
+| `1` | error — something actually failed |
+
+`3` is not a failure. Everything that existed was downloaded correctly.
+
+### Why not a Claude scheduled task
+
+It would not work. This machine's network policy blocks
+`api.planningcenteronline.com` from Anthropic's sandbox, so a cloud-side run
+cannot reach PCO at all. Windows Task Scheduler runs where the network and the
+files are, and does not depend on a chat session being open.
 
 ## Still open
 

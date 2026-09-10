@@ -39,6 +39,7 @@
     "diagnose:segments": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/diagnose-segments.ts",
     "generate:importmap": "cross-env NODE_OPTIONS=--no-deprecation payload generate:importmap",
     "import:kq": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/import-kq-roster.ts",
+    "reconcile:kq": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/reconcile-kq-september.ts",
     "inspect:fields": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/inspect-fields.ts",
     "inspect:values": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/inspect-field-values.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",

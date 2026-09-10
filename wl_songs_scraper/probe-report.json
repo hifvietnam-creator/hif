@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-08T08:22:35.980Z",
+  "generatedAt": "2026-09-10T07:59:34.594Z",
   "monthsSampled": 24,
   "serviceTypesConsidered": [
     {
@@ -8,18 +8,18 @@
     }
   ],
   "positionNamesSeen": {
-    "Livestream/Videography": 137,
-    "Backup Singer 1": 137,
-    "Bass Guitarist": 136,
-    "Backup Singer 2": 133,
-    "Drummer": 132,
-    "Worship Leader": 126,
-    "Sound": 124,
-    "Acoustic Guitarist": 124,
-    "Pianist": 124,
-    "Slides & PPT Operations": 121,
-    "EmCee": 87,
-    "Photography": 10,
+    "Livestream/Videography": 136,
+    "Backup Singer 1": 136,
+    "Bass Guitarist": 134,
+    "Backup Singer 2": 132,
+    "Drummer": 131,
+    "Worship Leader": 125,
+    "Sound": 123,
+    "Acoustic Guitarist": 123,
+    "Pianist": 123,
+    "Slides & PPT Operations": 120,
+    "EmCee": 86,
+    "Photography": 9,
     "Electric Guitarist": 3,
     "Sunday Service Prayer": 2
   },
@@ -90,7 +90,7 @@
       "serviceTypeId": "957307",
       "planId": "90431283",
       "date": "2026-09-13",
-      "title": "Summer Service",
+      "title": "Created with Love",
       "times": [
         "08:30",
         "10:00",
@@ -99,13 +99,13 @@
       "leaders": [
         "Judy Ann Torres-Reyes"
       ],
-      "songCount": 0
+      "songCount": 5
     },
     {
       "serviceType": "Turn into Praise!",
       "serviceTypeId": "957307",
       "planId": "57780031",
-      "date": "2026-09-08",
+      "date": "2026-09-10",
       "title": "No dates",
       "times": [],
       "leaders": [
@@ -142,7 +142,8 @@
       ],
       "leaders": [
         "Elyciah Faith Klaartjies"
-      ]
+      ],
+      "songCount": 0
     },
     {
       "serviceType": "Turn into Praise!",
@@ -157,7 +158,8 @@
       ],
       "leaders": [
         "Sarah Morris"
-      ]
+      ],
+      "songCount": 6
     },
     {
       "serviceType": "Turn into Praise!",
@@ -1703,20 +1705,6 @@
       "leaders": [
         "Lovella Blanila- Dacles"
       ]
-    },
-    {
-      "serviceType": "Turn into Praise!",
-      "serviceTypeId": "957307",
-      "planId": "72730317",
-      "date": "2024-09-08",
-      "title": "9AM & 11AM",
-      "times": [
-        "09:00",
-        "11:00"
-      ],
-      "leaders": [
-        "Sarah Jackson"
-      ]
     }
   ],
   "archiveFolders": [
@@ -1856,33 +1844,173 @@
     "Ngoc Pearl Ngo",
     "Oluwatomisin Ogunbawo"
   ],
+  "attachmentKinds": [
+    {
+      "pcoType": "AttachmentChart::Lyric",
+      "filetype": "lyric",
+      "contentType": "—",
+      "count": 3,
+      "downloaded": false,
+      "exampleAttributes": {
+        "allow_mp3_download": false,
+        "attachable_type": "Arrangement",
+        "content": null,
+        "content_type": null,
+        "created_at": "2020-01-28T06:28:09Z",
+        "display_name": "Lyrics",
+        "downloadable": true,
+        "file_size": 0,
+        "filename": "Great Things - lyrics.pdf",
+        "filetype": "lyric",
+        "has_preview": false,
+        "import_to_item_details": null,
+        "licenses_purchased": null,
+        "licenses_remaining": null,
+        "licenses_used": null,
+        "linked_url": null,
+        "page_order": [],
+        "pco_type": "AttachmentChart::Lyric",
+        "remote_link": null,
+        "streamable": false,
+        "thumbnail_url": null,
+        "transposable": false,
+        "updated_at": "2025-06-20T04:41:10Z",
+        "url": "https://services.planningcenteronline.com/songs/18689341/arrangements/21382335/lyric_chart",
+        "web_streamable": false
+      }
+    },
+    {
+      "pcoType": "AttachmentS3",
+      "filetype": "pdf",
+      "contentType": "application/pdf",
+      "count": 9,
+      "downloaded": true,
+      "exampleAttributes": {
+        "allow_mp3_download": false,
+        "attachable_type": "Arrangement",
+        "content": null,
+        "content_type": "application/pdf",
+        "created_at": "2021-09-24T13:54:15Z",
+        "deleted_at": null,
+        "display_name": "Great Things - E.pdf",
+        "downloadable": true,
+        "file_size": 39965,
+        "filename": "Great Things - E.pdf",
+        "filetype": "pdf",
+        "has_preview": false,
+        "import_to_item_details": null,
+        "licenses_purchased": 0,
+        "licenses_remaining": -24,
+        "licenses_used": 24,
+        "linked_url": "https://services.planningcenteronline.com/songs/18689341/arrangements/21382335",
+        "page_order": [],
+        "pco_type": "AttachmentS3",
+        "remote_link": "b1cd7cbf31b182a666c1d5ab8e7d8946",
+        "streamable": false,
+        "thumbnail_url": null,
+        "transposable": false,
+        "updated_at": "2021-09-24T13:54:15Z",
+        "url": "https://services.planningcenteronline.com/attachments/113853421",
+        "web_streamable": false
+      }
+    },
+    {
+      "pcoType": "AttachmentYoutube",
+      "filetype": "video",
+      "contentType": "application/octet-stream",
+      "count": 15,
+      "downloaded": false,
+      "exampleAttributes": {
+        "allow_mp3_download": false,
+        "attachable_type": "Arrangement",
+        "content": null,
+        "content_type": "application/octet-stream",
+        "created_at": "2023-10-05T10:03:13Z",
+        "deleted_at": null,
+        "display_name": "YouTube: Phil Wickham - Great Things (Official Lyric Video)",
+        "downloadable": false,
+        "file_size": 0,
+        "filename": "YouTube: Phil Wickham - Great Things (Official Lyric Video)",
+        "filetype": "video",
+        "has_preview": false,
+        "import_to_item_details": null,
+        "licenses_purchased": 0,
+        "licenses_remaining": -18,
+        "licenses_used": 18,
+        "linked_url": "https://services.planningcenteronline.com/songs/18689341/arrangements/21382335",
+        "page_order": [],
+        "pco_type": "AttachmentYoutube",
+        "remote_link": null,
+        "streamable": false,
+        "thumbnail_url": "https://images.planningcenterusercontent.com/v1/transform?bucket=planning_center_production&expires_at=1790816399&key=attachment_thumbnails%2F4e442e728ac64e7cc55385f19ed9755a8722697a.jpg&thumb=640%3E&signature=35876f49b4df88031e7ef01e82d38537ee58273b7f6c1276af36199752755be4",
+        "transposable": false,
+        "updated_at": "2023-10-05T10:03:13Z",
+        "url": "https://services.planningcenteronline.com/attachments/155613906",
+        "web_streamable": true
+      }
+    },
+    {
+      "pcoType": "AttachmentLink",
+      "filetype": "file",
+      "contentType": "application/octet-stream",
+      "count": 3,
+      "downloaded": false,
+      "exampleAttributes": {
+        "allow_mp3_download": false,
+        "attachable_type": "Arrangement",
+        "content": null,
+        "content_type": "application/octet-stream",
+        "created_at": "2022-01-06T06:02:59Z",
+        "deleted_at": null,
+        "display_name": "viewchordsheet",
+        "downloadable": true,
+        "file_size": 0,
+        "filename": "viewchordsheet",
+        "filetype": "file",
+        "has_preview": false,
+        "import_to_item_details": null,
+        "licenses_purchased": 0,
+        "licenses_remaining": -7,
+        "licenses_used": 7,
+        "linked_url": "https://services.planningcenteronline.com/songs/18597977/arrangements/21274964",
+        "page_order": [],
+        "pco_type": "AttachmentLink",
+        "remote_link": "https://songselect.ccli.com/Songs/3383788/you-are-good/viewchordsheet",
+        "streamable": false,
+        "thumbnail_url": null,
+        "transposable": false,
+        "updated_at": "2022-01-06T06:02:59Z",
+        "url": "https://services.planningcenteronline.com/attachments/118937764",
+        "web_streamable": false
+      }
+    }
+  ],
   "sampleAttachmentAttributes": {
     "allow_mp3_download": false,
     "attachable_type": "Arrangement",
     "content": null,
     "content_type": "application/pdf",
-    "created_at": "2021-01-15T00:14:26Z",
+    "created_at": "2021-09-24T13:54:15Z",
     "deleted_at": null,
-    "display_name": "Lord You Are Good - Israel Houghton F.pdf",
+    "display_name": "Great Things - E.pdf",
     "downloadable": true,
-    "file_size": 38721,
-    "filename": "Lord You Are Good - Israel Houghton F.pdf",
+    "file_size": 39965,
+    "filename": "Great Things - E.pdf",
     "filetype": "pdf",
     "has_preview": false,
     "import_to_item_details": null,
     "licenses_purchased": 0,
-    "licenses_remaining": -21,
-    "licenses_used": 21,
-    "linked_url": "https://services.planningcenteronline.com/songs/18597977/arrangements/21274964",
+    "licenses_remaining": -24,
+    "licenses_used": 24,
+    "linked_url": "https://services.planningcenteronline.com/songs/18689341/arrangements/21382335",
     "page_order": [],
     "pco_type": "AttachmentS3",
-    "remote_link": "42144aaed5c70230ae456e6e95c8ecd0",
+    "remote_link": "b1cd7cbf31b182a666c1d5ab8e7d8946",
     "streamable": false,
     "thumbnail_url": null,
     "transposable": false,
-    "updated_at": "2021-01-15T00:14:28Z",
-    "url": "https://services.planningcenteronline.com/attachments/103043115",
+    "updated_at": "2021-09-24T13:54:15Z",
+    "url": "https://services.planningcenteronline.com/attachments/113853421",
     "web_streamable": false
-  },
-  "sampleHasDirectUrl": false
+  }
 }

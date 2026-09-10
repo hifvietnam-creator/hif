@@ -7,7 +7,7 @@
  * worse than a change that didn't happen.
  */
 
-import { getPool } from '../db'
+import { getPool, isoDate } from '../db'
 
 // Shapes and constants live in child-fields.ts, which imports no database code.
 // Client components must import from there directly: importing them from here
@@ -96,7 +96,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     lastName: r.last_name,
     preferredName: r.preferred_name,
     gender: r.gender,
-    birthdate: r.birthdate ? r.birthdate.toISOString().slice(0, 10) : null,
+    birthdate: isoDate(r.birthdate),
     grade: r.grade,
     groupCode: r.group_code,
     groupManual: r.group_manual,
@@ -106,7 +106,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     photoConsent: r.photo_consent,
     active: r.active,
     status: r.status as ChildStatus,
-    leftOn: r.left_on ? r.left_on.toISOString().slice(0, 10) : null,
+    leftOn: isoDate(r.left_on),
     statusNote: r.status_note,
     guardians: byChild.get(parseInt(r.child_id, 10)) ?? [],
   }))

@@ -15,7 +15,7 @@
  *    Sunday would quietly rewrite the past every time a child joins.
  */
 
-import { getPool } from '../db'
+import { getPool, isoDate } from '../db'
 
 const ATTENDED = `a.status in ('present','checked_out')`
 
@@ -59,7 +59,7 @@ async function sessionDates(limit = 8): Promise<string[]> {
     `select distinct service_date as d from kq.sessions order by 1 desc limit $1`,
     [limit],
   )
-  return rows.map((r) => r.d.toISOString().slice(0, 10))
+  return rows.map((r) => isoDate(r.d)!)
 }
 
 export async function getOverview(): Promise<Overview> {
@@ -90,7 +90,7 @@ export async function getOverview(): Promise<Overview> {
     const attended = Number(r.attended)
     const roster = Number(r.roster)
     return {
-      date: r.d.toISOString().slice(0, 10),
+      date: isoDate(r.d)!,
       attended,
       roster,
       rate: roster ? Math.round((attended / roster) * 100) : 0,

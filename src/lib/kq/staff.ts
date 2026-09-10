@@ -16,7 +16,7 @@
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
-import { getPool } from '../db'
+import { getPool, isoDate } from '../db'
 import { openSession } from './station'
 
 export type StaffMember = {
@@ -76,7 +76,7 @@ export async function listStaff(targetDate: string): Promise<StaffMember[]> {
   const { rows: dateRows } = await db.query<{ d: Date }>(
     `select distinct service_date as d from kq.sessions order by 1 desc limit 8`,
   )
-  const recentDates = dateRows.map((r) => r.d.toISOString().slice(0, 10)).reverse()
+  const recentDates = dateRows.map((r) => isoDate(r.d)!).reverse()
 
   const { rows: presence } = await db.query<{ staff_user_id: number; d: Date }>(
     `select distinct ss.staff_user_id, s.service_date as d
@@ -94,7 +94,7 @@ export async function listStaff(targetDate: string): Promise<StaffMember[]> {
 
   const historyBy = new Map(history.map((h) => [h.staff_user_id, h]))
   const presenceBy = new Set(
-    presence.map((p) => `${p.staff_user_id}|${p.d.toISOString().slice(0, 10)}`),
+    presence.map((p) => `${p.staff_user_id}|${isoDate(p.d)}`),
   )
 
   return users.docs.map((u) => {
@@ -107,7 +107,7 @@ export async function listStaff(targetDate: string): Promise<StaffMember[]> {
       role: (u as { kqRole: 'teacher' | 'ta' }).kqRole,
       assignedGroups: assignedBy.get(id) ?? [],
       sundaysServed: h ? Number(h.n) : 0,
-      lastServed: h?.last_served ? h.last_served.toISOString().slice(0, 10) : null,
+      lastServed: isoDate(h?.last_served),
       recent: recentDates.map((d) => presenceBy.has(`${id}|${d}`)),
     }
   })

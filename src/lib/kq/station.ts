@@ -14,7 +14,7 @@
 
 import type { PoolClient } from 'pg'
 
-import { getPool } from '../db'
+import { getPool, isoDate } from '../db'
 
 // ── Security codes ───────────────────────────────────────────────────────────
 
@@ -112,7 +112,7 @@ export async function openSession(
   const r = rows[0]!
   return {
     id: parseInt(r.id, 10),
-    serviceDate: r.service_date.toISOString().slice(0, 10),
+    serviceDate: isoDate(r.service_date)!,
     groupCode: r.group_code,
     groupLabel: r.label,
     room: r.room,
@@ -135,7 +135,7 @@ export async function getSession(sessionId: number): Promise<SessionInfo | null>
   if (!r) return null
   return {
     id: parseInt(r.id, 10),
-    serviceDate: r.service_date.toISOString().slice(0, 10),
+    serviceDate: isoDate(r.service_date)!,
     groupCode: r.group_code,
     groupLabel: r.label,
     room: r.room,

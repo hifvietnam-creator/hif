@@ -8,7 +8,7 @@
  * queue behind it.
  */
 
-import { getPool } from '../db'
+import { getPool, isoDate } from '../db'
 
 export type LabelData = {
   attendanceId: number
@@ -52,7 +52,7 @@ export async function getLabel(attendanceId: number): Promise<LabelData | null> 
     sessionId: parseInt(r.session_id, 10),
     childName: r.child_name,
     groupLabel: r.group_label,
-    serviceDate: r.service_date.toISOString().slice(0, 10),
+    serviceDate: isoDate(r.service_date)!,
     securityCode: r.security_code,
     allergies: r.allergies,
     guardianName: r.guardian_name,

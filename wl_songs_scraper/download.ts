@@ -23,6 +23,7 @@
  *   npx tsx --tsconfig tsconfig.scripts.json wl_songs_scraper/download.ts --next
  *
  * Selecting plans:
+ *   --sunday           the plan for the COMING Sunday (what the weekly job uses)
  *   --next             the next plan on or after today (default)
  *   --date 2026-09-13  one specific plan date
  *   --since 2026-01-01 [--until 2026-06-30]   a range, for backfilling
@@ -32,9 +33,17 @@
  *   --dry-run          list what would be written, download nothing
  *   --service-type ID  override config (repeatable)
  *   --force            re-download even if the file already exists
+ *   --skip-if-complete do nothing if a previous run already found every song's
+ *                      files — lets the Saturday retries cost nothing when
+ *                      Friday already finished the job
+ *
+ * Exit codes (for Task Scheduler):
+ *   0  done, or nothing to do
+ *   3  plan incomplete — some songs still have no files; retry later
+ *   1  error
  */
 
-import { readFileSync, existsSync, mkdirSync, statSync, renameSync, readdirSync, createWriteStream } from 'fs'
+import { readFileSync, writeFileSync, existsSync, mkdirSync, statSync, renameSync, readdirSync, createWriteStream } from 'fs'
 import { resolve, dirname, join, basename } from 'path'
 import { fileURLToPath } from 'url'
 import { Readable } from 'stream'
@@ -88,6 +97,8 @@ const multi = (n: string): string[] => {
 
 const DRY = has('dry-run')
 const FORCE = has('force')
+const SUNDAY_ONLY = has('sunday')
+const SKIP_IF_COMPLETE = has('skip-if-complete')
 const TODAY = new Date().toISOString().slice(0, 10)
 
 const serviceTypeIds = multi('service-type').length ? multi('service-type') : cfg.SERVICE_TYPE_IDS
@@ -139,9 +150,72 @@ async function selectPlans(): Promise<Plan[]> {
   const last = has('last') ? nums('last', 1) : 0
   if (last > 0) return all.filter((p) => p.date <= TODAY).slice(-last)
 
+  if (SUNDAY_ONLY) {
+    const target = upcomingSunday()
+    const match = all.filter((p) => p.date === target)
+    if (match.length === 0) console.log(dim(`  No plan dated ${target} (the coming Sunday).`))
+    return match
+  }
+
   // Default: --next — the soonest plan on or after today.
   const upcoming = all.filter((p) => p.date >= TODAY)
   return upcoming.length ? [upcoming[0]!] : []
+}
+
+// ── Completeness state ───────────────────────────────────────────────────────
+//
+// The weekly job runs Friday afternoon and, if the plan is not finished, again
+// on Saturday. To do that it has to remember what it found. A tiny JSON file
+// per plan date is enough, and keeps the schedule itself dumb: three identical
+// commands, with the decision made here.
+//
+// "Complete" means every song in the plan has at least one downloadable file.
+// Note what that cannot distinguish: a chart nobody has uploaded YET looks
+// exactly like a song that will never have one — PCO exposes no difference. So
+// a plan with a genuinely file-less song stays "incomplete" and each scheduled
+// run re-checks it, which is cheap because existing files are skipped. The
+// report names the songs still missing, so a human can see which it is.
+
+type PlanState = {
+  date: string
+  planId: string
+  complete: boolean
+  songs: number
+  songsWithFiles: number
+  songsMissingFiles: string[]
+  filesOnDisk: number
+  lastRun: string
+}
+
+const stateFile = (date: string) => resolve(ROOT, cfg.STATE_DIR, `${date}.json`)
+
+function readState(date: string): PlanState | null {
+  try {
+    return JSON.parse(readFileSync(stateFile(date), 'utf8')) as PlanState
+  } catch {
+    return null
+  }
+}
+
+function writeState(s: PlanState): void {
+  const dir = resolve(ROOT, cfg.STATE_DIR)
+  mkdirSync(dir, { recursive: true })
+  writeFileSync(stateFile(s.date), JSON.stringify(s, null, 2), 'utf8')
+}
+
+/**
+ * The coming Sunday as YYYY-MM-DD, or today when today is Sunday.
+ *
+ * Built from local date parts on purpose. `toISOString()` would convert to UTC
+ * first, and at UTC+7 that turns Saturday evening into Saturday morning — or
+ * rolls a Sunday back to the Saturday before, sending every file to the wrong
+ * folder.
+ */
+function upcomingSunday(from: Date = new Date()): string {
+  const d = new Date(from.getFullYear(), from.getMonth(), from.getDate())
+  d.setDate(d.getDate() + ((7 - d.getDay()) % 7))
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
 }
 
 type Pending = {
@@ -230,12 +304,26 @@ if (folders.length === 0) {
 }
 const overrides = L.loadOverrides(resolve(ROOT, cfg.MAPPING_FILE))
 
+// The Saturday retries cost nothing when Friday already finished the job. This
+// check happens before any API call, so a completed week is a no-op.
+if (SKIP_IF_COMPLETE && SUNDAY_ONLY) {
+  const target = upcomingSunday()
+  const prior = readState(target)
+  if (prior?.complete) {
+    console.log(green(`  ${target} already complete`) + dim(` — ${prior.filesOnDisk} file(s), nothing to do.`))
+    console.log(dim(`  Last run ${prior.lastRun}\n`))
+    process.exit(0)
+  }
+}
+
 const plans = await selectPlans()
 if (plans.length === 0) {
   console.log(yellow('  No plan matched that selection.\n'))
   process.exit(0)
 }
 console.log(dim(`  ${plans.length} plan(s) selected\n`))
+
+let anyIncomplete = false
 
 for (const plan of plans) {
   const leaders = await P.planLeaders(plan, cfg.WORSHIP_LEADER_POSITION, onWarn)
@@ -289,6 +377,8 @@ for (const plan of plans) {
   // name collisions can only be resolved with the full list in hand, and a
   // two-leader plan then costs one pass over the API instead of two.
   const pending: Pending[] = []
+  const songsMissingFiles: string[] = []
+
   for (const song of songs) {
     const attachments = await P.songAttachments(song, onWarn)
     let fileCount = 0
@@ -307,9 +397,13 @@ for (const plan of plans) {
     }
     if (fileCount === 0) {
       stats.noSongFiles++
+      songsMissingFiles.push(song.title)
       console.log(dim(`      ${song.title} — no files attached`))
     }
   }
+
+  const complete = songsMissingFiles.length === 0
+  if (!complete) anyIncomplete = true
 
   const renamed = resolveCollisions(pending)
   if (renamed.length) {
@@ -355,6 +449,28 @@ for (const plan of plans) {
       }
     }
   }
+
+  if (!DRY) {
+    writeState({
+      date: plan.date,
+      planId: plan.planId,
+      complete: complete && stats.failed === 0,
+      songs: songs.length,
+      songsWithFiles: songs.length - songsMissingFiles.length,
+      songsMissingFiles,
+      filesOnDisk: pending.length,
+      lastRun: new Date().toISOString(),
+    })
+  }
+
+  if (complete) {
+    console.log(green(`  complete`) + dim(' — every song has at least one file'))
+  } else {
+    console.log(
+      yellow(`  incomplete`) +
+        dim(` — ${songsMissingFiles.length} song(s) still have no files: ${songsMissingFiles.join(', ')}`),
+    )
+  }
   console.log()
 }
 
@@ -385,3 +501,10 @@ if (warnings.length) {
 }
 
 console.log()
+
+// ── Exit code, for Task Scheduler ────────────────────────────────────────────
+// 3 means "some songs still have no files" — the signal for a later retry.
+// It is NOT an error: everything that existed was downloaded correctly.
+if (stats.failed > 0) process.exit(1)
+if (anyIncomplete) process.exit(3)
+process.exit(0)

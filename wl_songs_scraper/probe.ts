@@ -21,7 +21,7 @@
  *   --months 24        how far back to sample plans (default from config)
  *   --plans 6          how many plans to inspect in song-level detail
  *   --all-types        probe every service type, not just the configured ones
- *   --test-open        make ONE attachment `open` POST to confirm downloading works
+ *   --test-open        open ONE attachment of EACH kind, to see what it really serves
  */
 
 import { readFileSync, writeFileSync } from 'fs'
@@ -90,7 +90,7 @@ function localTime(iso: string): string {
 
 console.log(bold('\nWorship-leader song downloader — reconnaissance'))
 console.log(dim('Read-only. Nothing is written to the archive.'))
-if (TEST_OPEN) console.log(dim('--test-open: will make ONE attachment `open` POST.'))
+if (TEST_OPEN) console.log(dim('--test-open: one `open` POST per kind of attachment.'))
 console.log()
 
 // 1. Credentials ─────────────────────────────────────────────────────────────
@@ -394,33 +394,59 @@ if (!sampleAttachment) {
     )
   }
 
-  if (TEST_OPEN) {
-    head('7b. Testing the `open` action')
-    console.log(dim('  One POST to /services/v2/attachments/{id}/open\n'))
-    try {
-      const url = await A.openAttachment(sampleAttachment.id)
-      if (!url) {
-        bad('The open action returned no URL.')
-      } else {
-        ok('PCO returned a signed download URL.')
-        console.log(dim(`      ${url.slice(0, 88)}…`))
+  if (!TEST_OPEN) {
+    console.log(dim('\n  Re-run with --test-open to check what each kind actually serves.'))
+  }
+}
 
-        // A one-byte ranged GET, not HEAD: S3 presigns for a specific method,
-        // so HEAD against a GET-signed URL 403s even when the URL is fine.
-        const v = await A.verifyUrl(url)
-        console.log(
-          `      GET (1 byte) ${v.status}` +
-            dim(`  ${v.contentType ?? '?'}  ${v.contentLength ?? '?'}`),
-        )
-        if (v.ok) ok('Download route confirmed end to end — the file is fetchable.')
-        else bad(`The signed URL did not serve the file (HTTP ${v.status}). Do not run a real download yet.`)
+// 7b. What each kind actually serves ─────────────────────────────────────────
+//
+// Testing one attachment only proved one kind worked. `viewchordsheet` slipped
+// through precisely because it was never the sample. So test ONE of every kind:
+// a single POST each, then a one-byte ranged GET. Cheap, and it settles the
+// question by evidence instead of by suspicion.
+
+if (TEST_OPEN && kinds.size) {
+  head('7b. What each kind actually serves')
+  console.log(dim('  One `open` POST plus a 1-byte ranged GET per kind.\n'))
+
+  for (const [key, k] of kinds) {
+    const [pcoType, filetype] = key.split(' | ')
+    const label = `${String(pcoType).slice(0, 22)} / ${filetype}`
+    try {
+      const url = await A.openAttachment(k.example.id)
+      if (!url) {
+        console.log(`  ${label.padEnd(34)} ${dim('open returned no URL')}`)
+        continue
+      }
+      const v = await A.verifyUrl(url)
+      const isHtml = String(v.contentType ?? '').includes('text/html')
+      const mark = !v.ok ? '\x1b[31m✗\x1b[0m' : isHtml ? '\x1b[33m~\x1b[0m' : '\x1b[32m✓\x1b[0m'
+      const meaning = !v.ok
+        ? `HTTP ${v.status}`
+        : isHtml
+          ? 'a WEB PAGE, not a file'
+          : `a real file — ${v.contentType}`
+      console.log(
+        `  ${mark} ${label.padEnd(34)} ${meaning}` +
+          dim(`  ${v.contentLength ?? ''}`) +
+          (k.verdict ? dim('  [downloaded]') : dim('  [skipped]')),
+      )
+
+      // The check that matters: does the code's verdict match reality?
+      if (k.verdict && (isHtml || !v.ok)) {
+        bad(`    ${label} is DOWNLOADED but does not serve a file. Fix isDownloadableFile().`)
+      }
+      if (!k.verdict && v.ok && !isHtml) {
+        warn(`    ${label} is SKIPPED but serves a real file — you may be losing content.`)
       }
     } catch (err) {
-      bad(`open failed: ${err instanceof Error ? err.message : err}`)
+      console.log(`  ${label.padEnd(34)} ${dim(String(err instanceof Error ? err.message : err).slice(0, 60))}`)
     }
-  } else {
-    console.log(dim('\n  Re-run with --test-open to confirm the download route end to end.'))
   }
+  console.log(
+    dim('\n  A ✓ marked [skipped] or a ~ marked [downloaded] means the rules are wrong.'),
+  )
 }
 
 // 8. Report ──────────────────────────────────────────────────────────────────
@@ -434,8 +460,18 @@ const report = {
   archiveFolders: folders,
   proposedMapping: matches,
   needsHandMapping: needsHand.map((m) => m.pcoName),
+  attachmentKinds: [...kinds.entries()].map(([key, k]) => {
+    const [pcoType, filetype, contentType] = key.split(' | ')
+    return {
+      pcoType,
+      filetype,
+      contentType,
+      count: k.count,
+      downloaded: k.verdict,
+      exampleAttributes: k.example.attributes ?? null,
+    }
+  }),
   sampleAttachmentAttributes: sampleAttachment?.attributes ?? null,
-  sampleHasDirectUrl: sampleAttachment ? A.directUrl(sampleAttachment) !== null : null,
 }
 
 writeFileSync(resolve(ROOT, cfg.PROBE_REPORT), JSON.stringify(report, null, 2), 'utf8')
