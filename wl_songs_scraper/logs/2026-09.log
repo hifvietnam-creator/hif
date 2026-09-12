@@ -1,0 +1,53 @@
+ 
+================================================== 
+2026-09-11 15:00:05
+npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+[1m
+Worship song downloader[0m
+[2mWriting into the leader archive.
+[0m
+[2m  1 plan(s) selected
+[0m
+[1m2026-09-13  Turn into Praise![0m[2m  plan 90431283[0m
+[2m  Judy Ann Torres-Reyes — 5 song(s)[0m
+[2m      I Stand In Awe — no files attached[0m
+[2m      Creator — no files attached[0m
+  [2m→[0m C:\Users\serve\OneDrive\MEDIA SHARE\WORSHIP TEAM SONG DATABASE\Worship Leaders Line-up\Judy Ann\2026\SEPTEMBER\September 13
+[33m  incomplete[0m[2m — 2 song(s) still have no files: I Stand In Awe, Creator[0m
+
+[1mSummary[0m
+  plans filed        1
+  songs              5
+  files downloaded   0
+  already present    4
+  songs with no file 2
+  links (not files)  3[2m  — YouTube etc., skipped[0m
+
+RESULT: incomplete - some songs still have no files 
+ 
+================================================== 
+2026-09-12 10:00:04
+npm warn Unknown project config "enable-pre-post-scripts". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+[1m
+Worship song downloader[0m
+[2mWriting into the leader archive.
+[0m
+[2m  1 plan(s) selected
+[0m
+[1m2026-09-13  Turn into Praise![0m[2m  plan 90431283[0m
+[2m  Judy Ann Torres-Reyes — 5 song(s)[0m
+  [2m→[0m C:\Users\serve\OneDrive\MEDIA SHARE\WORSHIP TEAM SONG DATABASE\Worship Leaders Line-up\Judy Ann\2026\SEPTEMBER\September 13
+      [32m↓[0m I Stand In Awe - C.pdf [2m110 KB[0m
+      [32m↓[0m I Stand in Awe - G.pdf [2m110 KB[0m
+      [32m↓[0m Creator - D.pdf [2m109 KB[0m
+      [32m↓[0m Creator - C.pdf [2m108 KB[0m
+[32m  complete[0m[2m — every song has at least one file[0m
+
+[1mSummary[0m
+  plans filed        1
+  songs              5
+  files downloaded   4[2m  (0.4 MB)[0m
+  already present    4
+  links (not files)  5[2m  — YouTube etc., skipped[0m
+
+RESULT: complete 

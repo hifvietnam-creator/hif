@@ -40,9 +40,12 @@ export default async function DashboardPage() {
   ])
 
   const delta = overview.attendedLatest - overview.attendedPrevious
-  const rate = overview.rosterNow
-    ? Math.round((overview.attendedLatest / overview.rosterNow) * 100)
-    : 0
+
+  // Take the rate straight from the Sundays table rather than recomputing it
+  // against today's roster. Doing the latter put 35% on the card and 43% in the
+  // table for the same Sunday, because 169 children are on the register now and
+  // only 138 were on it that week. One screen, one number.
+  const rate = overview.sundays.find((s) => s.date === overview.latestSunday)?.rate ?? 0
 
   return (
     <Shell current="/kq/dashboard" user={{ name: user.name ?? user.email, role: user.role }}>
@@ -61,8 +64,10 @@ export default async function DashboardPage() {
         up together on the first Sunday of August, not on their birthdays.
       </div>
 
-      {/* Headline numbers */}
-      <div className="mb-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      {/* Headline numbers. Two across on a phone rather than one: four
+          full-width cards means scrolling past the whole summary to reach
+          anything else. */}
+      <div className="mb-4 grid grid-cols-2 gap-3 xl:grid-cols-4">
         <Card
           label={overview.latestSunday ? `Attended ${fmt(overview.latestSunday)}` : 'Attended'}
           value={overview.attendedLatest}
@@ -79,7 +84,15 @@ export default async function DashboardPage() {
             )
           }
         />
-        <Card label="On the roster" value={overview.rosterNow} foot={`${rate}% attendance`} />
+        <Card
+          label="On the roster"
+          value={overview.rosterNow}
+          foot={
+            overview.latestSunday
+              ? `${rate}% came on ${fmt(overview.latestSunday)}`
+              : 'no Sundays recorded'
+          }
+        />
         <Card label="Teachers" value={teachers.totalDocs} foot="with a login" />
         <Card label="Assistants" value={assistants.totalDocs} foot="with a login" />
       </div>
@@ -203,10 +216,14 @@ function Card({
   foot: React.ReactNode
 }) {
   return (
-    <div className="rounded-card border border-line bg-paper px-4 py-3.5 shadow-sm">
-      <div className="text-[11px] font-bold uppercase tracking-wider text-hifmuted">{label}</div>
-      <div className="my-1 text-3xl font-bold tracking-tight text-ink">{value}</div>
-      <div className="text-xs text-hifmuted">{foot}</div>
+    <div className="rounded-card border border-line bg-paper px-3.5 py-3 shadow-sm sm:px-4 sm:py-3.5">
+      <div className="text-[10px] font-bold uppercase tracking-wider text-hifmuted sm:text-[11px]">
+        {label}
+      </div>
+      <div className="my-0.5 text-2xl font-bold tracking-tight text-ink sm:my-1 sm:text-3xl">
+        {value}
+      </div>
+      <div className="text-[11px] leading-snug text-hifmuted sm:text-xs">{foot}</div>
     </div>
   )
 }

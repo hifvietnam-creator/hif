@@ -1,13 +1,10 @@
 {
   "date": "2026-09-13",
   "planId": "90431283",
-  "complete": false,
+  "complete": true,
   "songs": 5,
-  "songsWithFiles": 3,
-  "songsMissingFiles": [
-    "I Stand In Awe",
-    "Creator"
-  ],
-  "filesOnDisk": 4,
-  "lastRun": "2026-09-10T08:26:02.929Z"
+  "songsWithFiles": 5,
+  "songsMissingFiles": [],
+  "filesOnDisk": 8,
+  "lastRun": "2026-09-12T03:00:56.147Z"
 }
