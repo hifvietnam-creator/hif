@@ -13,5 +13,10 @@
     "noEmit": true
   },
   "exclude": ["node_modules", "wl_songs_scraper", "wp_playlist"],
-  "include": ["scripts/**/*.ts"]
+
+  // environment.d.ts has to be named explicitly. Files reached through imports
+  // are pulled in automatically, but an ambient declaration nothing imports is
+  // not — and without it process.env.PAYLOAD_SECRET is `string | undefined`,
+  // so payload.config.ts fails a check that passes under the app config.
+  "include": ["scripts/**/*.ts", "src/environment.d.ts"]
 }

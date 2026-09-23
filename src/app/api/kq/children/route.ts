@@ -69,12 +69,10 @@ export async function PATCH(req: NextRequest) {
         if (!CHILD_STATUSES.includes(status)) {
           return NextResponse.json({ error: 'Unknown status' }, { status: 400 })
         }
-        const note = body.note ? String(body.note).trim() : null
-        // A reason is required to archive but not to restore. Recording why a
-        // child left is the whole point; welcoming one back needs no excuse.
-        if (status !== 'active' && !note) {
-          return NextResponse.json({ error: 'Please say why' }, { status: 400 })
-        }
+        // The note is optional. The reason is the status itself — "left Hanoi"
+        // already says why. Demanding free text on top meant the dialog looked
+        // finished while the button stayed dead.
+        const note = body.note ? String(body.note).trim() || null : null
         await setChildStatus(Number(body.childId), status, note, user.id)
         return NextResponse.json({ ok: true })
       }

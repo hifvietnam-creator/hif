@@ -3,6 +3,10 @@
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
+import Filters, {
+  GRADE_OPTIONS, GROUP_OPTIONS, SEX_OPTIONS,
+  type FilterDef, type FilterState,
+} from '@/components/kq/Filters'
 // From child-fields, not children: the latter imports the Postgres pool, and a
 // client component importing it pulls `pg` into the browser bundle.
 import { CHILD_STATUSES, STATUS_LABEL, type ChildRow, type ChildStatus } from '@/lib/kq/child-fields'
@@ -30,8 +34,7 @@ type Save = 'idle' | 'saving' | 'saved' | 'error'
 export default function KidsTable({ initial }: { initial: ChildRow[] }) {
   const [rows, setRows] = useState(initial)
   const [query, setQuery] = useState('')
-  const [filter, setFilter] =
-    useState<'all' | 'no-collector' | 'no-grade' | 'no-guardian' | 'archived'>('all')
+  const [filters, setFilters] = useState<FilterState>({})
   const [archiving, setArchiving] = useState<ChildRow | null>(null)
   const [adding, setAdding] = useState(false)
   const router = useRouter()
@@ -78,24 +81,68 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
     }
   }, [rows])
 
+  /**
+   * Every filter narrows the last, so they combine rather than replace.
+   *
+   * `status` is the exception and defaults to active-only. Archived children
+   * are not on the register, and leaving them in the default list is how a
+   * roster count quietly overstates itself.
+   */
   const visible = useMemo(() => {
     const q = query.trim().toLowerCase()
-    return rows
-      .filter((r) => {
-        // Archived children are hidden from every other view. They are not on
-        // the register, and leaving them in the default list is how a roster
-        // count quietly overstates itself.
-        if (filter === 'archived') return r.status !== 'active'
-        if (r.status !== 'active') return false
-        if (filter === 'no-collector') return !r.guardians.some((g) => g.canPickup)
-        if (filter === 'no-grade') return r.grade === null
-        if (filter === 'no-guardian') return r.guardians.length === 0
-        return true
-      })
-      .filter((r) =>
-        !q || `${r.firstName} ${r.lastName} ${r.preferredName ?? ''}`.toLowerCase().includes(q),
-      )
-  }, [rows, query, filter])
+    return rows.filter((r) => {
+      const status = filters.status ?? 'active'
+      if (status === 'left') { if (r.status === 'active') return false }
+      else if (status !== 'any' && r.status !== status) return false
+
+      if (filters.group && r.groupCode !== filters.group) return false
+
+      if (filters.grade === 'none') { if (r.grade !== null) return false }
+      else if (filters.grade && String(r.grade) !== filters.grade) return false
+
+      if (filters.sex === 'none') { if (r.gender) return false }
+      else if (filters.sex && r.gender !== filters.sex) return false
+
+      if (filters.needs === 'collector' && r.guardians.some((g) => g.canPickup)) return false
+      if (filters.needs === 'guardian' && r.guardians.length > 0) return false
+      if (filters.needs === 'card' && r.cardCode) return false
+      if (filters.needs === 'placement' && !r.provisional) return false
+      if (filters.needs === 'allergy' && !r.allergies) return false
+
+      if (q && !`${r.firstName} ${r.lastName} ${r.preferredName ?? ''}`.toLowerCase().includes(q))
+        return false
+
+      return true
+    })
+  }, [rows, query, filters])
+
+  const FILTER_DEFS: FilterDef[] = useMemo(() => [
+    { key: 'group', label: 'Any group', options: GROUP_OPTIONS },
+    { key: 'grade', label: 'Any grade', options: GRADE_OPTIONS },
+    { key: 'sex', label: 'Any sex', options: SEX_OPTIONS },
+    {
+      key: 'needs',
+      label: 'Needs attention',
+      options: [
+        { value: 'collector', label: 'Nobody can collect', count: counts.noCollector },
+        { value: 'guardian', label: 'No guardian at all', count: counts.noGuardian },
+        { value: 'card', label: 'No card code' },
+        { value: 'placement', label: 'Room unconfirmed' },
+        { value: 'allergy', label: 'Has an allergy' },
+      ],
+    },
+    {
+      key: 'status',
+      label: 'On the register',
+      options: [
+        { value: 'left', label: 'Has left', count: counts.archived },
+        ...CHILD_STATUSES.filter((s) => s !== 'active').map((s) => ({
+          value: s, label: STATUS_LABEL[s],
+        })),
+        { value: 'any', label: 'Everyone, including left' },
+      ],
+    },
+  ], [counts])
 
   return (
     <>
@@ -115,32 +162,21 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="mb-3 flex flex-wrap items-center gap-2">
+      <Filters
+        defs={FILTER_DEFS}
+        value={filters}
+        onChange={setFilters}
+        showing={visible.length}
+        total={counts.active}
+      >
         <input
           type="search"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search a name…"
-          className="w-56 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand"
+          className="w-52 rounded-lg border border-line bg-paper px-3 py-2 text-sm outline-none focus:border-brand"
         />
-        <Chip on={filter === 'all'} onClick={() => setFilter('all')}>
-          On the register {counts.active}
-        </Chip>
-        <Chip on={filter === 'no-collector'} onClick={() => setFilter('no-collector')} alert>
-          No collector {counts.noCollector}
-        </Chip>
-        <Chip on={filter === 'no-guardian'} onClick={() => setFilter('no-guardian')} alert>
-          No guardian {counts.noGuardian}
-        </Chip>
-        <Chip on={filter === 'no-grade'} onClick={() => setFilter('no-grade')}>
-          No grade {counts.noGrade}
-        </Chip>
-        <Chip on={filter === 'archived'} onClick={() => setFilter('archived')}>
-          Left {counts.archived}
-        </Chip>
-
-      </div>
+      </Filters>
 
       {error && (
         <div className="mb-3 flex items-start gap-2 rounded-card border border-alert/30 bg-alert-soft px-3 py-2 text-sm text-alert-deep">
@@ -388,7 +424,7 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
             {visible.length === 0 && (
               <tr>
                 <td colSpan={10} className="px-4 py-12 text-center text-hifmuted">
-                  {filter === 'archived' ? 'Nobody has left.' : 'Nobody matches that.'}
+                  {filters.status === 'left' ? 'Nobody has left.' : 'Nobody matches that.'}
                 </td>
               </tr>
             )}
@@ -651,13 +687,14 @@ function ArchiveDialog({
 
         <label className="mt-3 block">
           <span className="mb-1 block text-sm font-semibold text-ink">
-            Anything worth noting?
+            Anything else worth knowing{' '}
+            <span className="font-normal text-hifmuted">— optional</span>
           </span>
           <textarea
             value={note}
             onChange={(e) => setNote(e.target.value)}
             rows={2}
-            placeholder="e.g. Family returned to Manila in July — mother let Grace know."
+            placeholder="e.g. Family returned to Manila in July, mother let Grace know."
             className="w-full rounded-lg border border-line px-3 py-2 text-sm outline-none focus:border-brand"
           />
         </label>
@@ -669,8 +706,10 @@ function ArchiveDialog({
           >
             Cancel
           </button>
+          {/* Enabled as soon as a reason is picked. One is always selected, so
+              this only ever greys out while the save is in flight. */}
           <button
-            disabled={!note.trim() || busy}
+            disabled={busy}
             onClick={async () => {
               setBusy(true)
               await onConfirm(status, note.trim())
@@ -678,7 +717,7 @@ function ArchiveDialog({
             }}
             className="rounded-lg bg-brand-dark px-4 py-2.5 text-sm font-bold text-white disabled:opacity-40"
           >
-            Take off the register
+            {busy ? 'Saving…' : 'Take off the register'}
           </button>
         </div>
       </div>
@@ -696,28 +735,6 @@ function Td({ children }: { children: React.ReactNode }) {
   return <td className="px-3 py-1.5 align-middle">{children}</td>
 }
 
-function Chip({
-  children, on, onClick, alert,
-}: {
-  children: React.ReactNode; on: boolean; onClick: () => void; alert?: boolean
-}) {
-  return (
-    <button
-      onClick={onClick}
-      className={`rounded-full px-3 py-1.5 text-xs font-semibold transition ${
-        on
-          ? alert
-            ? 'bg-alert text-white'
-            : 'bg-brand-dark text-white'
-          : alert
-            ? 'bg-alert-soft text-alert-deep hover:brightness-95'
-            : 'bg-mist text-ink-2 hover:brightness-95'
-      }`}
-    >
-      {children}
-    </button>
-  )
-}
 
 /**
  * An editable cell.

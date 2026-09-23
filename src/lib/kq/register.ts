@@ -23,29 +23,8 @@
 
 import { getPool, isoDate } from '../db'
 
-export type CellState =
-  | 'not_yet'      // before this child was on any register
-  | 'absent'       // enrolled, session ran, no record
-  | 'paper'        // imported from a spreadsheet tick
-  | 'station'      // checked in and out at a station
-  | 'still_in'     // checked in, never checked out
-
-export type RegisterCell = {
-  state: CellState
-  group: string | null
-  checkedInAt: string | null
-  checkedOutAt: string | null
-}
-
-export type RegisterRow = {
-  childId: number
-  name: string
-  groupCode: string
-  joined: string | null
-  cells: RegisterCell[]
-  present: number
-  possible: number
-}
+export type { CellState, RegisterCell, RegisterRow } from './register-types'
+import type { CellState, RegisterCell, RegisterRow } from './register-types'
 
 export type RegisterData = {
   dates: string[]
@@ -92,10 +71,11 @@ export async function getRegister(
   // should read as absences rather than as not-yet-arrived.
   const { rows: kids } = await db.query<{
     child_id: string; name: string; group_code: string; joined: Date | null
+    grade: number | null; gender: string | null
   }>(
     `select r.child_id,
             coalesce(r.preferred_name, r.first_name) || ' ' || r.last_name as name,
-            r.group_code,
+            r.group_code, r.grade, r.gender,
             (select min(e.started_on) from kq.enrollments e where e.child_id = r.child_id) as joined
        from kq.current_roster r
       where ($1::text is null or r.group_code = $1)
@@ -116,9 +96,11 @@ export async function getRegister(
             a.checked_in_at, a.checked_out_at, s.group_code
        from kq.attendance a
        join kq.sessions s on s.id = a.session_id
+      -- 'absent' rows are fetched too. They are not the same as no record:
+      -- an absent row means somebody actively said this child was not there,
+      -- which the grid shows differently from a Sunday nobody wrote anything.
       where a.child_id = any($1::bigint[])
-        and s.service_date = any($2::date[])
-        and a.status in ('present', 'checked_out')`,
+        and s.service_date = any($2::date[])`,
     [ids, dates],
   )
 
@@ -136,13 +118,20 @@ export async function getRegister(
       const m = byChild.get(`${k.child_id}|${d}`)
 
       if (m) {
-        present++
+        const wasHere = m.status === 'present' || m.status === 'checked_out'
         possible++
-        perDate[i]!++
+        if (wasHere) { present++; perDate[i]!++ }
+
         const state: CellState =
-          m.source !== 'station' ? 'paper'
+          // A record exists but says absent, so somebody corrected it. If there
+          // is still a check-in time on the row, that is a station record an
+          // administrator overruled rather than an empty cell.
+          !wasHere ? 'removed'
+          : m.source === 'correction' ? 'added'
+          : m.source !== 'station' ? 'paper'
           : m.checked_out_at ? 'station'
           : 'still_in'
+
         return {
           state,
           group: m.group_code,
@@ -162,6 +151,8 @@ export async function getRegister(
       childId: parseInt(k.child_id, 10),
       name: k.name,
       groupCode: k.group_code,
+      grade: k.grade,
+      gender: k.gender,
       joined,
       cells,
       present,
