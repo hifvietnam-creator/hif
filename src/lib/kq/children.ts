@@ -8,6 +8,7 @@
  */
 
 import { getPool, isoDate } from '../db'
+import { cardLetters, groupPrefix } from './cards'
 
 // Shapes and constants live in child-fields.ts, which imports no database code.
 // Client components must import from there directly: importing them from here
@@ -504,6 +505,26 @@ export async function registerChild(
          on conflict (child_id, guardian_id) do nothing`,
         [childId, guardianId],
       )
+    }
+
+    // Give them a card code straight away where we can. A child registered at
+    // the door with no family name gets none, and turns up on Ate's
+    // cards-outstanding list rather than being handed a broken one.
+    const first = cardLetters(input.firstName)
+    const last = cardLetters(input.lastName)
+    if (first && last) {
+      const base = `${groupPrefix(input.groupCode)}-${first}-${last}`
+      for (let n = 1; n <= 40; n++) {
+        const candidate = n === 1 ? base : `${base}-${n}`
+        const { rowCount } = await client.query(
+          `update kq.children set card_code = $2
+            where id = $1 and not exists (
+              select 1 from kq.children x where x.card_code = $2
+            )`,
+          [childId, candidate],
+        )
+        if (rowCount) break
+      }
     }
 
     await client.query(

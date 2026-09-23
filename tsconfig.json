@@ -48,6 +48,8 @@
   ],
   "exclude": [
     "node_modules",
-    "scripts"
+    "scripts",
+    "wl_songs_scraper",
+    "wp_playlist"
   ]
 }

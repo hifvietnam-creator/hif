@@ -6,5 +6,9 @@
     "target": "ES2022",
     "noEmit": true
   },
+  // Runtime config for `tsx --tsconfig`, not a typecheck config. moduleResolution
+  // is "node" here, which cannot read package `exports` maps — fine for tsx,
+  // useless for checking types. Use tsconfig.check.json for that.
+  "exclude": ["node_modules", "wl_songs_scraper", "wp_playlist"],
   "include": ["scripts/**/*.ts", "src/**/*.ts", "src/**/*.tsx"]
 }

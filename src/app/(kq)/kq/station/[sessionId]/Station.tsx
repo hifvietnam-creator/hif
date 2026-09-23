@@ -45,20 +45,18 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
   const [active, setActive] = useState<RosterChild | null>(null)
   const [adding, setAdding] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [lastCode, setLastCode] = useState<
-    { name: string; code: string; attendanceId: number } | null
-  >(null)
+  const [lastCode, setLastCode] = useState<{ name: string; code: string | null } | null>(null)
 
-  // Printing goes through a hidden iframe rather than a new tab. A tab would
-  // pull the TA off the register mid-queue and leave them to find their way
-  // back with a parent waiting.
-  const printFrame = useRef<HTMLIFrameElement | null>(null)
-  const [autoPrint, setAutoPrint] = useState(true)
-
-  const printLabel = useCallback((attendanceId: number) => {
-    if (!printFrame.current) return
-    printFrame.current.src = `/kq/label/${attendanceId}`
-  }, [])
+  // Nothing prints at the station any more.
+  //
+  // The ministry keeps a box of physical cards, one per child, handed over at
+  // drop-off and returned at pick-up. There is no label to produce, so the
+  // printer, the hidden iframe and the auto-print toggle have all gone.
+  //
+  // That also disposes of a complaint from the first live Sunday: a print
+  // dialog appearing during dismissal. It was never the dismissal — a check-in
+  // that had not reached the server was sitting in the queue, drained once the
+  // connection returned, and printed then, while the TA was on the other tab.
 
   // Writes that have not reached the server yet. Held in state and retried, so
   // a dropped connection mid-service degrades to "saving" rather than to a lost
@@ -106,16 +104,10 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
           const data = await res.json().catch(() => ({}))
 
           if (res.ok) {
-            if (data.securityCode && data.attendanceId) {
-              setLastCode({
-                name: item.label,
-                code: data.securityCode,
-                attendanceId: data.attendanceId,
-              })
-              // Only print once the write has actually landed. Printing
-              // optimistically would put a code on a label that no row in the
-              // database agrees with if the request then failed.
-              if (autoPrint) printLabel(data.attendanceId)
+            // Only on a check-in. A dismissal returns no code, so the banner
+            // cannot appear at the wrong moment.
+            if (item.body.action === 'check_in') {
+              setLastCode({ name: item.label, code: data.cardCode ?? null })
             }
             setQueue((q) => q.filter((x) => x.clientUuid !== item.clientUuid))
           } else if (res.status >= 400 && res.status < 500) {
@@ -134,7 +126,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
       draining.current = false
       await refresh()
     })()
-  }, [queue, online, refresh])
+  }, [queue, online, refresh, mode])
 
   const enqueue = (body: Record<string, unknown>, childId: number, label: string) => {
     const clientUuid = uuid()
@@ -239,21 +231,23 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
         </div>
       )}
 
-      {lastCode && (
+      {/* Only while checking in. Switching to Dismiss clears it, so nothing
+          from the previous action is left hanging about on the wrong screen. */}
+      {lastCode && mode === 'in' && (
         <div className="flex items-center gap-2.5 border-b border-ok/30 bg-ok-soft px-4 py-3 text-sm text-ok-ink">
           <span className="min-w-0 flex-1 truncate">
             <b>{lastCode.name}</b> checked in
+            {lastCode.code && <> — hand over card</>}
           </span>
-          <span className="rounded bg-ink px-2 py-1 font-mono font-bold tracking-widest text-white">
-            {lastCode.code}
-          </span>
-          <button
-            onClick={() => printLabel(lastCode.attendanceId)}
-            className="kq-tap rounded border border-ok/40 px-2 py-1 text-xs font-bold"
-            title="Print these tags again"
-          >
-            Reprint
-          </button>
+          {lastCode.code ? (
+            <span className="rounded bg-ink px-2 py-1 font-mono font-bold tracking-widest text-white">
+              {lastCode.code}
+            </span>
+          ) : (
+            <span className="rounded bg-flag-soft px-2 py-1 text-xs font-bold text-flag">
+              no card yet
+            </span>
+          )}
           <button onClick={() => setLastCode(null)} className="font-bold">✕</button>
         </div>
       )}
@@ -262,6 +256,20 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
       <ul className="flex-1 divide-y divide-line">
         {visible.map((c) => (
           <li key={c.childId} className="flex items-center gap-3 px-3 py-3">
+            {/* In Dismiss mode the card code leads. A TA is holding a card a
+                parent just handed back and needs to find whose it is — so the
+                code has to be scannable down the list, not hidden behind a tap
+                on every child in turn. */}
+            {mode === 'out' && (
+              <span
+                className={`shrink-0 rounded px-2 py-1.5 font-mono text-xs font-bold tracking-wider ${
+                  c.cardCode ? 'bg-ink text-white' : 'bg-flag-soft text-flag'
+                }`}
+              >
+                {c.cardCode ?? 'no card'}
+              </span>
+            )}
+
             <div className="min-w-0 flex-1">
               <div className="font-semibold text-ink">
                 {displayName(c)}
@@ -277,7 +285,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
                 ) : (
                   c.guardians[0]!.fullName
                 )}
-                {c.securityCode && ` · ${c.securityCode}`}
+                {mode === 'in' && c.cardCode && ` · card ${c.cardCode}`}
                 {c.provisional && ' · room unconfirmed'}
               </div>
             </div>
@@ -342,33 +350,10 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
               ? 'All saved'
               : 'Offline — taps are being held'}
         </span>
-        <span className="flex items-center gap-3">
-          {stillHere > 0 && mode === 'out' && (
-            <span className="font-semibold text-flag">{stillHere} still in the room</span>
-          )}
-          <label className="kq-tap flex cursor-pointer items-center gap-1.5 text-ink-2">
-            <input
-              type="checkbox"
-              checked={autoPrint}
-              onChange={(e) => setAutoPrint(e.target.checked)}
-              className="h-3.5 w-3.5 accent-[#1f6b85]"
-            />
-            Print labels
-          </label>
-        </span>
+        {stillHere > 0 && mode === 'out' && (
+          <span className="font-semibold text-flag">{stillHere} still in the room</span>
+        )}
       </footer>
-
-      {/*
-        Off-screen rather than display:none — a hidden iframe does not always
-        lay out, and printing an unlaid-out document yields a blank label.
-      */}
-      <iframe
-        ref={printFrame}
-        title="Label printing"
-        aria-hidden="true"
-        tabIndex={-1}
-        className="pointer-events-none fixed left-[-9999px] top-0 h-[400px] w-[300px] border-0"
-      />
 
       {adding && (
         <WalkInSheet
@@ -579,6 +564,11 @@ function GuardianSheet({
       >
         <h2 className="text-lg font-bold text-ink">
           {mode === 'in' ? 'Check in' : 'Dismiss'} — {displayName(child)}
+          {mode === 'in' && child.cardCode && (
+            <span className="ml-2 rounded bg-ink px-2 py-1 align-middle font-mono text-xs font-bold tracking-wider text-white">
+              {child.cardCode}
+            </span>
+          )}
         </h2>
         {/* "Dismissed" is the status; the prompt asks about a person, and
             "who is dismissing?" would be asking the wrong question. */}
@@ -586,11 +576,11 @@ function GuardianSheet({
           {mode === 'in' ? 'Who is dropping off?' : 'Who is picking up?'}
         </p>
 
-        {mode === 'out' && child.securityCode && (
+        {mode === 'out' && child.cardCode && (
           <p className="mt-3 text-sm text-ink-2">
-            Their label should read{' '}
+            Their card reads{' '}
             <span className="rounded bg-ink px-2 py-1 font-mono font-bold tracking-widest text-white">
-              {child.securityCode}
+              {child.cardCode}
             </span>
           </p>
         )}

@@ -1,0 +1,17 @@
+{
+  // Typechecking the standalone scripts.
+  //
+  // NOT tsconfig.scripts.json. That one exists for `tsx --tsconfig` at runtime
+  // and sets moduleResolution: "node", which predates package `exports` maps —
+  // so pointing a typecheck at it makes every @payloadcms/* import fail to
+  // resolve and buries the real errors under forty false ones.
+  //
+  // This inherits "bundler" resolution from the base config and looks only at
+  // scripts/, which the base excludes.
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "exclude": ["node_modules", "wl_songs_scraper", "wp_playlist"],
+  "include": ["scripts/**/*.ts"]
+}

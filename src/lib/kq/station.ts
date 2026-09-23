@@ -16,22 +16,11 @@ import type { PoolClient } from 'pg'
 
 import { getPool, isoDate } from '../db'
 
-// ── Security codes ───────────────────────────────────────────────────────────
-
-/**
- * No B/8, S/5, G/6, O/0, I/1/L, U/V, Z/2.
- *
- * These get read aloud across a noisy room by Vietnamese, Korean, Filipino and
- * English speakers, and matched against a printed tag by someone holding a
- * toddler. Ambiguity between characters costs more than the extra entropy of a
- * fuller alphabet buys — 21³ is 9,261 combinations against a room of forty.
- */
-const CODE_ALPHABET = 'ACDEFHJKMNPRTWXY34679'
-
-const newCode = () =>
-  Array.from({ length: 3 }, () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]).join('')
-
 // ── Types ────────────────────────────────────────────────────────────────────
+//
+// Codes are no longer generated here. Each child has one permanent card code on
+// kq.children, printed on a physical card the ministry keeps and hands out at
+// the door. The station reads it; it never mints one. See src/lib/kq/cards.ts.
 
 export type RosterChild = {
   childId: number
@@ -42,7 +31,8 @@ export type RosterChild = {
   provisional: boolean
   attendanceId: number | null
   status: 'expected' | 'present' | 'checked_out' | 'absent'
-  securityCode: string | null
+  /** The code on their physical card. Same every week. Null until Ate issues one. */
+  cardCode: string | null
   checkedInAt: string | null
   checkedOutAt: string | null
   guardians: Guardian[]
@@ -160,7 +150,7 @@ export async function getRoster(sessionId: number): Promise<RosterChild[]> {
   const { rows } = await db.query<{
     child_id: string; first_name: string; last_name: string
     preferred_name: string | null; allergies: string | null; provisional: boolean
-    attendance_id: string | null; status: string | null; security_code: string | null
+    attendance_id: string | null; status: string | null; card_code: string | null
     checked_in_at: Date | null; checked_out_at: Date | null
   }>(
     // Two sources, unioned: children currently enrolled in this room, AND any
@@ -172,9 +162,9 @@ export async function getRoster(sessionId: number): Promise<RosterChild[]> {
     // make them disappear — no way to check them out, and nothing on screen
     // saying they were ever there. You cannot un-see a child who is in the room.
     `select c.id as child_id, c.first_name, c.last_name, c.preferred_name,
-            c.allergies,
+            c.allergies, c.card_code,
             coalesce(e.provisional, false) as provisional,
-            a.id as attendance_id, a.status, a.security_code,
+            a.id as attendance_id, a.status,
             a.checked_in_at, a.checked_out_at
        from kq.children c
        left join kq.enrollments e
@@ -228,7 +218,7 @@ export async function getRoster(sessionId: number): Promise<RosterChild[]> {
     provisional: r.provisional,
     attendanceId: r.attendance_id ? parseInt(r.attendance_id, 10) : null,
     status: (r.status as RosterChild['status']) ?? 'expected',
-    securityCode: r.security_code,
+    cardCode: r.card_code,
     checkedInAt: r.checked_in_at?.toISOString() ?? null,
     checkedOutAt: r.checked_out_at?.toISOString() ?? null,
     guardians: byChild.get(parseInt(r.child_id, 10)) ?? [],
@@ -266,71 +256,59 @@ export type CheckInArgs = {
 /**
  * Check a child in.
  *
- * Idempotent on clientUuid. If the network drops between the write and the
- * response, the station retries with the same uuid and gets the original row
- * back — including the same security code, which matters because it is already
- * printed on a label in a parent's hand.
+ * Idempotent on clientUuid: if the network drops between the write and the
+ * response, the station retries with the same uuid and gets the original row.
+ *
+ * Returns the child's card code so the TA knows which card to hand over. The
+ * code is not created here and does not change — it belongs to the child.
  */
 export async function checkIn(
   args: CheckInArgs,
-): Promise<{ attendanceId: number; securityCode: string | null }> {
+): Promise<{ attendanceId: number; cardCode: string | null }> {
   const db = getPool()
   const client = await db.connect()
 
   try {
     await client.query('begin')
 
-    const existing = await client.query<{ id: string; security_code: string }>(
-      `select id, security_code from kq.attendance where client_uuid = $1`,
+    const { rows: card } = await client.query<{ card_code: string | null }>(
+      `select card_code from kq.children where id = $1`,
+      [args.childId],
+    )
+    const cardCode = card[0]?.card_code ?? null
+
+    const existing = await client.query<{ id: string }>(
+      `select id from kq.attendance where client_uuid = $1`,
       [args.clientUuid],
     )
     if (existing.rows[0]) {
       await client.query('commit')
-      // A retry returns the ORIGINAL code, never a fresh one — the first is
-      // already printed and in a parent's hand.
-      return {
-        attendanceId: parseInt(existing.rows[0].id, 10),
-        securityCode: existing.rows[0].security_code,
-      }
+      return { attendanceId: parseInt(existing.rows[0].id, 10), cardCode }
     }
 
-    // Retry on a code collision rather than widening the alphabet. With 9,261
-    // codes against a room of forty, a second attempt is overwhelmingly enough.
-    let code = ''
-    let attendanceId = 0
-    for (let attempt = 0; attempt < 8; attempt++) {
-      code = newCode()
-      try {
-        const { rows } = await client.query<{ id: string }>(
-          `insert into kq.attendance
-             (session_id, child_id, source, security_code, status,
-              checked_in_at, checked_in_by_user, checked_in_guardian, client_uuid)
-           values ($1,$2,'station',$3,'present',now(),$4,$5,$6)
-           on conflict (session_id, child_id) do update
-             set status              = 'present',
-                 checked_in_at       = coalesce(kq.attendance.checked_in_at, now()),
-                 checked_in_by_user  = excluded.checked_in_by_user,
-                 checked_in_guardian = excluded.checked_in_guardian,
-                 security_code       = coalesce(kq.attendance.security_code, excluded.security_code),
-                 client_uuid         = coalesce(kq.attendance.client_uuid, excluded.client_uuid)
-           returning id, security_code`,
-          [args.sessionId, args.childId, code, args.actorUserId, args.guardianId, args.clientUuid],
-        )
-        attendanceId = parseInt(rows[0]!.id, 10)
-        code = (rows[0] as unknown as { security_code: string }).security_code
-        break
-      } catch (e) {
-        const pgCode = (e as { code?: string }).code
-        if (pgCode === '23505' && attempt < 7) continue    // duplicate code, try again
-        throw e
-      }
-    }
+    // No code is generated here any more, so no collision loop and no retries.
+    // The child's card already exists; this row just records that they arrived.
+    const { rows } = await client.query<{ id: string }>(
+      `insert into kq.attendance
+         (session_id, child_id, source, status,
+          checked_in_at, checked_in_by_user, checked_in_guardian, client_uuid)
+       values ($1,$2,'station','present',now(),$3,$4,$5)
+       on conflict (session_id, child_id) do update
+         set status              = 'present',
+             checked_in_at       = coalesce(kq.attendance.checked_in_at, now()),
+             checked_in_by_user  = excluded.checked_in_by_user,
+             checked_in_guardian = excluded.checked_in_guardian,
+             client_uuid         = coalesce(kq.attendance.client_uuid, excluded.client_uuid)
+       returning id`,
+      [args.sessionId, args.childId, args.actorUserId, args.guardianId, args.clientUuid],
+    )
+    const attendanceId = parseInt(rows[0]!.id, 10)
 
     await logEvent(client, attendanceId, 'check_in', args.actorUserId, args.guardianId,
-      { securityCode: code }, args.stationId ?? null)
+      { cardCode }, args.stationId ?? null)
 
     await client.query('commit')
-    return { attendanceId, securityCode: code }
+    return { attendanceId, cardCode }
   } catch (e) {
     await client.query('rollback')
     throw e

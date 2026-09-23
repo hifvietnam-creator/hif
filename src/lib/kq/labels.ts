@@ -1,11 +1,13 @@
 /**
  * Everything one printed tag needs, in a single query.
  *
- * Read from kq.attendance rather than rebuilt from the check-in request: a
- * reprint must reproduce the SAME code, because the original is already in a
- * parent's hand. Generating a fresh one would silently break the match at
- * collection — the failure would show up an hour later, at the door, with a
- * queue behind it.
+ * NOT USED BY THE STATION ANY MORE. Nothing prints at the door: the ministry
+ * keeps physical cards and hands them over, so there is no label to produce.
+ *
+ * Kept because the route is still the only way to render a tag, and Ate will
+ * want something like it when she comes to print the cards themselves. The code
+ * it shows now comes from kq.children.card_code, which is stable, rather than
+ * the per-session code this was originally built around.
  */
 
 import { getPool, isoDate } from '../db'
@@ -32,7 +34,7 @@ export async function getLabel(attendanceId: number): Promise<LabelData | null> 
             coalesce(c.preferred_name, c.first_name) || ' ' || c.last_name as child_name,
             g.label as group_label,
             s.service_date,
-            a.security_code,
+            c.card_code as security_code,
             c.allergies,
             gu.full_name as guardian_name
        from kq.attendance a

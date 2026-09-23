@@ -44,6 +44,7 @@
     "inspect:values": "cross-env NODE_OPTIONS=--no-deprecation tsx --tsconfig tsconfig.scripts.json scripts/inspect-field-values.ts",
     "generate:types": "cross-env NODE_OPTIONS=--no-deprecation payload generate:types",
     "ii": "cross-env NODE_OPTIONS=--no-deprecation pnpm --ignore-workspace install",
+    "check:types": "tsc --noEmit && tsc --noEmit -p tsconfig.check.json",
     "lint": "cross-env NODE_OPTIONS=--no-deprecation eslint .",
     "lint:fix": "cross-env NODE_OPTIONS=--no-deprecation eslint . --fix",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",

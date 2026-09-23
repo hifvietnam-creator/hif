@@ -51,15 +51,15 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'clientUuid required' }, { status: 400 })
       }
 
-      const { attendanceId, securityCode } = await checkIn({
+      const { attendanceId, cardCode } = await checkIn({
         sessionId, childId, guardianId,
         actorUserId: user.id,
         clientUuid: body.clientUuid,
         stationId,
       })
-      // attendanceId is what the station prints from. Returned even on a retry,
-      // where it points at the original row and therefore the original code.
-      return NextResponse.json({ ok: true, attendanceId, securityCode })
+      // cardCode tells the TA which physical card to hand the parent. It is the
+      // child's permanent code, not something minted for this check-in.
+      return NextResponse.json({ ok: true, attendanceId, cardCode })
     }
 
     if (body.action === 'check_out') {
