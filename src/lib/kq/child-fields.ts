@@ -22,6 +22,8 @@ export type ChildRow = {
   groupCode: string
   groupManual: boolean
   provisional: boolean
+  /** Code on their physical card. Null until they have a family name. */
+  cardCode: string | null
   allergies: string | null
   careNotes: string | null
   photoConsent: boolean | null

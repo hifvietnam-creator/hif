@@ -31,7 +31,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     first_name: string; last_name: string; preferred_name: string | null
     gender: string | null; birthdate: Date | null
     grade: number | null; group_code: string
-    group_manual: boolean; provisional: boolean
+    group_manual: boolean; provisional: boolean; card_code: string | null
     allergies: string | null; care_notes: string | null
     photo_consent: boolean | null; active: boolean
     status: string; left_on: Date | null; status_note: string | null
@@ -43,6 +43,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
             c.first_name, c.last_name, c.preferred_name,
             c.gender, c.birthdate,
             e.grade, e.group_code, e.group_manual, e.provisional,
+            c.card_code,
             c.allergies, c.care_notes, c.photo_consent, c.active,
             c.status, c.left_on, c.status_note
        from kq.children c
@@ -102,6 +103,7 @@ export async function listChildren(includeInactive = false): Promise<ChildRow[]>
     groupCode: r.group_code,
     groupManual: r.group_manual,
     provisional: r.provisional,
+    cardCode: r.card_code,
     allergies: r.allergies,
     careNotes: r.care_notes,
     photoConsent: r.photo_consent,
