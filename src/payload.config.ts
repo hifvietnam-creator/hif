@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { resendAdapter } from '@payloadcms/email-resend'
 import sharp from 'sharp'
 import path from 'path'
 import { buildConfig, PayloadRequest } from 'payload'
@@ -71,6 +72,26 @@ export default buildConfig({
   },
   // This config helps us configure global or default features that the other editors can inherit
   editor: defaultLexical,
+
+  /**
+   * Transactional email.
+   *
+   * Only used for password resets at the moment. Without an adapter Payload
+   * accepts a reset request, sends nothing, and tells the person to check their
+   * inbox — which is worse than having no reset at all, because they wait.
+   *
+   * Left undefined when RESEND_API_KEY is absent rather than configured with an
+   * empty key. Payload then falls back to logging mail to the console, which is
+   * what you want locally and obvious if it ever reaches production.
+   */
+  email: process.env.RESEND_API_KEY
+    ? resendAdapter({
+        defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'noreply@hif.vn',
+        defaultFromName: 'Hanoi International Fellowship',
+        apiKey: process.env.RESEND_API_KEY,
+      })
+    : undefined,
+
   db: postgresAdapter({
     // Schema push is a development convenience: it alters tables automatically
     // to match the config. Payload documents it as dev-only, and it becomes

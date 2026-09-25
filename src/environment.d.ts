@@ -5,6 +5,10 @@ declare global {
       DATABASE_URL: string
       NEXT_PUBLIC_SERVER_URL: string
       VERCEL_PROJECT_PRODUCTION_URL: string
+      // Optional on purpose. Without them Payload logs mail to the console
+      // instead of sending, which is right locally and loud in production.
+      RESEND_API_KEY?: string
+      EMAIL_FROM_ADDRESS?: string
     }
   }
 }

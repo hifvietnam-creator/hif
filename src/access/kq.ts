@@ -3,19 +3,20 @@ import type { AccessArgs, FieldAccess } from 'payload'
 import type { User } from '@/payload-types'
 
 /**
- * KidzQuest role checks.
+ * Who may do what.
  *
- * Two layers, deliberately kept apart:
+ * THREE INDEPENDENT THINGS, and keeping them apart is the point of this file:
  *
- *   kqRole              what kind of thing you may do
- *   kq.session_staff    which room you may do it in, today
+ *   siteAdmin           runs the website. Reaches the Payload CMS.
+ *   kqRole              runs, teaches in, or helps with KidzQuest.
+ *   kq.session_staff    which room you may work in, today.
  *
- * A TA can check children out of their own room and no other. That falls out
- * of the session join rather than needing a rule here — this file only answers
- * the first question.
+ * siteAdmin and kqRole do not imply one another. A webmaster can have the CMS
+ * and no ministry role; a ministry administrator can run KidzQuest and never
+ * see a sermon. They were one field until September 2026, which meant handing
+ * the whole church website to whoever looked after the children.
  *
- * These guard the Payload admin panel and the users collection. The station
- * routes under /kq do their own session-level check on top.
+ * The room restriction falls out of the session join rather than living here.
  */
 
 type Check = (args: AccessArgs<User>) => boolean
@@ -30,6 +31,19 @@ type Check = (args: AccessArgs<User>) => boolean
  */
 const roleOf = (user: unknown): string | null =>
   (user as { kqRole?: string } | null | undefined)?.kqRole ?? null
+
+const isSite = (user: unknown): boolean =>
+  (user as { siteAdmin?: boolean } | null | undefined)?.siteAdmin === true
+
+/**
+ * Runs the website. Gates the Payload CMS and nothing else.
+ *
+ * Deliberately NOT satisfied by kqRole === 'admin'. That was the old behaviour
+ * and it is what this change exists to undo.
+ */
+export const isSiteAdmin: Check = ({ req: { user } }) => isSite(user)
+
+export const isSiteAdminField: FieldAccess = ({ req: { user } }) => isSite(user)
 
 export const isKqAdmin: Check = ({ req: { user } }) => roleOf(user) === 'admin'
 
@@ -52,8 +66,30 @@ export const isKqStaff: Check = ({ req: { user } }) => {
  */
 export const isSelfOrKqAdmin = ({ req: { user } }: AccessArgs<User>) => {
   if (!user) return false
-  if (roleOf(user) === 'admin') return true
+  if (isSite(user) || roleOf(user) === 'admin') return true
   return { id: { equals: user.id } }
+}
+
+/**
+ * May this person act on that one?
+ *
+ * The escalation guard. A KidzQuest administrator can add volunteers and set
+ * their passwords, which means that without this she could set the site
+ * administrator's password, sign in as them, and reach the CMS she was
+ * deliberately kept out of.
+ *
+ * So she may only act on teachers and assistants, and never on a site admin or
+ * another ministry admin. Site admins are unrestricted, because they already
+ * hold the keys to everything.
+ */
+export function canManage(
+  actor: unknown,
+  target: { kqRole?: string | null; siteAdmin?: boolean | null },
+): boolean {
+  if (isSite(actor)) return true
+  if (roleOf(actor) !== 'admin') return false
+  if (target.siteAdmin) return false
+  return target.kqRole === 'teacher' || target.kqRole === 'ta'
 }
 
 /**

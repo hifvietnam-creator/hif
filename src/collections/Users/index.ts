@@ -1,35 +1,60 @@
 import type { CollectionConfig } from 'payload'
 
-import { isKqAdmin, isKqAdminField, isSelfOrKqAdmin } from '../../access/kq'
+import {
+  isKqAdminField,
+  isSelfOrKqAdmin,
+  isSiteAdmin,
+  isSiteAdminField,
+} from '../../access/kq'
 
 /**
- * Every operation here used to be `authenticated`, which was fine while the
- * only accounts were staff building the site. It stops being fine the moment
- * KidzQuest volunteers get logins: `authenticated` on `delete` means any TA can
- * delete any other user, and `admin: authenticated` puts them inside the CMS
- * with the sermons, media and site settings.
+ * Two kinds of authority, kept apart.
  *
- * So: admins manage users, everyone else can see and edit only themselves, and
- * nobody but an admin reaches /admin at all. TAs and teachers work through the
- * /kq station routes, which are ordinary front-end pages gated on kqRole.
+ *   siteAdmin  runs the website. Reaches this admin panel.
+ *   kqRole     runs, teaches in, or helps with KidzQuest.
+ *
+ * Until September 2026 `admin` here was `isKqAdmin`, so the person who looked
+ * after the children's ministry also held the sermons, the pages, the media and
+ * every user account. Nothing went wrong, but only because there was one of
+ * her.
+ *
+ * KidzQuest administrators now manage their own volunteers at /kq/people and
+ * never come here at all.
  */
 export const Users: CollectionConfig = {
   slug: 'users',
   access: {
-    // Reaching the Payload admin panel. A TA has no business in here.
-    admin: isKqAdmin,
-    create: isKqAdmin,
-    delete: isKqAdmin,
-    // Returns a query constraint for non-admins, so a TA listing users gets
-    // back exactly one row — their own — rather than everyone's email address.
+    // The CMS. Website only.
+    admin: isSiteAdmin,
+    create: isSiteAdmin,
+    delete: isSiteAdmin,
+    // A query constraint for everyone else, so a volunteer listing users gets
+    // back one row — themselves — rather than every email in the ministry.
     read: isSelfOrKqAdmin,
     update: isSelfOrKqAdmin,
   },
   admin: {
-    defaultColumns: ['name', 'email', 'kqRole'],
+    defaultColumns: ['name', 'email', 'kqRole', 'siteAdmin'],
     useAsTitle: 'name',
   },
-  auth: true,
+  auth: {
+    // Password resets go out through Resend. Without an adapter Payload accepts
+    // the request and sends nothing, so this is only honest once RESEND_API_KEY
+    // is set in the environment.
+    forgotPassword: {
+      generateEmailSubject: () => 'Reset your KidzQuest password',
+      generateEmailHTML: (args) => {
+        const token = (args as { token?: string } | undefined)?.token ?? ''
+        const url = `${process.env.NEXT_PUBLIC_SERVER_URL}/admin/reset/${token}`
+        return `
+          <p>Somebody asked to reset the password for this account.</p>
+          <p><a href="${url}">Choose a new password</a></p>
+          <p>If that was not you, nothing has changed and you can ignore this.</p>
+          <p>Hanoi International Fellowship</p>
+        `
+      },
+    },
+  },
   fields: [
     {
       name: 'name',
@@ -46,24 +71,68 @@ export const Users: CollectionConfig = {
       admin: {
         position: 'sidebar',
         description:
-          'Administrator manages the roster and reaches the CMS. Teacher can check ' +
-          'in, check out and approve a collection override. Teaching assistant can ' +
-          'check in and out for their assigned room only.',
+          'What this person does in KidzQuest. Administrator manages the roster and ' +
+          'the volunteers. Teacher can check in, dismiss and approve a pick-up. ' +
+          'Teaching assistant can check in and dismiss for their own room.',
       },
-      // No default. An account with no role can sign in but can do nothing —
-      // which is the right outcome for a half-finished invitation, and much
-      // better than silently defaulting someone into a permission.
+      // No default. An account with no role signs in and sees nothing, which is
+      // the right outcome for a half-finished invitation and better than being
+      // quietly dropped into a permission.
       access: {
-        // Only an admin may set or change a role. Without this, a TA could edit
-        // their own record — which isSelfOrKqAdmin allows, correctly, so they
-        // can change their password — and promote themselves to admin.
-        //
-        // Field access has its own signature in Payload, hence the separate
-        // isKqAdminField rather than reusing the collection-level check.
         create: isKqAdminField,
         update: isKqAdminField,
       },
     },
+    {
+      name: 'kqActive',
+      type: 'checkbox',
+      defaultValue: true,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Unticked for somebody who has stopped serving. They keep their account and ' +
+          'their history, but cannot sign in. Tick it again to bring them back.',
+      },
+      access: {
+        create: isKqAdminField,
+        update: isKqAdminField,
+      },
+    },
+    {
+      name: 'siteAdmin',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        position: 'sidebar',
+        description:
+          'Can reach this admin panel and edit the website. Nothing to do with ' +
+          'KidzQuest. Grant it sparingly.',
+      },
+      // Only a site admin can create another one. A KidzQuest administrator
+      // has no route to this field: not here, because she cannot reach the CMS,
+      // and not through /kq/people, which refuses to touch a siteAdmin at all.
+      access: {
+        create: isSiteAdminField,
+        update: isSiteAdminField,
+      },
+    },
   ],
+  hooks: {
+    beforeLogin: [
+      ({ user }) => {
+        // Refused at the door rather than let into an empty app. Somebody who
+        // has stopped serving should be told plainly, not left wondering why
+        // every screen is blank.
+        const u = user as unknown as { kqActive?: boolean; siteAdmin?: boolean }
+        if (u.siteAdmin) return user
+        if (u.kqActive === false) {
+          throw new Error(
+            'This account is no longer active. Please contact the KidzQuest administrator.',
+          )
+        }
+        return user
+      },
+    ],
+  },
   timestamps: true,
 }

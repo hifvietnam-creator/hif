@@ -38,6 +38,9 @@ const NAV: { heading: string; items: NavItem[] }[] = [
       { href: '/kq/kids', label: 'Kids', sunday: true, ready: true, adminOnly: true },
       { href: '/kq/teachers', label: 'Teachers', ready: true, adminOnly: true },
       { href: '/kq/assistants', label: 'Assistants', ready: true, adminOnly: true },
+      // Accounts, as opposed to who is in which room this Sunday. Different
+      // question, so a different screen.
+      { href: '/kq/people', label: 'People', ready: true, adminOnly: true },
     ],
   },
 ]
