@@ -447,9 +447,17 @@ export interface User {
   id: number;
   name?: string | null;
   /**
-   * Administrator manages the roster and reaches the CMS. Teacher can check in, check out and approve a collection override. Teaching assistant can check in and out for their assigned room only.
+   * What this person does in KidzQuest. Administrator manages the roster and the volunteers. Teacher can check in, dismiss and approve a pick-up. Teaching assistant can check in and dismiss for their own room.
    */
   kqRole?: ('admin' | 'teacher' | 'ta') | null;
+  /**
+   * Unticked for somebody who has stopped serving. They keep their account and their history, but cannot sign in. Tick it again to bring them back.
+   */
+  kqActive?: boolean | null;
+  /**
+   * Can reach this admin panel and edit the website. Nothing to do with KidzQuest. Grant it sparingly.
+   */
+  siteAdmin?: boolean | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -1796,6 +1804,8 @@ export interface CategoriesSelect<T extends boolean = true> {
 export interface UsersSelect<T extends boolean = true> {
   name?: T;
   kqRole?: T;
+  kqActive?: T;
+  siteAdmin?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
