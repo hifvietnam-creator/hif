@@ -56,7 +56,7 @@ export default function KidsPage() {
           <div className="about-media reveal">
             <Image
               className="about-img"
-              src="/assets/img/kids.jpg"
+              src="/assets/kq/kq1.png"
               alt="Children enjoying KidzQuest at HIF"
               width={600}
               height={450}

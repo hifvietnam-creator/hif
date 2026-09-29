@@ -23,7 +23,10 @@ const nextConfig: NextConfig = {
         pathname: '/api/media/file/**',
       },
       {
-        pathname: '/assets/img/**',
+        // Everything under /assets, not just /assets/img — photographs now sit
+        // in per-section folders (welcome, kq) and a narrower pattern means
+        // next/image rejects them at runtime rather than at build.
+        pathname: '/assets/**',
       },
     ],
     qualities: [100],

@@ -56,7 +56,7 @@ export default function AftershockPage() {
           <div className="about-media reveal">
             <Image
               className="about-img"
-              src="/assets/img/youth.jpg"
+              src="/assets/aftershock/aftsk1.jpg"
               alt="HIF Aftershock youth together"
               width={600}
               height={450}

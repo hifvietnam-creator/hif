@@ -4,6 +4,7 @@ import Link from "next/link";
 import ScrollReveal from "@/components/ScrollReveal";
 import JourneyStrip from "@/components/JourneyStrip";
 import HasStrip from "@/components/HasStrip";
+import WelcomeCarousel from "@/components/WelcomeCarousel";
 
 export const metadata: Metadata = {
   title: "Hanoi International Fellowship — Find your spiritual home in Hanoi",
@@ -131,13 +132,15 @@ export default function HomePage() {
         <section className="section visit" id="visit">
           <div className="container">
             <ScrollReveal>
-              <Image
+              <WelcomeCarousel
                 className="visit-welcome-banner"
-                src="/assets/img/visit-welcome.jpg"
-                alt="HIF welcome team greeting guests at the door"
-                width={1180}
-                height={410}
-                loading="lazy"
+                slides={[
+                  { src: '/assets/welcome/IMG_0326.jpg', alt: 'HIF gathered together on a Sunday' },
+                  { src: '/assets/welcome/3.PNG', alt: 'Welcome team greeting guests at the door' },
+                  { src: '/assets/welcome/4.PNG', alt: 'Friends talking together after the service' },
+                  { src: '/assets/welcome/25.PNG', alt: 'The congregation worshipping' },
+                  { src: '/assets/welcome/40.PNG', alt: 'People sharing coffee and conversation' },
+                ]}
               />
             </ScrollReveal>
             <div className="visit-grid">
