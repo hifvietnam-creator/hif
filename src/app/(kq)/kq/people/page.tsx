@@ -27,8 +27,8 @@ export default async function PeoplePage() {
   const { user: raw } = await payload.auth({ headers: await nextHeaders() })
   const siteAdmin = (raw as { siteAdmin?: boolean } | null)?.siteAdmin === true
 
-  if (!user && !siteAdmin) redirect('/admin/login?redirect=/kq/people')
-  if (user && user.role !== 'admin' && !siteAdmin) redirect('/kq/station')
+  if (!user && !siteAdmin) redirect('/kq/login?redirect=/kq/people')
+  if (user && user.role !== 'admin' && !siteAdmin) redirect('/kq')
 
   return (
     <Shell

@@ -22,7 +22,7 @@ export default async function RegisterPage({
   searchParams: Promise<{ weeks?: string }>
 }) {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/register')
+  if (!user) redirect('/kq/login?redirect=/kq/register')
 
   const { weeks: weeksParam } = await searchParams
   const weeks = weeksParam === 'all' ? 0 : Math.max(4, parseInt(weeksParam ?? '12', 10) || 12)

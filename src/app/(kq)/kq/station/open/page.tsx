@@ -19,7 +19,7 @@ export default async function OpenSession({
   searchParams: Promise<{ group?: string; date?: string }>
 }) {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/station')
 
   const { group, date } = await searchParams
   if (!group) redirect('/kq/station')

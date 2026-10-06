@@ -11,8 +11,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function KidsPage() {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/kids')
-  if (user.role !== 'admin') redirect('/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/kids')
+  if (user.role !== 'admin') redirect('/kq')
 
   // Archived children are loaded too — the "Left" filter needs them, and the
   // table hides them from every other view.

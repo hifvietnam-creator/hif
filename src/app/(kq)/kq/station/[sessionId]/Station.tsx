@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import SignOut from '@/components/kq/SignOut'
 import type { Guardian, RosterChild, SessionInfo } from '@/lib/kq/station'
 
 type Props = {
@@ -187,9 +188,14 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
     <main className="mx-auto flex min-h-screen max-w-lg flex-col bg-paper">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-brand-dark px-4 pb-3 pt-4 text-white">
-        <div className="flex items-center justify-between text-sm opacity-90">
+        {/* Rooms, who you are, and a way out. The way out matters on a shared
+            tablet: without it the next volunteer to pick the thing up inherits
+            the last one's session. */}
+        <div className="flex items-center gap-3 text-sm opacity-90">
           <a href="/kq/station" className="underline-offset-2 hover:underline">← Rooms</a>
-          <span>{you.name}</span>
+          <a href="/kq" className="underline-offset-2 hover:underline">Home</a>
+          <span className="min-w-0 flex-1 truncate text-right">{you.name}</span>
+          <SignOut className="shrink-0 underline-offset-2 hover:underline disabled:opacity-50" />
         </div>
         <h1 className="mt-1 text-lg font-bold">{session.groupLabel}</h1>
         <div className="mt-3 grid grid-cols-3 gap-2 text-center">

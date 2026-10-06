@@ -1,6 +1,7 @@
 import { redirect, notFound } from 'next/navigation'
 import { headers as nextHeaders } from 'next/headers'
 
+import StationBar from '@/components/kq/StationBar'
 import { getKqUser, canWorkSession, canOverride } from '@/lib/kq/auth'
 import { getSession, getRoster } from '@/lib/kq/station'
 
@@ -18,20 +19,23 @@ export default async function StationPage({
   if (Number.isNaN(sessionId)) notFound()
 
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect(`/admin/login?redirect=/kq/station/${sessionId}`)
+  if (!user) redirect(`/kq/login?redirect=/kq/station/${sessionId}`)
 
   if (!(await canWorkSession(user, sessionId))) {
     return (
-      <main className="mx-auto max-w-md px-4 py-16 text-center">
-        <h1 className="text-xl font-bold text-ink">Not your room</h1>
-        <p className="mt-2 text-sm text-ink-2">
-          You are not rostered to this session. Ask an administrator to add you,
-          or go back and pick a room you are assigned to.
-        </p>
-        <a href="/kq/station" className="mt-6 inline-block font-semibold text-brand-dark underline">
-          Back to rooms
-        </a>
-      </main>
+      <>
+        <StationBar title="Not your room" subtitle={user.name ?? user.email} />
+        <main className="mx-auto max-w-md px-4 py-16 text-center">
+          <h1 className="text-xl font-bold text-ink">Not your room</h1>
+          <p className="mt-2 text-sm text-ink-2">
+            You are not rostered to this session. Ask an administrator to add you,
+            or go back and pick a room you are assigned to.
+          </p>
+          <a href="/kq/station" className="mt-6 inline-block font-semibold text-brand-dark underline">
+            Back to rooms
+          </a>
+        </main>
+      </>
     )
   }
 

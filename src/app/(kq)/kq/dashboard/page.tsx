@@ -29,8 +29,8 @@ const fmtLong = (iso: string) =>
 
 export default async function DashboardPage() {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/dashboard')
-  if (user.role !== 'admin') redirect('/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/dashboard')
+  if (user.role !== 'admin') redirect('/kq')
 
   const payload = await getPayload({ config: configPromise })
   const [overview, teachers, assistants] = await Promise.all([

@@ -20,8 +20,8 @@ export const dynamic = 'force-dynamic'
  */
 export default async function AssistantsPage() {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/assistants')
-  if (user.role !== 'admin') redirect('/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/assistants')
+  if (user.role !== 'admin') redirect('/kq')
 
   const date = upcomingSunday()
   const staff = await listStaff(date)

@@ -12,8 +12,8 @@ export const dynamic = 'force-dynamic'
 
 export default async function TeachersPage() {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/teachers')
-  if (user.role !== 'admin') redirect('/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/teachers')
+  if (user.role !== 'admin') redirect('/kq')
 
   const date = upcomingSunday()
   const staff = await listStaff(date)

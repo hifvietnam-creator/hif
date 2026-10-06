@@ -40,7 +40,7 @@ export default async function LabelPage({
   if (Number.isNaN(attendanceId)) notFound()
 
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login')
+  if (!user) redirect('/kq/login')
 
   const label = await getLabel(attendanceId)
   if (!label) notFound()

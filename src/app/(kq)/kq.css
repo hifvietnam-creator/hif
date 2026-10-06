@@ -20,6 +20,12 @@
 @import 'tailwindcss';
 
 @source "./";
+/* The shell, the station bar and the sign-out button live in src/components/kq
+   rather than in this route group, so they fall outside the @source above.
+   Automatic detection does reach them today, but it is the same class of
+   silent failure described above: the classes simply stop being generated and
+   the sidebar renders as plain text. Name them. */
+@source "../../components/kq/";
 
 @theme {
   /* HIF brand, from the Journey graphic */

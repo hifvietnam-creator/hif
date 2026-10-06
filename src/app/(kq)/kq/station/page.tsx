@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { headers as nextHeaders } from 'next/headers'
 
+import StationBar from '@/components/kq/StationBar'
 import { getKqUser } from '@/lib/kq/auth'
 import { getPool } from '@/lib/db'
 import { upcomingSunday } from '@/lib/kq/station'
@@ -16,7 +17,7 @@ export const dynamic = 'force-dynamic'
  */
 export default async function StationPicker() {
   const user = await getKqUser(await nextHeaders())
-  if (!user) redirect('/admin/login?redirect=/kq/station')
+  if (!user) redirect('/kq/login?redirect=/kq/station')
 
   const sunday = upcomingSunday()
   const db = getPool()
@@ -45,58 +46,62 @@ export default async function StationPicker() {
   })
 
   return (
-    <main className="mx-auto max-w-2xl px-4 py-8">
-      <header className="mb-6">
-        <h1 className="text-2xl font-bold tracking-tight text-ink">KidzQuest</h1>
-        <p className="mt-1 text-sm text-hifmuted">
-          {pretty} · signed in as {user.name ?? user.email} ({user.role})
-        </p>
-      </header>
+    <>
+      <StationBar title="Pick a room" subtitle={user.name ?? user.email} />
 
-      <div className="space-y-3">
-        {rows.map((r) => {
-          const expected = Number(r.expected)
-          const present = Number(r.present)
-          const collected = Number(r.collected)
-          const started = r.session_id !== null
+      <main className="mx-auto max-w-2xl px-4 py-6">
+        <header className="mb-5">
+          <h1 className="text-xl font-bold tracking-tight text-ink">{pretty}</h1>
+          <p className="mt-0.5 text-sm text-hifmuted">
+            Tap your room to start checking children in.
+          </p>
+        </header>
 
-          return (
-            <Link
-              key={r.code}
-              href={`/kq/station/open?group=${r.code}&date=${sunday}`}
-              className="kq-tap flex items-center gap-4 rounded-card border border-line bg-paper p-4 shadow-sm transition hover:border-brand"
-            >
-              <div className="flex-1">
-                <div className="text-lg font-semibold text-ink">{r.label}</div>
-                <div className="text-sm text-hifmuted">
-                  {expected === 0 ? (
-                    <span className="text-flag">Nobody on the register</span>
-                  ) : (
-                    <>
-                      {expected} on the register
-                      {started && ` · ${present} here · ${collected} dismissed`}
-                    </>
-                  )}
-                </div>
-              </div>
-              <span
-                className={`rounded-full px-3 py-1 text-xs font-bold ${
-                  started ? 'bg-ok-soft text-ok-ink' : 'bg-mist text-hifmuted'
-                }`}
+        <div className="space-y-3">
+          {rows.map((r) => {
+            const expected = Number(r.expected)
+            const present = Number(r.present)
+            const collected = Number(r.collected)
+            const started = r.session_id !== null
+
+            return (
+              <Link
+                key={r.code}
+                href={`/kq/station/open?group=${r.code}&date=${sunday}`}
+                className="kq-tap flex items-center gap-4 rounded-card border border-line bg-paper p-4 shadow-sm transition hover:border-brand"
               >
-                {started ? 'Open' : 'Start'}
-              </span>
-            </Link>
-          )
-        })}
-      </div>
+                <div className="flex-1">
+                  <div className="text-lg font-semibold text-ink">{r.label}</div>
+                  <div className="text-sm text-hifmuted">
+                    {expected === 0 ? (
+                      <span className="text-flag">Nobody on the register</span>
+                    ) : (
+                      <>
+                        {expected} on the register
+                        {started && ` · ${present} here · ${collected} dismissed`}
+                      </>
+                    )}
+                  </div>
+                </div>
+                <span
+                  className={`rounded-full px-3 py-1 text-xs font-bold ${
+                    started ? 'bg-ok-soft text-ok-ink' : 'bg-mist text-hifmuted'
+                  }`}
+                >
+                  {started ? 'Open' : 'Start'}
+                </span>
+              </Link>
+            )
+          })}
+        </div>
 
-      {user.role === 'admin' && (
-        <p className="mt-8 text-sm text-hifmuted">
-          You are an administrator, so you can open any room. Teachers and assistants
-          only see rooms they are rostered to.
-        </p>
-      )}
-    </main>
+        {user.role === 'admin' && (
+          <p className="mt-8 text-sm text-hifmuted">
+            You are an administrator, so you can open any room. Teachers and assistants
+            only see rooms they are rostered to.
+          </p>
+        )}
+      </main>
+    </>
   )
 }

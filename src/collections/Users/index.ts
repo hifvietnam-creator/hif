@@ -1,4 +1,5 @@
 import type { CollectionConfig } from 'payload'
+import { APIError } from 'payload'
 
 import {
   isKqAdminField,
@@ -126,8 +127,14 @@ export const Users: CollectionConfig = {
         const u = user as unknown as { kqActive?: boolean; siteAdmin?: boolean }
         if (u.siteAdmin) return user
         if (u.kqActive === false) {
-          throw new Error(
+          // APIError rather than a bare Error on purpose. Payload turns an
+          // unrecognised throw into a 500 and "Something went wrong", which
+          // would send a volunteer to the site administrator about a server
+          // fault instead of to Ate about their account. APIError carries the
+          // message and the status through to the sign-in screen.
+          throw new APIError(
             'This account is no longer active. Please contact the KidzQuest administrator.',
+            403,
           )
         }
         return user

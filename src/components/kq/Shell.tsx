@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import React from 'react'
 
+import SignOut from './SignOut'
+
 /**
  * Admin shell for KidzQuest.
  *
@@ -23,29 +25,51 @@ type NavItem = {
   adminOnly?: boolean
 }
 
+/**
+ * Labels are the ones the ministry uses, not the ones the database uses.
+ *
+ * "Teachers" and "People" both used to be in this list, and both read as the
+ * place you add a teacher. One was the Sunday rota, the other was the accounts,
+ * and nothing on screen said which. They now say what they are for.
+ *
+ * The second heading was "Admin", which is the single word for the one place
+ * Ate must never go. It is "Ministry" now.
+ */
 const NAV: { heading: string; items: NavItem[] }[] = [
+  {
+    heading: 'KidzQuest',
+    items: [{ href: '/kq', label: 'Home', ready: true }],
+  },
   {
     heading: 'Sunday',
     items: [
-      { href: '/kq/station', label: 'Attendance', sunday: true, ready: true },
+      { href: '/kq/station', label: 'Take attendance', sunday: true, ready: true },
       { href: '/kq/register', label: 'Register', sunday: true, ready: true },
     ],
   },
   {
-    heading: 'Admin',
+    heading: 'Ministry',
     items: [
       { href: '/kq/dashboard', label: 'Dashboard', sunday: true, ready: true, adminOnly: true },
-      { href: '/kq/kids', label: 'Kids', sunday: true, ready: true, adminOnly: true },
-      { href: '/kq/teachers', label: 'Teachers', ready: true, adminOnly: true },
-      { href: '/kq/assistants', label: 'Assistants', ready: true, adminOnly: true },
-      // Accounts, as opposed to who is in which room this Sunday. Different
-      // question, so a different screen.
-      { href: '/kq/people', label: 'People', ready: true, adminOnly: true },
+      { href: '/kq/kids', label: 'Children', sunday: true, ready: true, adminOnly: true },
+      // Who is in which room this Sunday.
+      { href: '/kq/teachers', label: 'Rota: teachers', ready: true, adminOnly: true },
+      { href: '/kq/assistants', label: 'Rota: assistants', ready: true, adminOnly: true },
+      // Accounts, which is a different question from the rota, so a different
+      // screen. This is where a teacher gets created.
+      { href: '/kq/people', label: 'Volunteers and logins', ready: true, adminOnly: true },
     ],
   },
 ]
 
 const ALL_ITEMS = NAV.flatMap((s) => s.items)
+
+/** "ta" is not a word. Nobody calls themselves that out loud. */
+const ROLE_LABEL: Record<string, string> = {
+  admin: 'Administrator',
+  teacher: 'Teacher',
+  ta: 'Teaching assistant',
+}
 
 export default function Shell({
   current,
@@ -96,6 +120,10 @@ export default function Shell({
               </div>
             )
           })}
+
+          <div className="mt-3 border-t border-[#24313f] pt-2">
+            <SignOut className="w-full rounded-md px-2.5 py-3 text-left text-sm text-[#b6c2ce] hover:bg-[#1f2b38] hover:text-white disabled:opacity-50" />
+          </div>
         </nav>
       </details>
 
@@ -128,9 +156,12 @@ export default function Shell({
           )
         })}
 
-        <div className="mt-auto border-t border-[#24313f] px-2 pt-3 text-xs">
-          <div className="font-semibold text-white">{user.name}</div>
-          <div className="capitalize text-[#7d8fa2]">{user.role}</div>
+        <div className="mt-auto border-t border-[#24313f] pt-3">
+          <div className="px-2 text-xs">
+            <div className="font-semibold text-white">{user.name}</div>
+            <div className="text-[#7d8fa2]">{ROLE_LABEL[user.role] ?? user.role}</div>
+          </div>
+          <SignOut className="mt-2 w-full rounded-md px-2 py-2 text-left text-xs font-semibold text-[#8fa3b6] hover:bg-[#1f2b38] hover:text-white disabled:opacity-50" />
         </div>
       </aside>
 
