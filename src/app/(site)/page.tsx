@@ -209,7 +209,8 @@ export default async function HomePage() {
               <Link className="min-card" href="/saranbang">
                 <span className="min-bar bar-red" />
                 <h3>Saranbang</h3>
-                <p>A Korean conversation club — practise Korean and make friends.</p>
+                <p>A friendly conversation club for anyone learning Korean.</p>
+                <span className="min-when">Thursdays · 6:30–8:30pm</span>
                 <span className="min-more">
                   About Saranbang <span aria-hidden="true">→</span>
                 </span>

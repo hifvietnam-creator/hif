@@ -64,7 +64,7 @@ export default function MinistriesPage() {
               <Link className="min-card" href="/saranbang">
                 <span className="min-bar bar-red"></span>
                 <h3>Saranbang Korean Club</h3>
-                <p>A Korean conversation club — practise Korean and make friends.</p>
+                <p>A conversation club for anyone learning Korean — Thursdays, 6:30pm.</p>
               </Link>
               <Link className="min-card" href="/alpha">
                 <span className="min-bar bar-red"></span>
