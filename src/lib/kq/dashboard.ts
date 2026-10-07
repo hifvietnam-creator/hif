@@ -39,6 +39,8 @@ export type Concern = {
   headline: string
   detail: string
   meta: string
+  /** Where to go to deal with it. A row without one is a fact, not a job. */
+  href?: string
 }
 
 export type Overview = {
@@ -134,21 +136,47 @@ export async function getOverview(): Promise<Overview> {
   // ── Needs a look ───────────────────────────────────────────────────────────
   const concerns: Concern[] = []
 
-  // Children nobody may legally collect. The one that stops a Sunday.
-  const { rows: noCollector } = await db.query<{ n: string }>(
-    `select count(*)::text as n
-       from kq.current_roster r
-      where not exists (
-        select 1 from kq.child_guardians cg
-         where cg.child_id = r.child_id and cg.can_pickup
-      )`,
+  // Children nobody may collect. The one that stops a Sunday.
+  //
+  // Two rows, not one, because they are two different jobs. "No adult on file"
+  // is a conversation with a parent. "On file, none ticked" is reading a name
+  // and ticking a box. Under one number Ate could not tell ten seconds of work
+  // from ten minutes, and in October 2026 all 42 turned out to be the first
+  // kind, which nobody had guessed.
+  const { rows: noCollector } = await db.query<{ no_adult: string; none_ticked: string }>(
+    `select count(*) filter (where not has_adult)::text as no_adult,
+            count(*) filter (where has_adult)::text     as none_ticked
+       from (
+         select exists (select 1 from kq.child_guardians cg
+                         where cg.child_id = r.child_id) as has_adult
+           from kq.current_roster r
+          where not exists (
+            select 1 from kq.child_guardians cg
+             where cg.child_id = r.child_id and cg.can_pickup
+          )
+       ) t`,
   )
-  if (Number(noCollector[0]!.n) > 0) {
+  const noAdult = Number(noCollector[0]!.no_adult)
+  const noneTicked = Number(noCollector[0]!.none_ticked)
+  const kids = (n: number) => (n === 1 ? '1 child' : `${n} children`)
+
+  if (noAdult > 0) {
     concerns.push({
       kind: 'blocker',
-      headline: `${noCollector[0]!.n} children`,
-      detail: 'have nobody authorised to collect them',
-      meta: 'check-out needs an override',
+      headline: kids(noAdult),
+      detail: noAdult === 1 ? 'has no adult on file' : 'have no adult on file',
+      meta: 'add one, or a teacher can at the door',
+      href: '/kq/kids?needs=guardian',
+    })
+  }
+  if (noneTicked > 0) {
+    concerns.push({
+      kind: 'blocker',
+      headline: kids(noneTicked),
+      detail:
+        (noneTicked === 1 ? 'has' : 'have') + ' an adult on file, but nobody ticked to collect',
+      meta: 'open the row and tick',
+      href: '/kq/kids?needs=unticked',
     })
   }
 

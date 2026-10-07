@@ -2,7 +2,7 @@ import { redirect, notFound } from 'next/navigation'
 import { headers as nextHeaders } from 'next/headers'
 
 import StationBar from '@/components/kq/StationBar'
-import { getKqUser, canWorkSession, canOverride } from '@/lib/kq/auth'
+import { getKqUser, canAddAdult, canWorkSession, canOverride } from '@/lib/kq/auth'
 import { getSession, getRoster } from '@/lib/kq/station'
 
 import Station from './Station'
@@ -52,6 +52,7 @@ export default async function StationPage({
       initialRoster={roster}
       you={{ id: user.id, name: user.name ?? user.email, role: user.role }}
       mayOverride={canOverride(user)}
+      mayAddAdult={canAddAdult(user)}
     />
   )
 }

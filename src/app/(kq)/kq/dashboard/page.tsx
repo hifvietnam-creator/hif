@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { headers as nextHeaders } from 'next/headers'
 import { getPayload } from 'payload'
@@ -5,7 +6,10 @@ import configPromise from '@payload-config'
 
 import Shell from '@/components/kq/Shell'
 import { getKqUser } from '@/lib/kq/auth'
+import { listPickupsToConfirm } from '@/lib/kq/children'
 import { getOverview } from '@/lib/kq/dashboard'
+
+import PickupsToConfirm from './PickupsToConfirm'
 
 export const dynamic = 'force-dynamic'
 
@@ -33,8 +37,9 @@ export default async function DashboardPage() {
   if (user.role !== 'admin') redirect('/kq')
 
   const payload = await getPayload({ config: configPromise })
-  const [overview, teachers, assistants] = await Promise.all([
+  const [overview, toConfirm, teachers, assistants] = await Promise.all([
     getOverview(),
+    listPickupsToConfirm(),
     payload.count({ collection: 'users', where: { kqRole: { equals: 'teacher' } } }),
     payload.count({ collection: 'users', where: { kqRole: { equals: 'ta' } } }),
   ])
@@ -184,26 +189,45 @@ export default async function DashboardPage() {
           <h2 className="text-[15px] font-semibold text-ink">Needs a look</h2>
         </div>
         <ul>
-          {overview.concerns.map((c, i) => (
-            <li key={i} className="flex items-center gap-3 border-b border-line/70 px-4 py-3 last:border-0">
-              <span
-                className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold ${
-                  c.kind === 'blocker' ? 'bg-alert-soft text-alert-deep' : 'bg-flag-soft text-flag'
-                }`}
-              >
-                {c.kind === 'blocker' ? '!' : '?'}
-              </span>
-              <span className="flex-1 text-sm text-ink">
-                <b>{c.headline}</b> {c.detail}
-              </span>
-              <span className="hidden text-xs text-hifmuted sm:block">{c.meta}</span>
-            </li>
-          ))}
+          {overview.concerns.map((c, i) => {
+            const body = (
+              <>
+                <span
+                  className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold ${
+                    c.kind === 'blocker' ? 'bg-alert-soft text-alert-deep' : 'bg-flag-soft text-flag'
+                  }`}
+                >
+                  {c.kind === 'blocker' ? '!' : '?'}
+                </span>
+                <span className="flex-1 text-sm text-ink">
+                  <b>{c.headline}</b> {c.detail}
+                </span>
+                <span className="hidden text-xs text-hifmuted sm:block">{c.meta}</span>
+                {c.href && <span className="shrink-0 text-lg leading-none text-brand-dark">›</span>}
+              </>
+            )
+            // A row that can be acted on is a link to where that happens, and
+            // the whole row is the target. Rows that are only a fact stay text,
+            // so nothing looks tappable that is not.
+            return (
+              <li key={i} className="border-b border-line/70 last:border-0">
+                {c.href ? (
+                  <Link href={c.href} className="flex items-center gap-3 px-4 py-3.5 hover:bg-mist/60">
+                    {body}
+                  </Link>
+                ) : (
+                  <div className="flex items-center gap-3 px-4 py-3">{body}</div>
+                )}
+              </li>
+            )
+          })}
           {overview.concerns.length === 0 && (
             <li className="px-4 py-8 text-center text-sm text-hifmuted">Nothing outstanding.</li>
           )}
         </ul>
       </section>
+
+      <PickupsToConfirm initial={toConfirm} />
     </Shell>
   )
 }

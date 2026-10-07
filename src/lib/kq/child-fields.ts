@@ -68,3 +68,68 @@ export const STATUS_LABEL: Record<ChildStatus, string> = {
   moved_to_aftershock: 'Moved to Aftershock',
   duplicate: 'Duplicate record',
 }
+
+// ── Adults who may collect ───────────────────────────────────────────────────
+
+/**
+ * Is this relationship one where a tick needs no explanation?
+ *
+ * A mother or a father collecting their own child is the ordinary case and
+ * should cost one tap. Everybody else, including a blank, is somebody acting on
+ * a parent's say-so, and the record should name where that say-so came from.
+ *
+ * Deliberately a short closed list. "Parent" is not on it: it is what gets
+ * typed when nobody asked which one, and that is exactly when the line is worth
+ * having.
+ */
+const PARENT_WORDS = new Set(['mother', 'father', 'mom', 'mum', 'mummy', 'mommy', 'dad', 'daddy'])
+
+export const isParentRelationship = (relationship: string | null | undefined): boolean =>
+  PARENT_WORDS.has((relationship ?? '').trim().toLowerCase())
+
+/** Shortest source line the server accepts. Enough for "Mum said so". */
+export const PICKUP_SOURCE_MIN = 5
+
+/**
+ * Does granting pick-up to this adult need a line saying who authorised it?
+ * One rule, used by the form to show the box and by the API to insist on it.
+ */
+export const needsPickupSource = (relationship: string | null | undefined, canPickup: boolean) =>
+  canPickup && !isParentRelationship(relationship)
+
+/** What the add-an-adult form sends, on every screen that has one. */
+export type NewAdultInput = {
+  fullName: string
+  relationship: string | null
+  phone: string | null
+  email: string | null
+  canPickup: boolean
+  /** Who said they may collect. Required when needsPickupSource is true. */
+  source: string | null
+}
+
+/** What the server says back, so the screen shows the row that actually landed. */
+export type AddedAdult = {
+  guardianId: number
+  fullName: string
+  relationship: string | null
+  phone: string | null
+  email: string | null
+  canPickup: boolean
+  /** True when this adult was already on file, for a brother or sister. */
+  alreadyOnFile: boolean
+}
+
+/** One line on Ate's list of teacher additions to confirm. */
+export type PickupToConfirm = {
+  childId: number
+  guardianId: number
+  childName: string
+  groupCode: string
+  guardianName: string
+  guardianPhone: string | null
+  relationship: string | null
+  source: string | null
+  addedBy: string | null
+  addedAt: string | null
+}

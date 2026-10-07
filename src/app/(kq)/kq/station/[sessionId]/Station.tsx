@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
+import AdultSheet, { saveAdult } from '@/components/kq/AdultSheet'
 import SignOut from '@/components/kq/SignOut'
 import type { Guardian, RosterChild, SessionInfo } from '@/lib/kq/station'
 
@@ -10,6 +11,8 @@ type Props = {
   initialRoster: RosterChild[]
   you: { id: number; name: string; role: string }
   mayOverride: boolean
+  /** Teachers and administrators. Assistants see the adults and who to ask. */
+  mayAddAdult: boolean
 }
 
 type Queued = {
@@ -39,12 +42,15 @@ const uuid = () =>
 const displayName = (c: RosterChild) =>
   `${c.preferredName || c.firstName} ${c.lastName}`.trim()
 
-export default function Station({ session, initialRoster, you, mayOverride }: Props) {
+export default function Station({ session, initialRoster, you, mayOverride, mayAddAdult }: Props) {
   const [roster, setRoster] = useState(initialRoster)
   const [mode, setMode] = useState<'in' | 'out'>('in')
   const [query, setQuery] = useState('')
   const [active, setActive] = useState<RosterChild | null>(null)
   const [adding, setAdding] = useState(false)
+  // The child whose adults are open. An id, not the row, so the sheet reads
+  // from the roster and shows the new adult the moment the reload lands.
+  const [adultsFor, setAdultsFor] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [lastCode, setLastCode] = useState<{ name: string; code: string | null } | null>(null)
 
@@ -183,6 +189,7 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
   }, [roster, mode, query])
 
   const stillHere = counts.present
+  const adultsChild = adultsFor === null ? null : roster.find((c) => c.childId === adultsFor) ?? null
 
   return (
     <main className="mx-auto flex min-h-screen max-w-lg flex-col bg-paper">
@@ -285,14 +292,32 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
                   </span>
                 )}
               </div>
-              <div className="truncate text-xs text-hifmuted">
+              {/* The adults line is a button. It is the one place on this
+                  screen that says who a child goes home with, so it is also
+                  where a teacher adds somebody. Sized for a thumb, with the
+                  Check in button a safe distance to the right. */}
+              <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-hifmuted">
                 {c.guardians.length === 0 ? (
-                  <span className="font-semibold text-alert">No guardian on file</span>
+                  <button
+                    onClick={() => setAdultsFor(c.childId)}
+                    className="kq-tap rounded-full bg-alert-soft px-2.5 py-1.5 font-bold text-alert-deep"
+                  >
+                    {mayAddAdult ? 'No adult on file · Add one' : 'No adult on file'}
+                  </button>
                 ) : (
-                  c.guardians[0]!.fullName
+                  <button
+                    onClick={() => setAdultsFor(c.childId)}
+                    className="kq-tap max-w-full truncate rounded-full bg-mist px-2.5 py-1.5 font-semibold text-ink-2"
+                  >
+                    {c.guardians[0]!.fullName}
+                    {c.guardians.length > 1 && ` +${c.guardians.length - 1}`}
+                  </button>
                 )}
-                {mode === 'in' && c.cardCode && ` · card ${c.cardCode}`}
-                {c.provisional && ' · room unconfirmed'}
+                {c.guardians.length > 0 && !c.guardians.some((g) => g.canPickup) && (
+                  <span className="font-semibold text-alert-deep">nobody may collect yet</span>
+                )}
+                {mode === 'in' && c.cardCode && <span>card {c.cardCode}</span>}
+                {c.provisional && <span>room unconfirmed</span>}
               </div>
             </div>
 
@@ -388,6 +413,36 @@ export default function Station({ session, initialRoster, you, mayOverride }: Pr
               setError('No connection. A child cannot be registered offline.')
               return false
             }
+          }}
+        />
+      )}
+
+      {adultsChild && (
+        <AdultSheet
+          // Keyed so that opening a second child starts a clean form.
+          key={adultsChild.childId}
+          childName={adultsChild.preferredName || adultsChild.firstName}
+          adults={adultsChild.guardians}
+          mayAdd={mayAddAdult}
+          addNote={
+            you.role === 'teacher'
+              ? 'This is saved with your name, and Ate will see it this week.'
+              : undefined
+          }
+          onClose={() => setAdultsFor(null)}
+          onAdd={async (input) => {
+            // Not queued, for the same reason a new child is not: the server
+            // decides whether this adult is already on file for a brother or
+            // sister, and the answer has to come back before anyone is told
+            // it is saved.
+            const { problem } = await saveAdult({
+              action: 'guardian',
+              childId: adultsChild.childId,
+              sessionId: session.id,
+              ...input,
+            })
+            if (problem === null) await refresh()
+            return problem
           }}
         />
       )}

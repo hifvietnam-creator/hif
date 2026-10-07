@@ -56,7 +56,8 @@ can never be edited.** Write a new one.
 
 `010` the `kq` schema · `011` year bounds · `012` session key (NULLs don't
 collide in a unique constraint) · `013` child audit · `014` child status ·
-`015` Cognito fields · `016` card codes · `017` corrections.
+`015` Cognito fields · `016` card codes · `017` corrections · `018` guardian
+entry (**not applied yet**).
 
 ## Traps that have already cost a day each
 
@@ -80,55 +81,64 @@ collide in a unique constraint) · `013` child audit · `014` child status ·
 
 ---
 
-## Agreed and not yet built: guardian entry
+## Guardian entry: built 6 October, not yet committed or deployed
 
-This is the next build. The design is settled; the data question below is not.
+**The query was run.** All 42 children nobody could collect had **no guardian
+on record**. Zero had a guardian with nothing ticked. 42 of 169 on the roster:
+Pathfinders 17, Trailblazers 12, Explorers 7, Voyagers 6. So this is an *add an
+adult* build. `node scripts/kq-guardian-split.mjs` reruns it, read-only.
 
-**Why.** Children on the roster with nobody holding `can_pickup` can be
-released to anyone, because there is no list for a TA to check against. The
-dashboard's "Needs a look" row counts them live.
+**Before pushing, in this order:**
 
-**The shape.** "Nobody authorised to collect them" is two problems in one
-label, and they must be separated on screen or Ate cannot tell a ten-second fix
-from a ten-minute phone call:
+1. `pnpm db:migrate:kq` to apply `018_kidzquest_guardian_entry.sql`. It only
+   adds columns, a view and an event type, so the live code keeps working with
+   it applied. The new code does **not** work without it.
+2. `pnpm check:types`.
+3. Stage by name. The files are listed at the end of this section.
 
-1. Guardians on record, none ticked `can_pickup`. She reads "mother", ticks it.
-2. No guardian rows at all. Needs a conversation with the parent.
+**What it does:**
 
-**Run this before building** — the August import set `can_pickup` for whichever
-contact the spreadsheet named primary, so most of these are probably case 2,
-which makes it an *add a guardian* screen rather than a *tick a box* screen:
+- Dashboard "Needs a look" is two rows now, each a link: no adult on file
+  (`/kq/kids?needs=guardian`) and adults on file with none ticked
+  (`?needs=unticked`).
+- One shared sheet, `src/components/kq/AdultSheet.tsx`: bottom sheet on a
+  phone, side panel on a laptop. Mother, Father, Someone else. Mother or father
+  is tick and save. Anyone else needs one line, "Who told you they may
+  collect?", enforced by the API as well as the form.
+- **Teachers add an adult from the Take attendance room list**, on the child's
+  row, not inside the check-in pop-up. Only for children in a room they are
+  rostered to. Assistants see the adults and are asked to tell a teacher.
+- **A teacher's tick is in force straight away.** It appears on the dashboard
+  under "Added by a teacher", where Ate confirms it or removes the tick.
+- Every add, tick, untick and confirm writes `kq.child_events` with the actor's
+  id, name and role, and the source line.
+- Teachers cannot change an existing tick. That stays with Ate.
 
-```sql
-select
-  case when exists (select 1 from kq.child_guardians cg where cg.child_id = r.child_id)
-       then 'has a guardian, none ticked'
-       else 'no guardian on record' end as situation,
-  count(*)
-from kq.current_roster r
-where not exists (
-  select 1 from kq.child_guardians cg
-   where cg.child_id = r.child_id and cg.can_pickup
-)
-group by 1;
-```
+**Two behaviour changes worth knowing:**
 
-**Decided:**
+- `addGuardian` used to reuse an existing adult on phone or email alone. It now
+  needs the name to match too. Families share a phone, and the old rule would
+  have authorised whoever was already stored under that number.
+- The Children page used to invent an id for a newly added adult, so ticking
+  them before a reload saved nothing. It now uses the id the server returns.
 
-- No new nav item. A filter on the Children page, reached by making the
-  dashboard's "Needs a look" row a link.
-- A slide-out panel per child showing guardians: name, relationship, phone, and
-  whether each may collect. Guardians only for this build. Not the timeline.
-- Every change writes to the child audit table with the actor's name.
-- **Teachers may add a guardian too**, not only Ate. She is not in every
-  classroom and the right moment to ask is at the door. Teachers already hold
-  override, so this is not a new power, but `can_pickup` is longer-lived than
-  an override: permanent and silent every Sunday after. So teacher edits are
-  logged loudly and surface to Ate as an "authorised by a teacher recently"
-  list to confirm, following the existing `placements_to_confirm` pattern.
-- Friction only where it earns its place: mother or father, tick and move on.
-  Blank, driver, helper, grandparent, anything else, type one line saying where
-  the authorisation came from. It goes in the audit.
+**Tested** against a local Postgres 16 with migrations 001 to 018 applied, and
+in a browser at 390px and 1280px as teacher, assistant and administrator.
+**Not tested against Neon**, which this session could not reach.
+
+**Files:** `migrations/analytics/018_kidzquest_guardian_entry.sql`,
+`src/components/kq/AdultSheet.tsx`,
+`src/app/(kq)/kq/dashboard/PickupsToConfirm.tsx`,
+`src/app/(kq)/kq/dashboard/page.tsx`, `src/app/(kq)/kq/kids/KidsTable.tsx`,
+`src/app/(kq)/kq/kids/page.tsx`,
+`src/app/(kq)/kq/station/[sessionId]/Station.tsx`,
+`src/app/(kq)/kq/station/[sessionId]/page.tsx`,
+`src/app/api/kq/children/route.ts`, `src/lib/kq/auth.ts`,
+`src/lib/kq/child-fields.ts`, `src/lib/kq/children.ts`,
+`src/lib/kq/dashboard.ts`, `scripts/kq-guardian-split.mjs`, and this file.
+
+**Left for later:** the volunteer guides do not show the new button yet, and a
+teacher cannot correct their own typo after saving.
 
 ## Registration: Cognito or our own form
 

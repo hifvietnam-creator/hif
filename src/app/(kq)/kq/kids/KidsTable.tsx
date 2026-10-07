@@ -3,13 +3,17 @@
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
 
+import AdultSheet, { saveAdult } from '@/components/kq/AdultSheet'
 import Filters, {
   GRADE_OPTIONS, GROUP_OPTIONS, SEX_OPTIONS,
   type FilterDef, type FilterState,
 } from '@/components/kq/Filters'
 // From child-fields, not children: the latter imports the Postgres pool, and a
 // client component importing it pulls `pg` into the browser bundle.
-import { CHILD_STATUSES, STATUS_LABEL, type ChildRow, type ChildStatus } from '@/lib/kq/child-fields'
+import {
+  CHILD_STATUSES, STATUS_LABEL,
+  type AddedAdult, type ChildRow, type ChildStatus,
+} from '@/lib/kq/child-fields'
 
 const GROUP_CODES = ['explorers', 'voyagers', 'trailblazers', 'pathfinders', 'aftershock']
 
@@ -31,10 +35,16 @@ const GROUP_TINT: Record<string, string> = {
 
 type Save = 'idle' | 'saving' | 'saved' | 'error'
 
-export default function KidsTable({ initial }: { initial: ChildRow[] }) {
+export default function KidsTable({
+  initial, initialFilters = {},
+}: {
+  initial: ChildRow[]
+  /** From the URL, so the dashboard can link straight to "no adult on file". */
+  initialFilters?: FilterState
+}) {
   const [rows, setRows] = useState(initial)
   const [query, setQuery] = useState('')
-  const [filters, setFilters] = useState<FilterState>({})
+  const [filters, setFilters] = useState<FilterState>(initialFilters)
   const [archiving, setArchiving] = useState<ChildRow | null>(null)
   const [adding, setAdding] = useState(false)
   const router = useRouter()
@@ -70,6 +80,14 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
   const local = (childId: number, patchRow: Partial<ChildRow>) =>
     setRows((rs) => rs.map((r) => (r.childId === childId ? { ...r, ...patchRow } : r)))
 
+  const flashSaved = () => {
+    setSave('saved')
+    setTimeout(() => setSave((s) => (s === 'saved' ? 'idle' : s)), 1500)
+  }
+
+  // The child whose adults are open in the side panel.
+  const panelRow = expanded === null ? null : rows.find((r) => r.childId === expanded) ?? null
+
   const counts = useMemo(() => {
     const live = rows.filter((r) => r.status === 'active')
     return {
@@ -77,6 +95,9 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
       noCollector: live.filter((r) => !r.guardians.some((g) => g.canPickup)).length,
       noGrade: live.filter((r) => r.grade === null).length,
       noGuardian: live.filter((r) => r.guardians.length === 0).length,
+      noneTicked: live.filter(
+        (r) => r.guardians.length > 0 && !r.guardians.some((g) => g.canPickup),
+      ).length,
       archived: rows.filter((r) => r.status !== 'active').length,
     }
   }, [rows])
@@ -105,6 +126,10 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
 
       if (filters.needs === 'collector' && r.guardians.some((g) => g.canPickup)) return false
       if (filters.needs === 'guardian' && r.guardians.length > 0) return false
+      if (
+        filters.needs === 'unticked' &&
+        (r.guardians.length === 0 || r.guardians.some((g) => g.canPickup))
+      ) return false
       if (filters.needs === 'card' && r.cardCode) return false
       if (filters.needs === 'placement' && !r.provisional) return false
       if (filters.needs === 'allergy' && !r.allergies) return false
@@ -124,8 +149,12 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
       key: 'needs',
       label: 'Needs attention',
       options: [
-        { value: 'collector', label: 'Nobody can collect', count: counts.noCollector },
-        { value: 'guardian', label: 'No guardian at all', count: counts.noGuardian },
+        // Two different jobs under one worry, so they are two filters. The
+        // first is a conversation with a parent. The second is reading a name
+        // and ticking a box.
+        { value: 'guardian', label: 'No adult on file', count: counts.noGuardian },
+        { value: 'unticked', label: 'Adults on file, none ticked', count: counts.noneTicked },
+        { value: 'collector', label: 'Nobody can collect (both)', count: counts.noCollector },
         { value: 'card', label: 'No card code' },
         { value: 'placement', label: 'Room unconfirmed' },
         { value: 'allergy', label: 'Has an allergy' },
@@ -210,7 +239,6 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
               const canBeCollected = r.guardians.some((g) => g.canPickup)
               const open = expanded === r.childId
               return (
-                <>
                   <tr
                     key={r.childId}
                     className={`border-t border-line/70 ${open ? 'bg-brand-soft/40' : ''}`}
@@ -219,9 +247,10 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
                       <button
                         onClick={() => setExpanded(open ? null : r.childId)}
                         className="grid h-6 w-6 place-items-center rounded text-hifmuted hover:bg-mist"
-                        title="Guardians"
+                        title="Adults for this child"
+                        aria-label={`Adults for ${r.preferredName || r.firstName}`}
                       >
-                        {open ? '▾' : '▸'}
+                        {open ? '◂' : '▸'}
                       </button>
                     </Td>
                     <Td>
@@ -377,47 +406,6 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
                       )}
                     </Td>
                   </tr>
-
-                  {open && (
-                    <tr key={`${r.childId}-g`} className="border-t border-line/70 bg-brand-soft/25">
-                      <td colSpan={10} className="px-4 py-3">
-                        <GuardianPanel
-                          row={r}
-                          onTogglePickup={async (guardianId, next) => {
-                            local(r.childId, {
-                              guardians: r.guardians.map((g) =>
-                                g.id === guardianId ? { ...g, canPickup: next } : g,
-                              ),
-                            })
-                            await patch({
-                              action: 'pickup', childId: r.childId, guardianId, canPickup: next,
-                            })
-                          }}
-                          onAdd={async (input) => {
-                            const res = await patch({ action: 'guardian', childId: r.childId, ...input })
-                            if (res) {
-                              local(r.childId, {
-                                guardians: [
-                                  ...r.guardians,
-                                  {
-                                    id: Date.now(), // replaced on next full load
-                                    fullName: input.fullName,
-                                    relationship: input.relationship,
-                                    canPickup: input.canPickup,
-                                    isPrimary: false,
-                                    email: input.email,
-                                    phone: input.phone,
-                                  },
-                                ],
-                              })
-                            }
-                            return !!res
-                          }}
-                        />
-                      </td>
-                    </tr>
-                  )}
-                </>
               )
             })}
 
@@ -469,6 +457,57 @@ export default function KidsTable({ initial }: { initial: ChildRow[] }) {
               setError('No connection. Nothing was saved.')
               return false
             }
+          }}
+        />
+      )}
+
+      {panelRow && (
+        <AdultSheet
+          key={panelRow.childId}
+          childName={panelRow.preferredName || panelRow.firstName}
+          adults={panelRow.guardians}
+          mayAdd
+          mayTick
+          showEmail
+          onClose={() => setExpanded(null)}
+          onTogglePickup={async (guardianId, next, source) => {
+            const { problem } = await saveAdult({
+              action: 'pickup', childId: panelRow.childId, guardianId, canPickup: next, source,
+            })
+            // Only once the server agrees. This is who a child goes home with,
+            // and a tick on screen that the database does not have is the one
+            // thing this table must never show.
+            if (problem === null) {
+              local(panelRow.childId, {
+                guardians: panelRow.guardians.map((g) =>
+                  g.id === guardianId ? { ...g, canPickup: next } : g,
+                ),
+              })
+              flashSaved()
+            }
+            return problem
+          }}
+          onAdd={async (input) => {
+            const { problem, data } = await saveAdult({
+              action: 'guardian', childId: panelRow.childId, ...input,
+            })
+            if (problem !== null) return problem
+
+            // The row the server wrote, with its real id. The earlier version
+            // invented an id on the client, and ticking that adult afterwards
+            // updated nothing while the screen said it had.
+            const a = data.adult as AddedAdult
+            const line = {
+              id: a.guardianId, fullName: a.fullName, relationship: a.relationship,
+              canPickup: a.canPickup, isPrimary: false, email: a.email, phone: a.phone,
+            }
+            local(panelRow.childId, {
+              guardians: panelRow.guardians.some((g) => g.id === a.guardianId)
+                ? panelRow.guardians.map((g) => (g.id === a.guardianId ? { ...g, ...line, isPrimary: g.isPrimary } : g))
+                : [...panelRow.guardians, line],
+            })
+            flashSaved()
+            return null
           }}
         />
       )}
@@ -779,151 +818,5 @@ function Cell({
         highlight ? 'bg-flag-soft' : 'bg-transparent'
       } ${numeric ? 'text-center' : ''}`}
     />
-  )
-}
-
-function GuardianPanel({
-  row, onTogglePickup, onAdd,
-}: {
-  row: ChildRow
-  onTogglePickup: (guardianId: number, next: boolean) => Promise<void>
-  onAdd: (input: {
-    fullName: string; relationship: string | null
-    email: string | null; phone: string | null; canPickup: boolean
-  }) => Promise<boolean>
-}) {
-  const [adding, setAdding] = useState(row.guardians.length === 0)
-  const [fullName, setFullName] = useState('')
-  const [relationship, setRelationship] = useState('')
-  const [phone, setPhone] = useState('')
-  const [email, setEmail] = useState('')
-  const [canPickup, setCanPickup] = useState(true)
-
-  return (
-    <div className="max-w-3xl">
-      <h3 className="mb-2 text-xs font-bold uppercase tracking-wider text-hifmuted">
-        Adults for {row.preferredName || row.firstName}
-      </h3>
-
-      {row.guardians.length === 0 && (
-        <p className="mb-3 rounded-card bg-alert-soft px-3 py-2 text-sm text-alert-deep">
-          Nobody is on file. This child cannot be checked out on Sunday without a
-          teacher overriding, which is recorded as an exception every week until
-          somebody is added here.
-        </p>
-      )}
-
-      <div className="space-y-1.5">
-        {row.guardians.map((g) => (
-          <div
-            key={g.id}
-            className="flex items-center gap-3 rounded-card border border-line bg-paper px-3 py-2"
-          >
-            <div className="min-w-0 flex-1">
-              <div className="text-sm font-semibold text-ink">
-                {g.fullName}
-                {g.isPrimary && (
-                  <span className="ml-2 rounded-full bg-mist px-1.5 py-0.5 text-[10px] font-bold text-hifmuted">
-                    PRIMARY
-                  </span>
-                )}
-              </div>
-              <div className="truncate text-xs text-hifmuted">
-                {g.relationship ?? 'contact'}
-                {g.phone && ` · ${g.phone}`}
-                {g.email && ` · ${g.email}`}
-              </div>
-            </div>
-            <label className="flex shrink-0 cursor-pointer items-center gap-2 text-xs font-semibold">
-              <input
-                type="checkbox"
-                checked={g.canPickup}
-                onChange={(e) => onTogglePickup(g.id, e.target.checked)}
-                className="h-4 w-4 accent-[#6fa22a]"
-              />
-              <span className={g.canPickup ? 'text-ok-ink' : 'text-hifmuted'}>
-                May pick up
-              </span>
-            </label>
-          </div>
-        ))}
-      </div>
-
-      {!adding ? (
-        <button
-          onClick={() => setAdding(true)}
-          className="mt-2 rounded-lg border border-line bg-paper px-3 py-1.5 text-xs font-semibold text-ink-2 hover:border-brand"
-        >
-          + Add an adult
-        </button>
-      ) : (
-        <div className="mt-2 rounded-card border border-line bg-paper p-3">
-          <div className="grid gap-2 sm:grid-cols-2">
-            <Field label="Full name" value={fullName} onChange={setFullName} />
-            <Field label="Relationship" value={relationship} onChange={setRelationship} placeholder="mother, uncle, driver…" />
-            <Field label="Phone" value={phone} onChange={setPhone} placeholder="0912 345 678" />
-            <Field label="Email" value={email} onChange={setEmail} />
-          </div>
-          <label className="mt-2 flex cursor-pointer items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={canPickup}
-              onChange={(e) => setCanPickup(e.target.checked)}
-              className="h-4 w-4 accent-[#6fa22a]"
-            />
-            May pick up this child
-          </label>
-          <p className="mt-1 text-xs text-hifmuted">
-            Being a contact and being allowed to pick up are separate. Leave this
-            unticked for someone who should be reachable but not hand the child over.
-          </p>
-          <div className="mt-3 flex gap-2">
-            <button
-              disabled={!fullName.trim()}
-              onClick={async () => {
-                const okDone = await onAdd({
-                  fullName: fullName.trim(),
-                  relationship: relationship.trim() || null,
-                  email: email.trim() || null,
-                  phone: phone.trim() || null,
-                  canPickup,
-                })
-                if (okDone) {
-                  setFullName(''); setRelationship(''); setPhone(''); setEmail('')
-                  setAdding(false)
-                }
-              }}
-              className="rounded-lg bg-brand-dark px-3.5 py-2 text-sm font-semibold text-white disabled:opacity-40"
-            >
-              Add
-            </button>
-            <button
-              onClick={() => setAdding(false)}
-              className="rounded-lg border border-line px-3.5 py-2 text-sm font-semibold text-ink-2"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-    </div>
-  )
-}
-
-function Field({
-  label, value, onChange, placeholder,
-}: {
-  label: string; value: string; onChange: (v: string) => void; placeholder?: string
-}) {
-  return (
-    <label className="block">
-      <span className="mb-1 block text-xs font-semibold text-ink-2">{label}</span>
-      <input
-        value={value}
-        placeholder={placeholder}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full rounded-lg border border-line px-2.5 py-2 text-sm outline-none focus:border-brand"
-      />
-    </label>
   )
 }

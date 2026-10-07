@@ -19,9 +19,14 @@ export {
   EDITABLE_CHILD_FIELDS,
   STATUS_LABEL,
 } from './child-fields'
-export type { ChildRow, ChildStatus, EditableChildField } from './child-fields'
+export type {
+  AddedAdult, ChildRow, ChildStatus, EditableChildField, NewAdultInput, PickupToConfirm,
+} from './child-fields'
 
-import type { ChildRow, ChildStatus, EditableChildField } from './child-fields'
+import { PICKUP_SOURCE_MIN, needsPickupSource } from './child-fields'
+import type {
+  AddedAdult, ChildRow, ChildStatus, EditableChildField, NewAdultInput, PickupToConfirm,
+} from './child-fields'
 
 export async function listChildren(includeInactive = false): Promise<ChildRow[]> {
   const db = getPool()
@@ -558,28 +563,131 @@ export async function registerChild(
   }
 }
 
-/** Turn a guardian's authority to collect on or off. */
+// ── Adults who may collect ───────────────────────────────────────────────────
+
+/** Who is making the change. The name is stored, so the audit reads on its own. */
+export type PickupActor = {
+  id: number
+  name: string
+  /** Assistants never reach these functions. The API turns them away first. */
+  role: 'admin' | 'teacher'
+}
+
+/**
+ * A change that was understood and turned down, with a sentence fit to show the
+ * person who asked. Anything else thrown from here is a fault, and the API
+ * reports it as one.
+ */
+export class PickupRefused extends Error {
+  constructor(message: string) {
+    super(message)
+    this.name = 'PickupRefused'
+  }
+}
+
+/** Names compared without case, spacing or Vietnamese tone marks. */
+const nameKey = (s: string) =>
+  s.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/đ/gi, 'd')
+    .toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+
+/** A Vietnamese mobile in the form the importer stored, or null. */
+const toE164 = (digits: string) =>
+  /^0[35789]\d{8}$/.test(digits) ? '+84' + digits.slice(1)
+  : /^84[35789]\d{8}$/.test(digits) ? '+' + digits
+  : null
+
+function checkSource(relationship: string | null, canPickup: boolean, source: string | null) {
+  if (needsPickupSource(relationship, canPickup) && (source ?? '').trim().length < PICKUP_SOURCE_MIN) {
+    throw new PickupRefused(
+      'Please add a line saying who told you this adult may collect. ' +
+      'It is only skipped for a mother or father.',
+    )
+  }
+}
+
+/**
+ * The provenance columns from migration 018, for a tick being granted now.
+ *
+ * An administrator's tick confirms itself. A teacher's is in force straight
+ * away and waits on kq.pickups_to_confirm for Ate to look at.
+ */
+const GRANT_SQL = `
+  can_pickup          = true,
+  pickup_set_by       = $3,
+  pickup_set_by_name  = $4,
+  pickup_set_role     = $5,
+  pickup_set_at       = now(),
+  pickup_source       = $6,
+  pickup_confirmed_by = case when $5 = 'admin' then $3::integer else null end,
+  pickup_confirmed_at = case when $5 = 'admin' then now() else null end`
+
+/**
+ * Turn a guardian's authority to collect on or off.
+ *
+ * Granting it to anyone other than a mother or father needs a line saying
+ * where the authorisation came from. Taking it away never does: removing a
+ * permission should not cost more than the mistake that granted it.
+ */
 export async function setPickup(
   childId: number,
   guardianId: number,
   canPickup: boolean,
-  actorUserId: number,
+  actor: PickupActor,
+  source: string | null = null,
 ): Promise<void> {
   const db = getPool()
   const client = await db.connect()
   try {
     await client.query('begin')
-    await client.query(
-      `update kq.child_guardians set can_pickup = $3
-        where child_id = $1 and guardian_id = $2`,
-      [childId, guardianId, canPickup],
+
+    const { rows } = await client.query<{
+      can_pickup: boolean; relationship: string | null; full_name: string
+    }>(
+      `select cg.can_pickup, cg.relationship, g.full_name
+         from kq.child_guardians cg
+         join kq.guardians g on g.id = cg.guardian_id
+        where cg.child_id = $1 and cg.guardian_id = $2
+          for update of cg`,
+      [childId, guardianId],
     )
+    const cur = rows[0]
+    if (!cur) throw new PickupRefused('That adult is not on file for this child.')
+
+    // A tap that changes nothing is not history.
+    if (cur.can_pickup === canPickup) {
+      await client.query('commit')
+      return
+    }
+
+    const cleanSource = source?.trim() || null
+    if (canPickup) {
+      checkSource(cur.relationship, true, cleanSource)
+      await client.query(
+        `update kq.child_guardians set ${GRANT_SQL}
+          where child_id = $1 and guardian_id = $2`,
+        [childId, guardianId, actor.id, actor.name, actor.role, cleanSource],
+      )
+    } else {
+      // Who granted it and why are left in place. They are the answer to "how
+      // did this adult come to be ticked", which is still worth having after
+      // the tick has gone.
+      await client.query(
+        `update kq.child_guardians set can_pickup = false
+          where child_id = $1 and guardian_id = $2`,
+        [childId, guardianId],
+      )
+    }
+
     await client.query(
       `insert into kq.child_events
          (child_id, event_type, field, old_value, new_value, actor_user_id, detail)
        values ($1,'pickup_changed','can_pickup',$2,$3,$4,$5)`,
-      [childId, String(!canPickup), String(canPickup), actorUserId,
-       JSON.stringify({ guardianId })],
+      [childId, String(cur.can_pickup), String(canPickup), actor.id,
+       JSON.stringify({
+         guardianId, guardianName: cur.full_name, relationship: cur.relationship,
+         source: canPickup ? cleanSource : null,
+         actorName: actor.name, actorRole: actor.role,
+       })],
     )
     await client.query('commit')
   } catch (e) {
@@ -593,66 +701,235 @@ export async function setPickup(
 /**
  * Attach an adult to a child, creating the guardian if they are new.
  *
- * Matches an existing guardian on email or phone before creating one, for the
- * same reason the importer did: a family sharing a number should not become two
- * records, or a correction made in one place will silently not apply in the
- * other.
+ * REUSING AN ADULT ALREADY ON FILE
+ *
+ * A brother's mother is almost certainly this child's mother, and two records
+ * for her would mean a corrected phone number applies to one child and not the
+ * other. So an existing guardian is reused, but only when the contact detail
+ * AND the name both match.
+ *
+ * It used to match on phone or email alone. Families share a phone, 010 says
+ * so in as many words, and on that rule a teacher typing the mother's name
+ * against the family number would have silently authorised whoever was already
+ * stored under it, usually the father. The name on the screen and the adult in
+ * the database have to be the same person or this table is not worth having.
+ *
+ * WHO MAY CALL THIS
+ *
+ * Administrators, and teachers at the door. A teacher's tick is in force at
+ * once and lands on Ate's list to confirm. See migration 018 for why.
+ *
+ * Adding never removes. If this adult is already ticked for this child, a
+ * second add with the box unticked leaves them ticked. Unticking is its own
+ * action with its own audit line.
  */
 export async function addGuardian(
   childId: number,
-  input: {
-    fullName: string
-    relationship: string | null
-    email: string | null
-    phone: string | null
-    canPickup: boolean
-  },
-  actorUserId: number,
+  input: NewAdultInput,
+  actor: PickupActor,
+  via: 'children' | 'attendance' = 'children',
+): Promise<AddedAdult> {
+  const fullName = input.fullName.trim().replace(/\s+/g, ' ')
+  if (!fullName) throw new PickupRefused('A name is needed.')
+
+  const relationship = input.relationship?.trim().toLowerCase() || null
+  const source = input.source?.trim() || null
+  const email = input.email?.trim().toLowerCase() || null
+  const phone = input.phone?.trim() || null
+  const digits = (phone ?? '').replace(/\D/g, '')
+  const e164 = toE164(digits)
+
+  checkSource(relationship, input.canPickup, source)
+
+  const db = getPool()
+  const client = await db.connect()
+  try {
+    await client.query('begin')
+
+    const { rows: child } = await client.query(
+      `select 1 from kq.children where id = $1 for update`,
+      [childId],
+    )
+    if (child.length === 0) throw new PickupRefused('That child is not on the register.')
+
+    let guardianId: number | null = null
+
+    // Already an adult for this very child, under the same name. Typing "Mr
+    // Long" twice should find Mr Long, with or without a phone number, rather
+    // than leaving two of him on one child.
+    const { rows: mine } = await client.query<{ id: string; full_name: string }>(
+      `select g.id, g.full_name
+         from kq.child_guardians cg
+         join kq.guardians g on g.id = cg.guardian_id
+        where cg.child_id = $1
+        order by g.id`,
+      [childId],
+    )
+    const here = mine.find((r) => nameKey(r.full_name) === nameKey(fullName))
+    if (here) guardianId = parseInt(here.id, 10)
+
+    if (guardianId === null && (email || digits.length >= 8)) {
+      // Stored numbers are a mixture of "0912 345 678", "0912345678" and
+      // "+84912345678", so both sides are reduced to digits before comparing.
+      const { rows } = await client.query<{ id: string; full_name: string }>(
+        `select id, full_name from kq.guardians
+          where ($1::citext is not null and email = $1::citext)
+             or ($2::text <> '' and (
+                  regexp_replace(coalesce(phone, ''), '\\D', '', 'g') = $2
+               or regexp_replace(coalesce(e164,  ''), '\\D', '', 'g') = $2
+               or ($3::text is not null and e164 = $3)
+             ))
+          order by id`,
+        [email, digits.length >= 8 ? digits : '', e164],
+      )
+      const same = rows.find((r) => nameKey(r.full_name) === nameKey(fullName))
+      if (same) guardianId = parseInt(same.id, 10)
+    }
+
+    const alreadyOnFile = guardianId !== null
+
+    if (guardianId === null) {
+      const { rows } = await client.query<{ id: string }>(
+        `insert into kq.guardians (full_name, email, phone, e164)
+         values ($1,$2,$3,$4) returning id`,
+        [fullName, email, phone, e164],
+      )
+      guardianId = parseInt(rows[0]!.id, 10)
+    }
+
+    const { rows: linkRows } = await client.query<{
+      can_pickup: boolean; relationship: string | null
+    }>(
+      `select can_pickup, relationship from kq.child_guardians
+        where child_id = $1 and guardian_id = $2 for update`,
+      [childId, guardianId],
+    )
+    const link = linkRows[0]
+    const wasTicked = link?.can_pickup === true
+    const granting = input.canPickup && !wasTicked
+
+    if (!link) {
+      await client.query(
+        `insert into kq.child_guardians (child_id, guardian_id, relationship, is_primary, can_pickup)
+         values ($1,$2,$3,false,false)`,
+        [childId, guardianId, relationship],
+      )
+    } else if (relationship && relationship !== link.relationship) {
+      await client.query(
+        `update kq.child_guardians set relationship = $3
+          where child_id = $1 and guardian_id = $2`,
+        [childId, guardianId, relationship],
+      )
+    }
+
+    if (granting) {
+      await client.query(
+        `update kq.child_guardians set ${GRANT_SQL}
+          where child_id = $1 and guardian_id = $2`,
+        [childId, guardianId, actor.id, actor.name, actor.role, source],
+      )
+    }
+
+    const detail = JSON.stringify({
+      guardianId, relationship: relationship ?? link?.relationship ?? null,
+      canPickup: wasTicked || input.canPickup,
+      source: granting ? source : null,
+      alreadyOnFile, via,
+      actorName: actor.name, actorRole: actor.role,
+    })
+
+    if (!link) {
+      await client.query(
+        `insert into kq.child_events
+           (child_id, event_type, new_value, actor_user_id, detail)
+         values ($1,'guardian_added',$2,$3,$4)`,
+        [childId, fullName, actor.id, detail],
+      )
+    } else if (granting) {
+      // Already a contact for this child, now allowed to collect. That is a
+      // change to pick-up, and the log should say so in those words.
+      await client.query(
+        `insert into kq.child_events
+           (child_id, event_type, field, old_value, new_value, actor_user_id, detail)
+         values ($1,'pickup_changed','can_pickup','false','true',$2,$3)`,
+        [childId, actor.id, detail],
+      )
+    }
+
+    const { rows: out } = await client.query<{
+      full_name: string; relationship: string | null; can_pickup: boolean
+      email: string | null; phone: string | null
+    }>(
+      `select g.full_name, cg.relationship, cg.can_pickup,
+              g.email::text as email, coalesce(g.e164, g.phone) as phone
+         from kq.child_guardians cg
+         join kq.guardians g on g.id = cg.guardian_id
+        where cg.child_id = $1 and cg.guardian_id = $2`,
+      [childId, guardianId],
+    )
+
+    await client.query('commit')
+
+    const o = out[0]!
+    return {
+      guardianId,
+      fullName: o.full_name,
+      relationship: o.relationship,
+      phone: o.phone,
+      email: o.email,
+      canPickup: o.can_pickup,
+      alreadyOnFile,
+    }
+  } catch (e) {
+    await client.query('rollback')
+    throw e
+  } finally {
+    client.release()
+  }
+}
+
+/**
+ * An administrator has looked at an adult a teacher authorised, and agrees.
+ *
+ * Changes nothing about who may collect. The tick was already in force. This
+ * records that somebody with time and a phone has checked it, which is the
+ * half of the safeguard a teacher at a door cannot supply.
+ */
+export async function confirmPickup(
+  childId: number,
+  guardianId: number,
+  actor: PickupActor,
 ): Promise<void> {
   const db = getPool()
   const client = await db.connect()
   try {
     await client.query('begin')
 
-    let guardianId: number | null = null
-    if (input.email || input.phone) {
-      const { rows } = await client.query<{ id: string }>(
-        `select id from kq.guardians
-          where ($1::citext is not null and email = $1::citext)
-             or ($2::text  is not null and (phone = $2 or e164 = $2))
-          limit 1`,
-        [input.email, input.phone],
-      )
-      if (rows[0]) guardianId = parseInt(rows[0].id, 10)
-    }
-
-    if (guardianId === null) {
-      const digits = (input.phone ?? '').replace(/\D/g, '')
-      const e164 = /^0[35789]\d{8}$/.test(digits) ? '+84' + digits.slice(1) : null
-      const { rows } = await client.query<{ id: string }>(
-        `insert into kq.guardians (full_name, email, phone, e164)
-         values ($1,$2,$3,$4) returning id`,
-        [input.fullName, input.email, input.phone, e164],
-      )
-      guardianId = parseInt(rows[0]!.id, 10)
-    }
-
-    await client.query(
-      `insert into kq.child_guardians (child_id, guardian_id, relationship, is_primary, can_pickup)
-       values ($1,$2,$3,false,$4)
-       on conflict (child_id, guardian_id) do update
-         set can_pickup   = excluded.can_pickup,
-             relationship = coalesce(excluded.relationship, kq.child_guardians.relationship)`,
-      [childId, guardianId, input.relationship, input.canPickup],
+    const { rows } = await client.query<{ full_name: string; pickup_set_by_name: string | null }>(
+      `update kq.child_guardians cg
+          set pickup_confirmed_by = $3, pickup_confirmed_at = now()
+         from kq.guardians g
+        where cg.child_id = $1 and cg.guardian_id = $2
+          and g.id = cg.guardian_id
+          and cg.can_pickup and cg.pickup_confirmed_at is null
+        returning g.full_name, cg.pickup_set_by_name`,
+      [childId, guardianId, actor.id],
     )
 
-    await client.query(
-      `insert into kq.child_events
-         (child_id, event_type, new_value, actor_user_id, detail)
-       values ($1,'guardian_added',$2,$3,$4)`,
-      [childId, input.fullName, actorUserId,
-       JSON.stringify({ guardianId, canPickup: input.canPickup, relationship: input.relationship })],
-    )
+    // Nothing matched: confirmed already from another tab, or unticked since.
+    // Either way the list is out of date, not broken.
+    if (rows[0]) {
+      await client.query(
+        `insert into kq.child_events
+           (child_id, event_type, field, new_value, actor_user_id, detail)
+         values ($1,'pickup_confirmed','can_pickup','true',$2,$3)`,
+        [childId, actor.id,
+         JSON.stringify({
+           guardianId, guardianName: rows[0].full_name,
+           addedBy: rows[0].pickup_set_by_name, actorName: actor.name,
+         })],
+      )
+    }
 
     await client.query('commit')
   } catch (e) {
@@ -661,4 +938,53 @@ export async function addGuardian(
   } finally {
     client.release()
   }
+}
+
+/** Adults a teacher has authorised that Ate has not looked at yet. Oldest first. */
+export async function listPickupsToConfirm(): Promise<PickupToConfirm[]> {
+  const { rows } = await getPool().query<{
+    child_id: string; guardian_id: string
+    first_name: string; last_name: string; preferred_name: string | null
+    group_code: string; guardian_name: string; guardian_phone: string | null
+    relationship: string | null; pickup_source: string | null
+    pickup_set_by_name: string | null; pickup_set_at: Date | null
+  }>(
+    `select * from kq.pickups_to_confirm order by pickup_set_at nulls last, child_id`,
+  )
+  return rows.map((r) => ({
+    childId: parseInt(r.child_id, 10),
+    guardianId: parseInt(r.guardian_id, 10),
+    childName: `${r.preferred_name || r.first_name} ${r.last_name}`.trim(),
+    groupCode: r.group_code,
+    guardianName: r.guardian_name,
+    guardianPhone: r.guardian_phone,
+    relationship: r.relationship,
+    source: r.pickup_source,
+    addedBy: r.pickup_set_by_name,
+    addedAt: r.pickup_set_at?.toISOString() ?? null,
+  }))
+}
+
+/**
+ * Is this child on the list for this session?
+ *
+ * The same two-part test getRoster uses: enrolled in the session's room, or
+ * already holding an attendance row for it. A teacher may add an adult for a
+ * child they can see on their own attendance list, and for nobody else.
+ */
+export async function childIsInSession(childId: number, sessionId: number): Promise<boolean> {
+  const { rows } = await getPool().query(
+    `select 1
+       from kq.sessions s
+      where s.id = $2
+        and (
+          exists (select 1 from kq.attendance a
+                   where a.session_id = s.id and a.child_id = $1)
+          or exists (select 1 from kq.children c
+                       join kq.enrollments e on e.child_id = c.id and e.ended_on is null
+                      where c.id = $1 and c.active and e.group_code = s.group_code)
+        )`,
+    [childId, sessionId],
+  )
+  return rows.length > 0
 }

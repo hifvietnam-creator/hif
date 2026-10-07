@@ -63,3 +63,16 @@ export async function canWorkSession(user: KqUser, sessionId: number): Promise<b
  * cost something — a more senior person putting their name against it.
  */
 export const canOverride = (user: KqUser) => user.role === 'admin' || user.role === 'teacher'
+
+/**
+ * Who may add an adult to a child's record and say they may collect.
+ *
+ * The same two roles as the override, and for the same reason: it is a decision
+ * about who a child leaves with. An assistant who learns something at the door
+ * tells the teacher, and the teacher puts their name to it.
+ *
+ * A teacher's addition is in force at once and is listed for an administrator
+ * to confirm afterwards. See migration 018.
+ */
+export const canAddAdult = (user: KqUser): user is KqUser & { role: 'admin' | 'teacher' } =>
+  user.role === 'admin' || user.role === 'teacher'
