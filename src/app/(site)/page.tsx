@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import configPromise from "@payload-config";
+import { getPayload } from "payload";
 import ScrollReveal from "@/components/ScrollReveal";
 import JourneyStrip from "@/components/JourneyStrip";
 import HasStrip from "@/components/HasStrip";
-import WelcomeCarousel from "@/components/WelcomeCarousel";
+import HeroSlides from "@/components/HeroSlides";
+
+// The page is static apart from the latest-sermon chip in the hero.
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "Hanoi International Fellowship — Find your spiritual home in Hanoi",
@@ -12,13 +17,83 @@ export const metadata: Metadata = {
     "One church family in Hanoi, Vietnam, welcoming people from 100+ nations over the years. Wherever you're starting from — curious, finding your way back, or looking for a church home — there's a place for you here.",
 };
 
-export default function HomePage() {
+/**
+ * The homepage carries only the first two stages of the Journey. Someone
+ * arriving at the website is at TRY or approaching JOIN; Grow, Serve and Go
+ * are for people already here and live on /ministries.
+ *
+ * Two calls to action, one per stage, repeated top and bottom:
+ *   TRY  → "Try something this week"  (the four doors below the hero)
+ *   JOIN → "Plan your Sunday visit"   (/plan-visit)
+ */
+
+// The hero image first, then the rest in rotation.
+const HERO_SLIDES = [
+  { src: "/assets/IMG_0555.jpg", position: "center 55%" },
+  { src: "/assets/welcome/IMG_0326.jpg", position: "center 35%" },
+  { src: "/assets/welcome/3.PNG", position: "center 30%" },
+  { src: "/assets/welcome/25.PNG", position: "center 60%" },
+  { src: "/assets/welcome/4.PNG", position: "center 35%" },
+  { src: "/assets/welcome/40.PNG", position: "center 45%" },
+];
+
+// The six fellowships leadership lists under JOIN. Each links to its own row
+// on /fellowships (the id there is the first word of the group's name).
+const FELLOWSHIPS: { name: string; img?: string }[] = [
+  { name: "Korean", img: "/assets/img/fellowship-korean.jpg" },
+  { name: "Vietnamese", img: "/assets/img/fellowship-vietnamese.jpg" },
+  { name: "Filipino", img: "/assets/img/fellowship-filipino.jpg" },
+  { name: "Japanese" },
+  { name: "Myanmar" },
+  { name: "African", img: "/assets/img/fellowship-african.jpg" },
+];
+
+type LatestSermon = { title: string; slug: string };
+
+/**
+ * The newest published sermon, for the chip in the hero.
+ *
+ * Sorted on sortDate, not date: undated archive sermons carry a 1900 sentinel
+ * there, and Postgres would otherwise put their NULL dates first. Excluding the
+ * sentinel as well means an undated sermon can never be presented as "latest".
+ *
+ * Never throws — a database problem should cost the homepage a chip, not the
+ * whole page.
+ */
+async function getLatestSermon(): Promise<LatestSermon | null> {
+  try {
+    const payload = await getPayload({ config: configPromise });
+    const res = await payload.find({
+      collection: "sermons",
+      where: {
+        and: [
+          { _status: { equals: "published" } },
+          { sortDate: { greater_than: "1901-01-01" } },
+        ],
+      },
+      sort: "-sortDate",
+      limit: 1,
+      depth: 0,
+      overrideAccess: true,
+      select: { title: true, slug: true },
+    });
+    const doc = res.docs[0];
+    if (!doc?.title || !doc.slug) return null;
+    return { title: doc.title, slug: doc.slug };
+  } catch {
+    return null;
+  }
+}
+
+export default async function HomePage() {
+  const sermon = await getLatestSermon();
+
   return (
     <>
       <HasStrip />
       {/* ============ HERO ============ */}
       <section className="hero">
-        <div className="hero-photo" aria-hidden="true" />
+        <HeroSlides slides={HERO_SLIDES} />
         <div className="container hero-inner">
           <ScrollReveal as="p" className="eyebrow eyebrow-light">
             A church family in Hanoi · since 1995
@@ -29,17 +104,16 @@ export default function HomePage() {
             home in Hanoi.
           </ScrollReveal>
           <ScrollReveal as="p" className="hero-lead">
-            Whether you&apos;re curious for the first time, finding your way back, or looking for a
-            church family far from home — there&apos;s a place for you here. One family, a
-            hundred-plus nations, one city to love.
+            Curious, finding your way back, or looking for a church family far from home —
+            there&apos;s a place for you here.
           </ScrollReveal>
           <ScrollReveal className="hero-actions">
-            <Link className="btn btn-primary btn-lg" href="/plan-visit">
-              Plan your visit
-            </Link>
-            <a className="btn btn-outline-light btn-lg" href="#watch">
-              Watch a service
+            <a className="btn btn-primary btn-lg" href="#try">
+              Try something this week
             </a>
+            <Link className="btn btn-outline-light btn-lg" href="/plan-visit">
+              Plan your Sunday visit
+            </Link>
           </ScrollReveal>
           <ScrollReveal as="ul" className="hero-stats" aria-label="At a glance">
             <li>
@@ -52,6 +126,17 @@ export default function HomePage() {
               <strong>30+</strong> years in Hanoi &amp; beyond
             </li>
           </ScrollReveal>
+          {sermon && (
+            <ScrollReveal>
+              <Link className="sermon-chip" href={`/sermons/${sermon.slug}`}>
+                <span className="sermon-chip-play" aria-hidden="true" />
+                <span className="sermon-chip-text">
+                  <span className="sermon-chip-label">Watch the latest sermon</span>
+                  <span className="sermon-chip-title">{sermon.title}</span>
+                </span>
+              </Link>
+            </ScrollReveal>
+          )}
         </div>
         <a className="hero-scroll" href="#try" aria-label="Scroll to explore">
           <span />
@@ -73,79 +158,169 @@ export default function HomePage() {
             </div>
             <div className="zone-lead">
               <h2>Come and see.</h2>
-              <p>Join us on a Sunday or online. Just experience it — no strings, no commitment.</p>
+              <p>
+                Four easy ways to meet people from HIF. No commitment, and no belief required.
+              </p>
             </div>
           </div>
         </ScrollReveal>
 
-        {/* Empathy / three doors */}
-        <section className="section start" id="start">
+        <section className="section start">
           <div className="container">
             <div className="section-head center">
-              <p className="eyebrow">Wherever you&apos;re starting from</p>
-              <h2 className="section-title">You&apos;re not meant to do life alone.</h2>
+              <p className="eyebrow">Start anywhere</p>
+              <h2 className="section-title">Pick whichever sounds like you.</h2>
               <p className="section-intro">
-                A fast-moving city can leave you stretched thin, far from home, or quietly
-                wondering if there&apos;s more. You don&apos;t need to have it all figured out to belong
-                here. Tell us where you&apos;re at:
+                You don&apos;t need to have anything figured out. Come once, see who you meet.
               </p>
             </div>
-            <div className="doors">
-              <ScrollReveal as="article" className="door door-red">
-                <div className="door-tag">I&apos;m curious</div>
-                <h3>Exploring for the first time</h3>
+            <div className="min-grid">
+              <Link className="min-card" href="/sports">
+                <span className="min-bar bar-red" />
+                <h3>Sports</h3>
                 <p>
-                  I don&apos;t know much about Jesus, the Bible, or church — but I&apos;m open. I&apos;m looking
-                  for hope, peace, or some kind of help my usual routines aren&apos;t giving me.
+                  Pickleball, football and volleyball with players from a dozen-plus countries —
+                  beginners and regulars alike.
                 </p>
-                <Link className="door-link" href="/jesus">
-                  Start here <span aria-hidden="true">→</span>
-                </Link>
-              </ScrollReveal>
-              <ScrollReveal as="article" className="door door-purple">
-                <div className="door-tag">Finding my way back</div>
-                <h3>Reaching for something solid</h3>
+                <span className="min-more">
+                  See the games <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+              <Link className="min-card" href="/spotlight">
+                <span className="min-bar bar-red" />
+                <h3>Spotlight English Club</h3>
+                <p>A free, friendly evening to practise English and make friends.</p>
+                <span className="min-when">Mondays &amp; Wednesdays · 6:30pm</span>
+                <span className="min-more">
+                  About Spotlight <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+              <Link className="min-card" href="/alpha">
+                <span className="min-bar bar-red" />
+                <h3>Alpha</h3>
                 <p>
-                  I&apos;ve had some faith or church somewhere in my past. Life moved on — and now
-                  I&apos;m reaching for something steady to build on again.
+                  A meal, a short talk and an open conversation about life and faith — no question
+                  off-limits.
                 </p>
-                <a className="door-link" href="#visit">
-                  Come as you are <span aria-hidden="true">→</span>
-                </a>
-              </ScrollReveal>
-              <ScrollReveal as="article" className="door door-blue">
-                <div className="door-tag">Looking for a church home</div>
-                <h3>New to Hanoi, finding family</h3>
+                <span className="min-more">
+                  Explore Alpha <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+              <Link className="min-card" href="/saranbang">
+                <span className="min-bar bar-red" />
+                <h3>Saranbang</h3>
+                <p>A Korean conversation club — practise Korean and make friends.</p>
+                <span className="min-more">
+                  About Saranbang <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+            </div>
+            <ScrollReveal as="p" className="journey-foot">
+              Curious about faith itself?{" "}
+              <Link href="/jesus">Start with who Jesus is →</Link>
+            </ScrollReveal>
+          </div>
+        </section>
+      </section>
+
+      {/* ============================================================= */}
+      {/* ==================== JOIN ZONE (purple) ===================== */}
+      {/* ============================================================= */}
+      <section className="jzone" id="join">
+        <ScrollReveal as="header" className="zone-head zone-join">
+          <div className="container zone-head-inner">
+            <div className="zone-chevron">
+              <span className="zone-num">Step 2</span>
+              <span className="zone-name">Join</span>
+            </div>
+            <div className="zone-lead">
+              <h2>Belong.</h2>
+              <p>The places you become known — on a Sunday and through the week.</p>
+            </div>
+          </div>
+        </ScrollReveal>
+
+        <section className="section ministries zone-join-cards" id="ministries">
+          <div className="container">
+            <div className="section-head center">
+              <p className="eyebrow">Find your people</p>
+              <h2 className="section-title">Three ways to become part of the family.</h2>
+            </div>
+            <div className="min-grid min-grid-3">
+              <a className="min-card" href="#visit">
+                <span className="min-bar bar-purple" />
+                <h3>Sunday services</h3>
                 <p>
-                  I follow Jesus and I&apos;m new in the city. I want a community for my family, real
-                  friendships, and a place to keep growing and serving.
+                  Music, a down-to-earth message and coffee after — in English, with KidzQuest for
+                  children.
                 </p>
-                <a className="door-link" href="#join">
-                  Find your people <span aria-hidden="true">→</span>
-                </a>
-              </ScrollReveal>
+                <span className="min-more">
+                  Times &amp; what to expect <span aria-hidden="true">↓</span>
+                </span>
+              </a>
+              <Link className="min-card" href="/connect">
+                <span className="min-bar bar-purple" />
+                <h3>Connect Groups</h3>
+                <p>Small circles that meet through the week to share life, food and faith.</p>
+                <span className="min-more">
+                  Find a group <span aria-hidden="true">→</span>
+                </span>
+              </Link>
+              <Link className="min-card" href="/fellowships">
+                <span className="min-bar bar-purple" />
+                <h3>Ethnic Fellowships</h3>
+                <p>
+                  Worship and friendship in your heart language — Korean, Vietnamese, Filipino,
+                  Japanese, Myanmar and African.
+                </p>
+                <span className="min-more">
+                  Meet the fellowships <span aria-hidden="true">→</span>
+                </span>
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* Visit / what to expect */}
+        {/* Fellowships */}
+        <section className="section fellowships">
+          <div className="container">
+            <div className="section-head center">
+              <p className="eyebrow eyebrow-light">Worship in your heart language</p>
+              <h2 className="section-title">Many nations, one family.</h2>
+              <p className="section-intro">
+                Find people from home — and make new friends from everywhere else. Our ethnic
+                fellowships gather alongside the wider church family.
+              </p>
+            </div>
+            <div className="fellow-grid fellow-grid-6">
+              {FELLOWSHIPS.map((f, i) => (
+                <Link
+                  key={f.name}
+                  className={`fellow${f.img ? "" : ` fellow-plain${i % 2 ? " alt" : ""}`}`}
+                  href={`/fellowships#${f.name.toLowerCase()}`}
+                >
+                  {f.img && (
+                    <Image
+                      src={f.img}
+                      alt={`${f.name} Fellowship`}
+                      width={320}
+                      height={200}
+                      loading="lazy"
+                    />
+                  )}
+                  <span className="fellow-name">{f.name}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Sunday services */}
         <section className="section visit" id="visit">
           <div className="container">
-            <ScrollReveal>
-              <WelcomeCarousel
-                className="visit-welcome-banner"
-                slides={[
-                  { src: '/assets/welcome/IMG_0326.jpg', alt: 'HIF gathered together on a Sunday' },
-                  { src: '/assets/welcome/3.PNG', alt: 'Welcome team greeting guests at the door' },
-                  { src: '/assets/welcome/4.PNG', alt: 'Friends talking together after the service' },
-                  { src: '/assets/welcome/25.PNG', alt: 'The congregation worshipping' },
-                  { src: '/assets/welcome/40.PNG', alt: 'People sharing coffee and conversation' },
-                ]}
-              />
-            </ScrollReveal>
             <div className="visit-grid">
               <div className="visit-copy reveal">
-                <p className="eyebrow">Plan your visit</p>
+                <p className="eyebrow">Sunday services</p>
                 <h2 className="section-title">What a Sunday looks like.</h2>
                 <p className="section-intro">
                   First time? Here&apos;s everything you need to know so you can relax and just come.
@@ -158,15 +333,9 @@ export default function HomePage() {
                   <li>Everything is in English, with a warm welcome for every nation.</li>
                 </ul>
                 <div className="visit-actions">
-                  <a
-                    className="btn btn-primary"
-                    href="mailto:admin@hif.vn?subject=I'd%20like%20to%20visit%20HIF&body=Hi%20HIF%20team%2C%20I'd%20like%20to%20plan%20a%20visit.%20Here's%20a%20bit%20about%20me%3A"
-                  >
-                    Let us know you&apos;re coming
-                  </a>
-                  <a className="btn btn-ghost" href="#locations">
-                    See locations &amp; times
-                  </a>
+                  <Link className="btn btn-primary" href="/plan-visit">
+                    Plan your Sunday visit
+                  </Link>
                 </div>
               </div>
               <div className="visit-times reveal">
@@ -200,355 +369,10 @@ export default function HomePage() {
                   </ul>
                 </div>
                 <p className="time-note">
-                  Can&apos;t make it in person?{" "}
-                  <a href="#watch">Watch live online →</a>
+                  <Link href="/locations">Addresses &amp; directions →</Link>
+                  <br />
+                  Can&apos;t make it in person? <Link href="/online">Watch live online →</Link>
                 </p>
-              </div>
-            </div>
-          </div>
-        </section>
-      </section>
-
-      {/* ============================================================= */}
-      {/* ==================== JOIN ZONE (purple) ===================== */}
-      {/* ============================================================= */}
-      <section className="jzone" id="join">
-        <ScrollReveal as="header" className="zone-head zone-join">
-          <div className="container zone-head-inner">
-            <div className="zone-chevron">
-              <span className="zone-num">Step 2</span>
-              <span className="zone-name">Join</span>
-            </div>
-            <div className="zone-lead">
-              <h2>Belong.</h2>
-              <p>Get to know people in a Connect Group and become part of the family.</p>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* About */}
-        <section className="section about" id="about">
-          <div className="container about-grid">
-            <div className="about-media reveal">
-              <Image
-                className="about-img"
-                src="/assets/img/about-family.jpg"
-                alt="HIF family from many nations gathered together in Hanoi"
-                width={640}
-                height={480}
-                loading="lazy"
-              />
-            </div>
-            <div className="about-copy reveal">
-              <p className="eyebrow">Who we are</p>
-              <h2 className="section-title">
-                A kaleidoscope of nations,
-                <br />
-                learning to love one city.
-              </h2>
-              <p>
-                Hanoi International Fellowship began in a living room in 1995 with a dozen people.
-                Three decades later we&apos;re a family from more than a hundred nations across three
-                congregations — Hanoi, Ecopark, and a growing outreach in Thai Nguyen.
-              </p>
-              <p>
-                We&apos;re not here to serve ourselves. We&apos;re here to help you find real life in
-                Jesus, and to love this city with our hands and feet. This is <em>your</em> story
-                — we&apos;re simply here to walk with you and point the way.
-              </p>
-              <blockquote className="pull">
-                There&apos;s an old word for what happens here —{" "}
-                <strong>polypoikilos</strong>, the &ldquo;many-colored&rdquo; beauty that shows up when
-                different people become one. That&apos;s what we&apos;re after.
-              </blockquote>
-              <Link className="link-arrow" href="/about">
-                Read our story <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-          </div>
-        </section>
-
-        {/* Fellowships */}
-        <section className="section fellowships">
-          <div className="container">
-            <div className="section-head center">
-              <p className="eyebrow eyebrow-light">Worship in your heart language</p>
-              <h2 className="section-title">Many nations, one family.</h2>
-              <p className="section-intro">
-                Find people from home — and make new friends from everywhere else. Our ethnic
-                fellowships gather alongside the wider church family.
-              </p>
-            </div>
-            <div className="fellow-grid">
-              <Link className="fellow" href="/fellowships">
-                <Image
-                  src="/assets/img/fellowship-vietnamese.jpg"
-                  alt="Vietnamese Fellowship"
-                  width={320}
-                  height={200}
-                  loading="lazy"
-                />
-                <span className="fellow-name">Vietnamese</span>
-              </Link>
-              <Link className="fellow" href="/fellowships">
-                <Image
-                  src="/assets/img/fellowship-korean.jpg"
-                  alt="Korean Fellowship"
-                  width={320}
-                  height={200}
-                  loading="lazy"
-                />
-                <span className="fellow-name">Korean</span>
-              </Link>
-              <Link className="fellow" href="/fellowships">
-                <Image
-                  src="/assets/img/fellowship-filipino.jpg"
-                  alt="Filipino Fellowship"
-                  width={320}
-                  height={200}
-                  loading="lazy"
-                />
-                <span className="fellow-name">Filipino</span>
-              </Link>
-              <Link className="fellow" href="/fellowships">
-                <Image
-                  src="/assets/img/fellowship-african.jpg"
-                  alt="African Fellowship"
-                  width={320}
-                  height={200}
-                  loading="lazy"
-                />
-                <span className="fellow-name">African</span>
-              </Link>
-            </div>
-            <ScrollReveal as="p" className="journey-foot">
-              Find people from home —{" "}
-              <Link href="/fellowships">explore our fellowships →</Link>
-            </ScrollReveal>
-          </div>
-        </section>
-
-        {/* Find your people */}
-        <section className="section ministries" id="ministries">
-          <div className="container">
-            <div className="section-head center">
-              <p className="eyebrow">Find your people</p>
-              <h2 className="section-title">
-                There&apos;s a place for every season of life.
-              </h2>
-              <p className="section-intro">
-                From your first questions to lifelong friendships — here&apos;s where to connect.
-              </p>
-            </div>
-            <div className="min-grid">
-              <article className="min-card">
-                <span className="min-bar bar-purple" />
-                <h3>Connect Groups</h3>
-                <p>Small circles that meet through the week to share life, food, and faith.</p>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-red" />
-                <h3>KidzQuest</h3>
-                <p>Fun, safe, faith-filled mornings where kids are known and loved.</p>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-blue" />
-                <h3>Aftershock Youth</h3>
-                <p>A home for teens to belong, have fun, and grow a faith of their own.</p>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-green" />
-                <h3>Spotlight English Clubs</h3>
-                <p>
-                  Practice English, make friends, and connect with the community midweek.
-                </p>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-purple" />
-                <h3>Ethnic Fellowships</h3>
-                <p>
-                  Worship and friendship in your heart language — Vietnamese, Korean, Filipino,
-                  African and more.
-                </p>
-              </article>
-            </div>
-            <ScrollReveal as="p" className="journey-foot">
-              See how every ministry fits the Journey —{" "}
-              <Link href="/ministries">explore all ministries →</Link>
-            </ScrollReveal>
-          </div>
-        </section>
-      </section>
-
-      {/* ============================================================= */}
-      {/* ==================== GROW ZONE (green) ====================== */}
-      {/* ============================================================= */}
-      <section className="jzone" id="grow">
-        <ScrollReveal as="header" className="zone-head zone-grow">
-          <div className="container zone-head-inner">
-            <div className="zone-chevron">
-              <span className="zone-num">Step 3</span>
-              <span className="zone-name">Grow</span>
-            </div>
-            <div className="zone-lead">
-              <h2>Grow in faith.</h2>
-              <p>
-                Ask honest questions about faith (try Alpha) and grow into who you&apos;re made to be.
-              </p>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        <section className="section grow">
-          <div className="container">
-            <div className="section-head center">
-              <p className="eyebrow">Grow in faith</p>
-              <h2 className="section-title">
-                Explore the big questions — at your pace.
-              </h2>
-              <p className="section-intro">
-                No question is off-limits. Wherever your faith is today, there&apos;s room to ask,
-                learn, and keep growing.
-              </p>
-            </div>
-            <div className="duo-grid">
-              <article className="min-card">
-                <span className="min-bar bar-green" />
-                <h3>Alpha</h3>
-                <p>
-                  A relaxed space to explore the big questions of life and faith — no question
-                  off-limits.
-                </p>
-                <Link className="link-arrow" href="/alpha">
-                  Explore Alpha <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-purple" />
-                <h3>What We Believe</h3>
-                <p>The heart of the Christian faith, in clear and simple words.</p>
-                <Link className="link-arrow" href="/beliefs">
-                  What we believe <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-            </div>
-            <ScrollReveal as="p" className="journey-foot">
-              Ready to take a step?{" "}
-              <Link href="/next-steps">Explore Next Steps →</Link>
-            </ScrollReveal>
-          </div>
-        </section>
-      </section>
-
-      {/* ============================================================= */}
-      {/* ==================== SERVE ZONE (blue) ====================== */}
-      {/* ============================================================= */}
-      <section className="jzone" id="serve">
-        <ScrollReveal as="header" className="zone-head zone-serve">
-          <div className="container zone-head-inner">
-            <div className="zone-chevron">
-              <span className="zone-num">Step 4</span>
-              <span className="zone-name">Serve</span>
-            </div>
-            <div className="zone-lead">
-              <h2>Serve.</h2>
-              <p>Discover what you&apos;re good at and use it to help others and bless the city.</p>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        <section className="section visit serve">
-          <div className="container">
-            <div className="section-head center">
-              <p className="eyebrow">Serve the city</p>
-              <h2 className="section-title">
-                Discover what you&apos;re good at — and use it.
-              </h2>
-              <p className="section-intro">
-                Your gifts can bless others and bring real hope to Hanoi. Here&apos;s where to start.
-              </p>
-            </div>
-            <div className="duo-grid">
-              <article className="min-card">
-                <span className="min-bar bar-blue" />
-                <h3>CityPartners</h3>
-                <p>Serve real needs across Hanoi — bringing hope, skills, and help to the city.</p>
-                <Link className="link-arrow" href="/citypartners">
-                  Meet CityPartners <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-              <article className="min-card">
-                <span className="min-bar bar-red" />
-                <h3>Worship &amp; Media</h3>
-                <p>Use your gifts in music, sound, and media to help people encounter God.</p>
-                <Link className="link-arrow" href="/ministries">
-                  See serve teams <span aria-hidden="true">→</span>
-                </Link>
-              </article>
-            </div>
-            <ScrollReveal as="p" className="journey-foot">
-              Find where you fit —{" "}
-              <Link href="/ministries">explore all ministries →</Link>
-            </ScrollReveal>
-          </div>
-        </section>
-      </section>
-
-      {/* ============================================================= */}
-      {/* ==================== GO ZONE (charcoal) ===================== */}
-      {/* ============================================================= */}
-      <section className="jzone" id="go">
-        <ScrollReveal as="header" className="zone-head zone-go">
-          <div className="container zone-head-inner">
-            <div className="zone-chevron">
-              <span className="zone-num">Step 5</span>
-              <span className="zone-name">Go</span>
-            </div>
-            <div className="zone-lead">
-              <h2>Go.</h2>
-              <p>Be sent — to love your workplace, your neighbors, your city, and the nations.</p>
-            </div>
-          </div>
-        </ScrollReveal>
-
-        {/* Love the city */}
-        <section className="section city" id="city">
-          <div className="container city-grid">
-            <div className="city-copy reveal">
-              <p className="eyebrow">Bigger than a Sunday</p>
-              <h2 className="section-title">We&apos;re here to love this city.</h2>
-              <p>
-                HIF is a missional church — outward-facing by design. In 2012 we launched{" "}
-                <strong>Love Hanoi</strong>, serving our city alongside local churches and partners.
-                In 2017 we helped host the Love Hanoi Festival: more than 30,000 people came, and
-                over 4,500 began following Jesus.
-              </p>
-              <p>
-                That story didn&apos;t stay in Hanoi. Our lead pastor&apos;s book,{" "}
-                <em>Love Your City</em>, sparked a movement now active around the world, and HIF is
-                a flagship of the Missional International Church Network. In 2025 we marked 30
-                years with one theme: <strong>Beyond</strong>.
-              </p>
-              <Link className="link-arrow" href="/give">
-                Be part of what&apos;s next <span aria-hidden="true">→</span>
-              </Link>
-            </div>
-            <div className="city-stats reveal">
-              <div className="stat stat-red">
-                <strong>30,000+</strong>
-                <span>gathered at the Love Hanoi Festival</span>
-              </div>
-              <div className="stat stat-purple">
-                <strong>4,500+</strong>
-                <span>began following Jesus</span>
-              </div>
-              <div className="stat stat-green">
-                <strong>1 book</strong>
-                <span>that grew a global movement</span>
-              </div>
-              <div className="stat stat-blue">
-                <strong>3 sites</strong>
-                <span>Hanoi · Ecopark · Thai Nguyen</span>
               </div>
             </div>
           </div>
@@ -603,198 +427,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ============ LOCATIONS ============ */}
-      <section className="section locations" id="locations">
-        <div className="container">
-          <div className="section-head center">
-            <p className="eyebrow">Find us</p>
-            <h2 className="section-title">Three places to gather.</h2>
-          </div>
-          <div className="loc-grid">
-            <ScrollReveal as="article" className="loc-card">
-              <Image
-                className="loc-img"
-                src="/assets/img/loc-hanoi.jpg"
-                alt="HIF Hanoi congregation gathered on a Sunday"
-                width={400}
-                height={250}
-                loading="lazy"
-              />
-              <div className="loc-body">
-                <h3>Hanoi</h3>
-                <p className="loc-addr">
-                  Detech Building, 8 Tôn Thất Thuyết, Cầu Giấy Ward, Hà Nội 10000
-                </p>
-                <p className="loc-time">Sundays · 8:30, 10:00 &amp; 11:30 AM</p>
-                <a
-                  className="link-arrow"
-                  href="https://maps.app.goo.gl/Lkq57WNkrt64A2aCA"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Get directions <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal as="article" className="loc-card">
-              <Image
-                className="loc-img"
-                src="/assets/img/loc-ecopark.jpg"
-                alt="HIF Ecopark congregation gathered for a service"
-                width={400}
-                height={250}
-                loading="lazy"
-              />
-              <div className="loc-body">
-                <h3>Ecopark</h3>
-                <p className="loc-addr">
-                  146 Đ. Thủy Nguyên, Khu đô thị Ecopark, Phụng Công, Hưng Yên
-                </p>
-                <p className="loc-time">Sundays · 10:00 AM</p>
-                <a
-                  className="link-arrow"
-                  href="https://maps.app.goo.gl/oHVQucWwUddMYU9E7"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Get directions <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </ScrollReveal>
-            <ScrollReveal as="article" className="loc-card">
-              <Image
-                className="loc-img"
-                src="/assets/img/loc-thainguyen.jpg"
-                alt="HIF Thai Nguyen outreach gathering of international students and workers"
-                width={400}
-                height={250}
-                loading="lazy"
-              />
-              <div className="loc-body">
-                <h3>
-                  Thai Nguyen <span className="loc-badge">Outreach</span>
-                </h3>
-                <p className="loc-addr">
-                  HTTL Thái Nguyên · ngõ 62 Hoàng Văn Thụ, Phan Đình Phùng, Thái Nguyên
-                </p>
-                <p className="loc-time">Int&apos;l students &amp; workers · get in touch for times</p>
-                <a
-                  className="link-arrow"
-                  href="https://maps.app.goo.gl/gjPaFqJjbDoRdgr39"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Get directions <span aria-hidden="true">→</span>
-                </a>
-              </div>
-            </ScrollReveal>
-          </div>
-        </div>
-      </section>
-
-      {/* ============ WATCH ============ */}
-      <section className="section watch" id="watch">
-        <div className="container watch-inner reveal">
-          <div className="watch-copy">
-            <p className="eyebrow eyebrow-light">Can&apos;t make it in person?</p>
-            <h2 className="section-title">Worship with us online.</h2>
-            <p>
-              Join a live service or catch up on recent messages and testimonies from anywhere in
-              the world.
-            </p>
-            <div className="watch-actions">
-              <a
-                className="btn btn-primary btn-lg"
-                href="https://www.youtube.com/@HIFVietnam"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                All videos on YouTube
-              </a>
-              <a
-                className="btn btn-outline-light btn-lg"
-                href="https://www.facebook.com/hifvietnam"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Watch on Facebook
-              </a>
-            </div>
-          </div>
-          <div className="watch-media">
-            <div className="video-embed">
-              <iframe
-                src="https://www.youtube-nocookie.com/embed/jtWD5zO7k2Q"
-                title="Ha's Baptism Testimony — HIF"
-                loading="lazy"
-                allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                allowFullScreen
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="container recent-msgs reveal">
-          <h3 className="recent-title">Recent from HIF</h3>
-          <div className="msg-grid">
-            <a
-              className="msg"
-              href="https://www.youtube.com/watch?v=jtWD5zO7k2Q"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="msg-thumb">
-                <Image
-                  src="/assets/img/yt1.jpg"
-                  alt=""
-                  width={320}
-                  height={180}
-                  loading="lazy"
-                />
-                <span className="msg-play" aria-hidden="true" />
-              </span>
-              <span className="msg-title">Ha&apos;s Baptism Testimony</span>
-            </a>
-            <a
-              className="msg"
-              href="https://www.youtube.com/watch?v=j6MGVTVM1VY"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="msg-thumb">
-                <Image
-                  src="/assets/img/yt2.jpg"
-                  alt=""
-                  width={320}
-                  height={180}
-                  loading="lazy"
-                />
-                <span className="msg-play" aria-hidden="true" />
-              </span>
-              <span className="msg-title">Prayer Workshop</span>
-            </a>
-            <a
-              className="msg"
-              href="https://www.youtube.com/watch?v=bHAKNOkK01s"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <span className="msg-thumb">
-                <Image
-                  src="/assets/img/yt3.jpg"
-                  alt=""
-                  width={320}
-                  height={180}
-                  loading="lazy"
-                />
-                <span className="msg-play" aria-hidden="true" />
-              </span>
-              <span className="msg-title">May 31st Celebration</span>
-            </a>
-          </div>
-        </div>
-      </section>
-
       {/* ============ FINAL CTA ============ */}
       <section className="section final-cta" id="give">
         <div className="final-kaleido" aria-hidden="true" />
@@ -804,22 +436,15 @@ export default function HomePage() {
             However you came to this page, there&apos;s room for you. Take one small step this week.
           </p>
           <div className="final-actions">
-            <Link className="btn btn-primary btn-lg" href="/plan-visit">
-              Plan a visit
+            <a className="btn btn-primary btn-lg" href="#try">
+              Try something this week
+            </a>
+            <Link className="btn btn-outline-light btn-lg" href="/plan-visit">
+              Plan your Sunday visit
             </Link>
-            <a className="btn btn-outline-light btn-lg" href="#watch">
-              Watch online
-            </a>
-            <a
-              className="btn btn-outline-light btn-lg"
-              href="mailto:admin@hif.vn?subject=I'd%20like%20to%20connect%20with%20HIF"
-            >
-              Get connected
-            </a>
           </div>
           <p className="give-line">
-            Want to support the mission?{" "}
-            <Link href="/give">Give to HIF →</Link>
+            Already part of HIF? <Link href="/ministries">Grow, serve and go →</Link>
           </p>
         </div>
       </section>

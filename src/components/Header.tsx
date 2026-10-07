@@ -17,7 +17,7 @@ const megaGroups: MegaGroup[] = [
     links: [
       { href: "/jesus", label: "Who is Jesus?" },
       { href: "/plan-visit", label: "Plan a Visit" },
-      { href: "/", label: "The Journey" },
+      { href: "/ministries", label: "The Journey" },
       { href: "/next-steps", label: "Next Steps" },
       // { href: "/resources#help", label: "FAQ & Practical Help" },
     ],
@@ -40,7 +40,9 @@ const megaGroups: MegaGroup[] = [
     links: [
       { href: "/ministries", label: "All Ministries" },
       { href: "/alpha", label: "Alpha" },
+      { href: "/sports", label: "Sports" },
       { href: "/spotlight", label: "Spotlight English Clubs" },
+      { href: "/saranbang", label: "Saranbang Korean Club" },
       { href: "/kids", label: "KidzQuest" },
       { href: "/aftershock", label: "Aftershock Youth" },
       { href: "/connect", label: "Connect Groups" },

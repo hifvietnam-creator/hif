@@ -144,7 +144,13 @@ export default async function FellowshipsPage() {
                 const fallbackColor = FALLBACK_COLORS[i % FALLBACK_COLORS.length]!;
 
                 return (
-                  <article key={String(f.id)} className="fellowship-row reveal">
+                  <article
+                    key={String(f.id)}
+                    // First word of the name, so the homepage tiles can link
+                    // straight to a row: /fellowships#korean
+                    id={(f.name as string).trim().split(/\s+/)[0]!.toLowerCase()}
+                    className="fellowship-row reveal"
+                  >
                     {/* Left: image */}
                     <div className="fellowship-img">
                       {imageUrl ? (

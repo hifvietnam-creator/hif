@@ -91,7 +91,7 @@ export default function PlanVisitPage() {
               </div>
               <p className="time-note">
                 Can&apos;t make it in person?{" "}
-                <Link href="/#watch">Watch live online →</Link>
+                <Link href="/online">Watch live online →</Link>
               </p>
             </div>
           </div>
@@ -260,7 +260,7 @@ export default function PlanVisitPage() {
             >
               Let us know you&apos;re coming
             </a>
-            <Link className="btn btn-outline-light btn-lg" href="/#watch">
+            <Link className="btn btn-outline-light btn-lg" href="/online">
               Watch online first
             </Link>
           </div>

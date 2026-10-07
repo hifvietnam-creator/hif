@@ -46,11 +46,11 @@ export default function MinistriesPage() {
               <span className="jstage-tag">Come and see — experience it, no strings attached.</span>
             </div>
             <div className="min-grid">
-              <article className="min-card">
+              <Link className="min-card" href="/sports">
                 <span className="min-bar bar-red"></span>
-                <h3>Sunday Gatherings</h3>
-                <p>Music, a down-to-earth message, and a warm welcome — in English, for every nation.</p>
-              </article>
+                <h3>Sports</h3>
+                <p>Pickleball, football and volleyball — beginners and regulars from a dozen-plus countries.</p>
+              </Link>
               <article className="min-card">
                 <span className="min-bar bar-red"></span>
                 <h3>Christmas &amp; Easter</h3>
@@ -60,6 +60,11 @@ export default function MinistriesPage() {
                 <span className="min-bar bar-red"></span>
                 <h3>Spotlight English Clubs</h3>
                 <p>Practice English, make friends, and connect with the community midweek.</p>
+              </Link>
+              <Link className="min-card" href="/saranbang">
+                <span className="min-bar bar-red"></span>
+                <h3>Saranbang Korean Club</h3>
+                <p>A Korean conversation club — practise Korean and make friends.</p>
               </Link>
               <Link className="min-card" href="/alpha">
                 <span className="min-bar bar-red"></span>
@@ -76,6 +81,11 @@ export default function MinistriesPage() {
               <span className="jstage-tag">Belong — become part of the family.</span>
             </div>
             <div className="min-grid">
+              <Link className="min-card" href="/#visit">
+                <span className="min-bar bar-purple"></span>
+                <h3>Sunday Gatherings</h3>
+                <p>Music, a down-to-earth message, and a warm welcome — in English, for every nation.</p>
+              </Link>
               <Link className="min-card" href="/connect">
                 <span className="min-bar bar-purple"></span>
                 <h3>Connect Groups</h3>

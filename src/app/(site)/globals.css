@@ -250,10 +250,15 @@ em { font-style: italic; }
      55%, not the original 28%: the top quarter of this photo is ceiling and
      downlights, so biasing downwards spends the crop on the empty part and
      keeps the congregation in frame. */
-  background: #15161a url("/assets/IMG_0555.jpg") center 55% / cover no-repeat;
+  background: #15161a;
 }
+/* The photographs themselves are <HeroSlides>: next/image, so the 8 MB original
+   is resized for the viewport instead of being fetched whole as a CSS
+   background. Every slide is stacked in the same place and crossfaded. */
+.hero-slide { object-fit: cover; opacity: 0; transition: opacity 1.4s ease; }
+.hero-slide.is-active { opacity: 1; }
 .hero-photo::after {
-  content: ""; position: absolute; inset: 0;
+  content: ""; position: absolute; inset: 0; z-index: 1;
   background:
     linear-gradient(95deg, rgba(11,11,15,.92) 0%, rgba(11,11,15,.74) 40%, rgba(11,11,15,.4) 72%, rgba(11,11,15,.32) 100%),
     linear-gradient(0deg, rgba(11,11,15,.78) 0%, rgba(11,11,15,0) 48%);
@@ -841,7 +846,7 @@ em { font-style: italic; }
   /* A narrow viewport crops the sides hard, since `cover` scales the landscape
      photo up to fill the height. Shifting right of centre keeps a face and the
      raised hand in shot rather than an anonymous slice of the middle. */
-  .hero-photo { background-position: 58% 55%; }
+  .hero-slide { object-position: 58% 55% !important; }
 }
 
 @media (max-width: 560px) {
@@ -1716,4 +1721,68 @@ details[open] .sermon-dq-summary::after { transform: rotate(90deg); }
 
 @media (max-width: 640px) {
   .testimony-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
+}
+
+/* ==========================================================================
+   Homepage — TRY / JOIN proposal
+   ========================================================================== */
+
+/* Hero: slide controls and the latest-sermon chip */
+.hero-dots { position: absolute; right: var(--gutter); bottom: 30px; z-index: 2; display: flex; align-items: center; gap: 9px; }
+.hero-dot { width: 9px; height: 9px; padding: 0; border: 0; border-radius: 50%; cursor: pointer; background: rgba(255,255,255,.45); transition: background .2s, transform .2s; }
+.hero-dot:hover { background: rgba(255,255,255,.8); }
+.hero-dot.is-active { background: #fff; transform: scale(1.25); }
+.hero-pause { width: 26px; height: 26px; margin-right: 4px; padding: 0; border: 1px solid rgba(255,255,255,.5); border-radius: 50%; background: rgba(0,0,0,.25); cursor: pointer; display: grid; place-items: center; }
+.hero-pause:hover { background: rgba(0,0,0,.5); }
+.hero-pause-icon { width: 8px; height: 9px; border-left: 3px solid #fff; border-right: 3px solid #fff; }
+.hero-play-icon { width: 0; height: 0; margin-left: 2px; border-left: 8px solid #fff; border-top: 5px solid transparent; border-bottom: 5px solid transparent; }
+.hero-dot:focus-visible, .hero-pause:focus-visible { outline: 2px solid #fff; outline-offset: 3px; }
+
+.sermon-chip {
+  display: inline-flex; align-items: center; gap: 14px; max-width: 100%; margin-top: 40px;
+  padding: 10px 20px 10px 10px; border-radius: 999px; color: #fff;
+  background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.28);
+  backdrop-filter: blur(10px); transition: background .2s, border-color .2s;
+}
+.sermon-chip:hover { background: rgba(255,255,255,.18); border-color: rgba(255,255,255,.55); }
+.sermon-chip-play { flex: 0 0 auto; width: 38px; height: 38px; border-radius: 50%; background: var(--red); display: grid; place-items: center; }
+.sermon-chip-play::before { content: ""; margin-left: 3px; border-left: 11px solid #fff; border-top: 7px solid transparent; border-bottom: 7px solid transparent; }
+.sermon-chip-text { display: flex; flex-direction: column; min-width: 0; line-height: 1.25; }
+.sermon-chip-label { font-size: .68rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: rgba(255,255,255,.75); }
+.sermon-chip-title { font-family: var(--font-display); font-weight: 700; font-size: 1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* Journey strip: the link out to the rest of the Journey */
+.js-more {
+  flex: 1 1 0; min-width: 0; display: flex; flex-direction: column; align-items: flex-end; justify-content: center; gap: 2px;
+  padding: 9px 6px; text-align: right;
+}
+.js-more-label { font-size: .6rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.js-more-link { font-family: var(--font-display); font-weight: 700; font-size: .92rem; color: var(--ink-2); white-space: nowrap; }
+.js-more:hover .js-more-link { color: var(--ink); }
+
+/* Stage cards: one line and one link each */
+.min-grid-3 { grid-template-columns: repeat(3, 1fr); }
+a.min-card { display: flex; flex-direction: column; color: inherit; }
+.min-more { margin-top: auto; padding-top: 18px; font-weight: 700; font-size: .92rem; color: var(--red); }
+.zone-join-cards .min-more { color: var(--purple); }
+.min-when { display: block; margin-top: 10px; font-size: .82rem; font-weight: 700; letter-spacing: .02em; color: var(--ink-2); }
+
+/* Six fellowships, two of them without a photograph yet */
+.fellow-grid-6 { grid-template-columns: repeat(3, 1fr); }
+.fellow-plain { background: linear-gradient(135deg, var(--purple), var(--blue-deep)); }
+.fellow-plain.alt { background: linear-gradient(135deg, var(--red), var(--purple)); }
+
+@media (max-width: 860px) {
+  .min-grid-3 { grid-template-columns: 1fr; }
+  .fellow-grid-6 { grid-template-columns: repeat(2, 1fr); }
+  .hero-dots { bottom: 22px; }
+  .hero-scroll { display: none; }
+}
+@media (max-width: 600px) {
+  .js-more { flex: 0 0 auto; padding-inline: 10px; margin-left: auto; }
+  .js-more-label { display: none; }
+  .sermon-chip { margin-top: 32px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-slide { transition: none; }
 }

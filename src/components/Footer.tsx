@@ -54,7 +54,7 @@ export default function Footer() {
         <nav className="footer-col" aria-label="Explore">
           <h4>Explore</h4>
           <Link href="/#try">I&apos;m New</Link>
-          <Link href="/#join">The Journey</Link>
+          <Link href="/ministries">The Journey</Link>
           <Link href="/about">Our Story</Link>
           <Link href="/beliefs">What We Believe</Link>
           <Link href="/ministries">Ministries</Link>

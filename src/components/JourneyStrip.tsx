@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
+// The homepage carries only the first two stages: a visitor arriving here is
+// at TRY or approaching JOIN. The rest of the Journey lives on /ministries.
 const stages = [
-  { id: "try",   num: "1", name: "Try",   desc: "Come & see",  cls: "js-try"   },
-  { id: "join",  num: "2", name: "Join",  desc: "Belong",      cls: "js-join"  },
-  { id: "grow",  num: "3", name: "Grow",  desc: "In faith",    cls: "js-grow"  },
-  { id: "serve", num: "4", name: "Serve", desc: "The city",    cls: "js-serve" },
-  { id: "go",    num: "5", name: "Go",    desc: "Be sent",     cls: "js-go"    },
+  { id: "try",  num: "1", name: "Try",  desc: "Come & see", cls: "js-try"  },
+  { id: "join", num: "2", name: "Join", desc: "Belong",     cls: "js-join" },
 ];
 
 export default function JourneyStrip() {
@@ -49,6 +49,12 @@ export default function JourneyStrip() {
             <span className="js-desc">{s.desc}</span>
           </a>
         ))}
+        <Link className="js-more" href="/ministries">
+          <span className="js-more-label">Already part of HIF?</span>
+          <span className="js-more-link">
+            Grow · Serve · Go <span aria-hidden="true">→</span>
+          </span>
+        </Link>
       </div>
     </nav>
   );
