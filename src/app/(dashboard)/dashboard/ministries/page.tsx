@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { requireDashboardUser } from '@/lib/dashboard-auth'
+
 import { Bars, Section, Stat, Table, Warning } from '../../_components/ui'
 import {
   getAttendanceByMonth,
@@ -47,6 +49,8 @@ function Cell({ cell }: { cell: MetricCell | undefined }) {
 }
 
 export default async function MinistriesPage() {
+  await requireDashboardUser()
+
   const [
     headline,
     attendance,

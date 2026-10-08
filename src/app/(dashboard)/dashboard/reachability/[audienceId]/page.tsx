@@ -1,4 +1,6 @@
 import React from 'react'
+
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -27,6 +29,8 @@ type Props = {
 }
 
 export default async function AudiencePage({ params, searchParams }: Props) {
+  await requireDashboardUser()
+
   const { audienceId } = await params
   const { status } = await searchParams
 

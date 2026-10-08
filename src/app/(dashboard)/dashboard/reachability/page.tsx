@@ -1,4 +1,6 @@
 import React from 'react'
+
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 import Link from 'next/link'
 
 import { Bars, Section, Stat, Table, Warning } from '../../_components/ui'
@@ -14,6 +16,8 @@ import {
 export const dynamic = 'force-dynamic'
 
 export default async function ReachabilityPage() {
+  await requireDashboardUser()
+
   const [audiences, campaignSummary, byMonth, campaigns] = await Promise.all([
     getAudiences(),
     getCampaignSummary(),

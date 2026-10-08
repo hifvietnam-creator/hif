@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getPool } from '@/lib/db'
-import { getMeUser } from '@/utilities/getMeUser'
+import { checkDashboardAccess } from '@/lib/dashboard-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -16,8 +16,13 @@ export const dynamic = 'force-dynamic'
  * layout above them, and this writes to the database.
  */
 export async function POST(req: NextRequest) {
-  const { user } = await getMeUser()
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const access = await checkDashboardAccess(req.headers)
+  if (!access.ok) {
+    return access.reason === 'signed-out'
+      ? NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      : NextResponse.json({ error: 'Forbidden' }, { status: 403 })
+  }
+  const { user } = access
 
   let body: { campus?: string; date?: string; adults?: unknown; kids?: unknown }
   try {

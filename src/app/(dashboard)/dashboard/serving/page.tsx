@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { requireDashboardUser } from '@/lib/dashboard-auth'
+
 import { Bars, Section, Stat, Table, Warning } from '../../_components/ui'
 import {
   getAssignedNeverScheduled,
@@ -19,6 +21,8 @@ export const dynamic = 'force-dynamic'
 const pct = (n: number, d: number) => (d === 0 ? '—' : `${Math.round((n / d) * 100)}%`)
 
 export default async function ServingPage() {
+  await requireDashboardUser()
+
   const [
     headline,
     ministries,

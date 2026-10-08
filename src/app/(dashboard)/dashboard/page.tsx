@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { requireDashboardUser } from '@/lib/dashboard-auth'
+
 import {
   getCampuses,
   getGroupConnection,
@@ -70,6 +72,8 @@ function Bars({ rows, total }: { rows: { label: string; count: number }[]; total
 }
 
 export default async function CongregationPage() {
+  await requireDashboardUser()
+
   const [headline, membership, nationality, campuses, connection, groupTypes, syncs] =
     await Promise.all([
       getHeadline(),

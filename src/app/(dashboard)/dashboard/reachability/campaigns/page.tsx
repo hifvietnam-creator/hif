@@ -1,4 +1,6 @@
 import React from 'react'
+
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 import Link from 'next/link'
 
 import { Bars, Section, Stat, Table } from '../../../_components/ui'
@@ -11,6 +13,8 @@ import {
 export const dynamic = 'force-dynamic'
 
 export default async function CampaignsPage() {
+  await requireDashboardUser()
+
   const [summary, byMonth, campaigns] = await Promise.all([
     getCampaignSummary(),
     getCampaignsByMonth(),

@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 import { getAudienceById, getAudienceSubscribers } from '@/lib/queries/reachability'
-import { getMeUser } from '@/utilities/getMeUser'
+import { checkDashboardAccess } from '@/lib/dashboard-auth'
 
 export const dynamic = 'force-dynamic'
 
@@ -12,9 +12,9 @@ export const dynamic = 'force-dynamic'
  * to correct them in Planning Center — so the export exists to get the data to
  * where the work happens.
  *
- * Auth is checked here explicitly. The dashboard pages are protected by the
- * layout, but a route handler has no layout above it: without this the export
- * would hand out every subscriber's address to anyone who guessed the URL.
+ * Auth is checked here explicitly: a route handler has no layout above it, and
+ * without this the export would hand out every subscriber's address to anyone
+ * who guessed the URL. Site admins only, the same rule as the pages.
  */
 
 function csvCell(value: unknown): string {
@@ -27,8 +27,12 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ audienceId: string }> },
 ) {
-  const { user } = await getMeUser()
-  if (!user) return new NextResponse('Unauthorized', { status: 401 })
+  const access = await checkDashboardAccess(req.headers)
+  if (!access.ok) {
+    return access.reason === 'signed-out'
+      ? new NextResponse('Unauthorized', { status: 401 })
+      : new NextResponse('Forbidden', { status: 403 })
+  }
 
   const { audienceId } = await params
   const group = await getAudienceById(audienceId)

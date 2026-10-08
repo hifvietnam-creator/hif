@@ -1,4 +1,6 @@
 import React from 'react'
+
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
@@ -12,6 +14,8 @@ export default async function CampaignPage({
 }: {
   params: Promise<{ campaignId: string }>
 }) {
+  await requireDashboardUser()
+
   const { campaignId } = await params
   const [campaign, summary] = await Promise.all([getCampaign(campaignId), getCampaignSummary()])
   if (!campaign) notFound()

@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { requireDashboardUser } from '@/lib/dashboard-auth'
+
 import { Bars, Section, Stat, Table, Warning } from '../../_components/ui'
 import RecordAttendance from '../../_components/RecordAttendance'
 import {
@@ -27,6 +29,8 @@ const BASELINE_HELP: Record<string, string> = {
 }
 
 export default async function AttendancePage() {
+  await requireDashboardUser()
+
   const [baselines, services, historic, kidsWeeks, kids, records, pending] = await Promise.all([
     getBaselines(),
     getServices(),

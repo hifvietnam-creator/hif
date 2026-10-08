@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import React from 'react'
 
-import { getMeUser } from '@/utilities/getMeUser'
+import { requireDashboardUser } from '@/lib/dashboard-auth'
 
 // Always fresh: these figures are the point of the page, and a cached number
 // nobody can explain is worse than a slow one.
@@ -21,8 +21,9 @@ const NAV = [
 ]
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  // Payload auth. Anyone without a valid session is sent to the admin login.
-  const { user } = await getMeUser({ nullUserRedirect: '/admin/login' })
+  // Site admins only. Signed out → login; signed in without the role → a
+  // plain "no access" page. Each page repeats this check: see dashboard-auth.
+  const user = await requireDashboardUser()
 
   return (
     <div className="min-h-screen bg-white text-neutral-900 dark:bg-neutral-950 dark:text-neutral-100">
