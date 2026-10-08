@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 /**
@@ -58,12 +59,42 @@ const SPORTS = [
   },
 ];
 
+const PHOTOS = [
+  {
+    src: "/assets/sports/pickleball-group.jpg",
+    alt: "A large group of pickleball players with paddles, gathered on an indoor court",
+    sport: "Pickleball",
+  },
+  {
+    src: "/assets/sports/pickleball-play.jpg",
+    alt: "Players mid-rally in a doubles pickleball game",
+    sport: "Pickleball",
+  },
+  {
+    src: "/assets/sports/volleyball-team.jpg",
+    alt: "Volleyball players from many countries posing together in a sports hall",
+    sport: "Volleyball",
+  },
+  {
+    src: "/assets/sports/volleyball-court.jpg",
+    alt: "A volleyball group lined up on an indoor court",
+    sport: "Volleyball",
+  },
+];
+
 export default function SportsPage() {
   return (
     <>
       {/* PAGE HERO */}
-      <section className="page-hero">
-        <div className="page-kaleido" aria-hidden="true" />
+      <section className="page-hero has-photo">
+        <div
+          className="page-photo"
+          style={{
+            backgroundImage: "url('/assets/sports/pickleball-play.jpg')",
+            backgroundPosition: "center 40%",
+          }}
+          aria-hidden="true"
+        />
         <div className="container">
           <p className="breadcrumb">
             <Link href="/">Home</Link> · <Link href="/ministries">Ministries</Link> · Sports
@@ -122,6 +153,26 @@ export default function SportsPage() {
                   {s.cta} <span aria-hidden="true">↗</span>
                 </span>
               </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* PHOTOS */}
+      <section className="section">
+        <div className="container">
+          <div className="section-head center">
+            <p className="eyebrow">On court</p>
+            <h2 className="section-title">A few of our regulars.</h2>
+          </div>
+          <div className="gallery gallery-2 reveal">
+            {PHOTOS.map((p) => (
+              <figure key={p.src}>
+                <Image src={p.src} alt={p.alt} width={1200} height={750} loading="lazy" />
+                <figcaption>
+                  <b>{p.sport}</b>
+                </figcaption>
+              </figure>
             ))}
           </div>
         </div>
