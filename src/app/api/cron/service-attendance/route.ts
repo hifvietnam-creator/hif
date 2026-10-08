@@ -24,6 +24,7 @@
 
 import { NextRequest, NextResponse } from 'next/server'
 
+import { denyUnlessCron } from '@/lib/cron-auth'
 import { getPool } from '@/lib/db'
 
 export const dynamic = 'force-dynamic'
@@ -36,11 +37,8 @@ const CAMPUSES = ['MyDinh', 'Ecopark', 'Thai Nguyen']
 const BACKFILL_WEEKS = 6
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get('authorization')
-  const cronSecret = process.env.CRON_SECRET
-  if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const denied = denyUnlessCron(req)
+  if (denied) return denied
 
   const pool = getPool()
   const client = await pool.connect()
